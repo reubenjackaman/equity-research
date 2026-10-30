@@ -26,6 +26,7 @@ export type Overview = {
   targetMean: number | null;
   targetHigh: number | null;
   analystCount: number | null;
+  profileSource: string; // "Yahoo Finance", or the fallback sources used on servers Yahoo blocks
 };
 
 export type PricePoint = { time: string; close: number };
@@ -285,5 +286,5 @@ export type ScreenerRow = {
 export const screenerApi = {
   options: () => get<Record<string, string[]>>("/api/screener/options"),
   run: (f: ScreenerFilters, signal?: AbortSignal) =>
-    get<{ total: number; results: ScreenerRow[] }>(`/api/screener?${new URLSearchParams(f).toString()}`, signal),
+    get<{ total: number; results: ScreenerRow[]; note: string | null }>(`/api/screener?${new URLSearchParams(f).toString()}`, signal),
 };
