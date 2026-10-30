@@ -15,7 +15,7 @@ export default function Home() {
       <section className="mx-auto grid max-w-6xl gap-8 px-4 pt-12 sm:pt-16 lg:grid-cols-[7fr_5fr] lg:items-end lg:gap-16">
         <div>
           <p className="font-serif text-lg font-semibold text-accent">Value Finch</p>
-          <h1 className="mt-4 text-3xl sm:text-4xl">Research on US and Canadian public companies, with the working shown.</h1>
+          <h1 className="mt-4 text-3xl sm:text-4xl">Equity research on US and Canadian companies.</h1>
           <p className="prose-width mt-6 text-muted">
             Financial statements, ratios, DCF and comparable-company valuation for US and TSX listings. A project by Reuben Jackaman.
           </p>
