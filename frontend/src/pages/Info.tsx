@@ -1,6 +1,6 @@
-import { ReactNode, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { FinchLogo } from "../components/Finch";
+import { ReactNode, useEffect } from"react";
+import { Link } from"react-router-dom";
+import { FinchLogo } from"../components/Finch";
 
 const UPDATED = "October 30, 2026";
 const GITHUB = "https://github.com/reubenjackaman";
@@ -12,17 +12,17 @@ function Page({ title, intro, children }: { title: string; intro?: string; child
   }, [title]);
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
-      {intro && <p className="mt-3 text-lg text-slate-500 dark:text-slate-400">{intro}</p>}
-      <div className="mt-8 space-y-4 leading-relaxed text-slate-700 dark:text-slate-300">{children}</div>
+    <article className="mx-auto max-w-6xl px-4 py-12">
+      <h1 className="text-3xl sm:text-4xl">{title}</h1>
+      {intro && <p className="prose-width mt-4 text-lg text-muted">{intro}</p>}
+      <div className="prose-width mt-8 space-y-4">{children}</div>
     </article>
   );
 }
 
 function H2({ id, children }: { id?: string; children: ReactNode }) {
   return (
-    <h2 id={id} className="scroll-mt-32 pt-4 text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
+    <h2 id={id} className="scroll-mt-32 pt-6 text-lg">
       {children}
     </h2>
   );
@@ -40,7 +40,7 @@ function Bullets({ items }: { items: ReactNode[] }) {
 
 function A({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <a href={href} target="_blank" rel="noreferrer" className="font-medium text-pink-600 hover:underline dark:text-pink-400">
+    <a href={href} target="_blank" rel="noreferrer" className="font-medium text-accent underline">
       {children}
     </a>
   );
@@ -109,7 +109,7 @@ export function About() {
   return (
     <Page title="About">
       <div className="flex items-center gap-4">
-        <FinchLogo className="h-16 w-16 shrink-0" />
+        <FinchLogo className="h-12 w-12 shrink-0 text-accent" />
         <p className="text-lg">Value Finch is a free research site for US and Canadian public companies.</p>
       </div>
 
@@ -126,7 +126,7 @@ export function About() {
       <H2>About the founder</H2>
       <p>I'm Reuben Jackaman, a second-year commerce student and the founder of Value Finch.</p>
       <p>
-        You can see the code on <A href={REPO}>GitHub</A>, or <Link to="/contact" className="font-medium text-pink-600 hover:underline dark:text-pink-400">get in touch</Link>.
+        You can see the code on <A href={REPO}>GitHub</A>, or <Link to="/contact" className="font-medium text-accent underline">get in touch</Link>.
       </p>
     </Page>
   );
@@ -137,17 +137,17 @@ export function Contact() {
     <Page title="Contact" intro="Found a wrong number, a bug, or have an idea? I'd like to hear about it.">
       <div className="card">
         <h2 className="font-semibold">Report a problem or suggest something</h2>
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+        <p className="mt-1 text-sm text-muted">
           Open an issue on <A href={`${REPO}/issues`}>GitHub</A>. If it's about a number, please include the ticker and the tab you were on.
         </p>
       </div>
       <div className="card">
         <h2 className="font-semibold">Find me online</h2>
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+        <p className="mt-1 text-sm text-muted">
           <A href={GITHUB}>github.com/reubenjackaman</A>
         </p>
       </div>
-      <p className="text-sm text-slate-500 dark:text-slate-400">I can't give investment advice or recommend stocks.</p>
+      <p className="text-sm text-muted">I can't give investment advice or recommend stocks.</p>
     </Page>
   );
 }
@@ -197,10 +197,10 @@ export function Privacy() {
       <p>To answer a request, the site's server receives what any website does, such as your IP address and the pages you request. The hosting provider, Render, may keep these in standard logs.</p>
 
       <H2>Other services</H2>
-      <p>Tickers you look up are sent from the server to data providers such as SEC EDGAR, Yahoo Finance and Finnhub to fetch results. Opening a news link takes you to that publisher's site, under its own privacy policy.</p>
+      <p>The site's fonts load from Google Fonts, so your browser also contacts Google, which receives your IP address. Tickers you look up are sent from the server to data providers such as SEC EDGAR, Yahoo Finance and Finnhub to fetch results. Opening a news link takes you to that publisher's site, under its own privacy policy.</p>
 
       <H2>Questions</H2>
-      <p>See the <Link to="/contact" className="font-medium text-pink-600 hover:underline dark:text-pink-400">contact page</Link>.</p>
+      <p>See the <Link to="/contact" className="font-medium text-accent underline">contact page</Link>.</p>
     </Page>
   );
 }
@@ -208,9 +208,8 @@ export function Privacy() {
 export function NotFound() {
   return (
     <Page title="Page not found">
-      <FinchLogo className="h-20 w-20" />
-      <p>This finch flew off. The page you're looking for doesn't exist.</p>
-      <Link to="/" className="font-medium text-pink-600 hover:underline dark:text-pink-400">Back to the nest →</Link>
+            <p>That page doesn't exist.</p>
+      <Link to="/" className="font-medium text-accent underline">Back to home</Link>
     </Page>
   );
 }

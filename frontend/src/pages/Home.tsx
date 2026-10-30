@@ -1,8 +1,7 @@
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
-import Explore from "../components/Explore";
-import { FinchLogo } from "../components/Finch";
-import SearchBar from "../components/SearchBar";
+import { useEffect } from"react";
+import { Link } from"react-router-dom";
+import Explore from"../components/Explore";
+import SearchBar from"../components/SearchBar";
 
 const EXAMPLES = ["AAPL", "MSFT", "NVDA", "SHOP.TO", "RY.TO", "CNR.TO"];
 
@@ -13,43 +12,38 @@ export default function Home() {
 
   return (
     <>
-      <div className="mx-auto flex max-w-2xl flex-col items-center px-4 pt-14 text-center sm:pt-20">
-        <FinchLogo className="h-20 w-20" />
-        <div className="mt-2 bg-linear-to-r from-pink-600 to-orange-500 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl">
-          Value Finch
+      <section className="mx-auto grid max-w-6xl gap-8 px-4 pt-12 sm:pt-16 lg:grid-cols-[7fr_5fr] lg:items-end lg:gap-16">
+        <div>
+          <p className="font-serif text-lg font-semibold text-accent">Value Finch</p>
+          <h1 className="mt-4 text-3xl sm:text-4xl">Research on US and Canadian public companies, with the working shown.</h1>
+          <p className="prose-width mt-6 text-muted">
+            Financial statements, ratios, DCF and comparable-company valuation for US and TSX listings. A project by Reuben Jackaman.
+          </p>
         </div>
-        <h1 className="mt-3 text-xl font-semibold tracking-tight sm:text-2xl">Research any public company</h1>
-        <p className="mt-3 text-slate-500 dark:text-slate-400">
-          US and TSX listings: financial statements, ratios, DCF and comparable-company valuation.
-        </p>
-        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">A project by Reuben Jackaman</p>
-        <div className="mt-8 w-full">
+        <div className="pb-1">
           <SearchBar large />
+          <p className="mt-3 flex flex-wrap items-center gap-x-3 text-sm text-muted">
+            <span>Try</span>
+            {EXAMPLES.map((t) => (
+              <Link key={t} to={`/company/${t}`} className="tap font-medium text-ink underline decoration-line-strong transition-colors hover:text-accent">
+                {t}
+              </Link>
+            ))}
+          </p>
         </div>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
-          {EXAMPLES.map((t) => (
-            <Link
-              key={t}
-              to={`/company/${t}`}
-              className="rounded-full border border-slate-200 bg-white px-3 py-1 text-sm text-slate-600 hover:border-blue-400 hover:text-blue-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
-            >
-              {t}
-            </Link>
-          ))}
+      </section>
+
+      <section className="mx-auto mt-16 max-w-6xl px-4">
+        <div className="flex flex-col gap-3 border-y border-line py-6 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
+          <div>
+            <h2 className="text-lg">Mystery Company</h2>
+            <p className="mt-1 text-muted">Guess today's company from its financials. You get six guesses.</p>
+          </div>
+          <Link to="/game" className="tap shrink-0 font-medium text-accent underline transition-colors hover:text-accent-hover">
+            Play today's puzzle
+          </Link>
         </div>
-      </div>
-      <div className="mx-auto mt-10 max-w-2xl px-4">
-        <Link
-          to="/game"
-          className="flex items-center justify-between gap-4 rounded-xl bg-linear-to-r from-pink-600 to-orange-500 p-5 text-white shadow-lg transition hover:brightness-110"
-        >
-          <span>
-            <span className="block text-lg font-bold">Mystery Company</span>
-            <span className="block text-sm text-white/90">Today's hidden company. Six guesses. Can you read the numbers?</span>
-          </span>
-          <span className="shrink-0 rounded-lg bg-white px-3 py-1.5 text-sm font-bold text-pink-600">Play →</span>
-        </Link>
-      </div>
+      </section>
       <Explore />
     </>
   );

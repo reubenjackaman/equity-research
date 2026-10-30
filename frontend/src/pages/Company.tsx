@@ -1,18 +1,18 @@
-import { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
-import { api, ApiError, Overview } from "../api";
-import * as fmt from "../format";
-import CompsTab from "../components/CompsTab";
-import DcfTab from "../components/DcfTab";
-import FinancialsTab from "../components/FinancialsTab";
-import NewsTab from "../components/NewsTab";
-import PriceChart from "../components/PriceChart";
-import RatiosTab from "../components/RatiosTab";
-import SearchBar from "../components/SearchBar";
-import SummaryTab from "../components/SummaryTab";
-import { StarIcon } from "../components/TopBar";
-import { addRecent, useSaved } from "../storage";
-import type { Theme } from "../theme";
+import { useEffect, useState } from"react";
+import { useParams, useSearchParams } from"react-router-dom";
+import { api, ApiError, Overview } from"../api";
+import * as fmt from"../format";
+import CompsTab from"../components/CompsTab";
+import DcfTab from"../components/DcfTab";
+import FinancialsTab from"../components/FinancialsTab";
+import NewsTab from"../components/NewsTab";
+import PriceChart from"../components/PriceChart";
+import RatiosTab from"../components/RatiosTab";
+import SearchBar from"../components/SearchBar";
+import SummaryTab from"../components/SummaryTab";
+import { StarIcon } from"../components/TopBar";
+import { addRecent, useSaved } from"../storage";
+import type { Theme } from"../theme";
 
 const TABS = ["Overview", "Financials", "Ratios", "News", "DCF", "Comps", "Summary"] as const;
 
@@ -39,7 +39,7 @@ export default function Company({ theme }: { theme: Theme }) {
   }, [ticker]);
 
   useEffect(() => {
-    document.title = data ? `${data.symbol} · ${data.name}` : "Value Finch";
+    document.title = data ? `${data.symbol} · ${data.name}`: "Value Finch";
     if (data) addRecent(data.symbol);
   }, [data]);
   const { isSaved, toggle } = useSaved();
@@ -54,22 +54,22 @@ export default function Company({ theme }: { theme: Theme }) {
       {/* Header: name, price, day change */}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
-          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-            <span className="font-semibold text-slate-700 dark:text-slate-200">{data.symbol}</span>
+          <div className="flex items-center gap-2 text-sm text-muted">
+            <span className="font-semibold text-ink">{data.symbol}</span>
             <span>·</span>
             <span>{data.exchange ?? "N/A"}</span>
             <span>·</span>
             <span>{data.currency ?? "N/A"}</span>
           </div>
           <div className="mt-1 flex items-center gap-2">
-            <h1 className="truncate text-2xl font-semibold tracking-tight sm:text-3xl">{data.name}</h1>
+            <h1 className="truncate text-xl sm:text-2xl">{data.name}</h1>
             <button
               onClick={() => toggle(data.symbol)}
               aria-pressed={isSaved(data.symbol)}
-              aria-label={isSaved(data.symbol) ? `Remove ${data.symbol} from saved` : `Save ${data.symbol}`}
+              aria-label={isSaved(data.symbol) ? `Remove ${data.symbol} from saved`: `Save ${data.symbol}`}
               title={isSaved(data.symbol) ? "Saved: click to remove" : "Save to your list"}
-              className={`shrink-0 rounded-lg p-1.5 transition hover:bg-slate-100 dark:hover:bg-slate-800 ${
-                isSaved(data.symbol) ? "text-amber-500" : "text-slate-400 hover:text-amber-500"
+              className={`shrink-0 rounded p-1.5 transition-colors hover:bg-subtle  ${
+                isSaved(data.symbol) ? "text-warn" : "text-muted hover:text-warn"
               }`}
             >
               <StarIcon filled={isSaved(data.symbol)} className="h-6 w-6" />
@@ -77,22 +77,22 @@ export default function Company({ theme }: { theme: Theme }) {
           </div>
         </div>
         <div className="sm:text-right">
-          <div className="text-2xl font-semibold sm:text-3xl">{fmt.price(data.price, data.currency)}</div>
-          <div className={`text-sm font-medium ${up ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
+          <div className="text-xl font-semibold sm:text-2xl">{fmt.price(data.price, data.currency)}</div>
+          <div className={`text-sm font-medium ${up ? "text-gain" : "text-loss"}`}>
             {fmt.signed(data.change)} ({fmt.signed(data.changePercent)}%) today
           </div>
         </div>
       </div>
 
-      <nav className="mt-6 flex gap-1 overflow-x-auto border-b [scrollbar-width:none] border-slate-200 dark:border-slate-800">
+      <nav className="mt-6 flex gap-1 overflow-x-auto border-b [scrollbar-width:none] border-line">
         {TABS.map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`-mb-px whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium ${
               t === tab
-                ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
-                : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-slate-100"
+                ? "border-accent text-accent"
+                : "border-transparent text-muted hover:text-ink"
             }`}
           >
             {t}
@@ -122,7 +122,7 @@ function OverviewTab({ data, theme }: { data: Overview; theme: Theme }) {
 
       <div className="card">
         <h2 className="mb-3 text-sm font-semibold">Key statistics</h2>
-        <dl className="divide-y divide-slate-100 text-sm dark:divide-slate-800">
+        <dl className="divide-y divide-line text-sm">
           <Stat label="Market cap" value={fmt.big(data.marketCap)} />
           <Stat label="Shares outstanding" value={fmt.big(data.sharesOutstanding)} />
           <Stat label="Volume" value={fmt.big(data.volume)} />
@@ -131,7 +131,7 @@ function OverviewTab({ data, theme }: { data: Overview; theme: Theme }) {
           <Stat label="Beta (5Y monthly)" value={fmt.num(data.beta)} />
         </dl>
         <div className="mt-4">
-          <div className="mb-1.5 text-xs text-slate-500 dark:text-slate-400">52-week range</div>
+          <div className="mb-1.5 text-xs text-muted">52-week range</div>
           <RangeBar low={data.fiftyTwoWeekLow} high={data.fiftyTwoWeekHigh} current={data.price} currency={data.currency} />
         </div>
       </div>
@@ -142,21 +142,21 @@ function OverviewTab({ data, theme }: { data: Overview; theme: Theme }) {
           {data.sector && <Tag>{data.sector}</Tag>}
           {data.industry && <Tag>{data.industry}</Tag>}
           {data.website && (
-            <a href={data.website} target="_blank" rel="noreferrer" className="ml-auto text-sm text-blue-600 hover:underline dark:text-blue-400">
+            <a href={data.website} target="_blank" rel="noreferrer" className="tap ml-auto text-sm text-accent hover:underline">
               {data.website.replace(/^https?:\/\/(www\.)?/, "")}
             </a>
           )}
         </div>
-        <p className={`text-sm leading-relaxed text-slate-600 dark:text-slate-300 ${expanded ? "" : "line-clamp-4"}`}>
+        <p className={`text-sm leading-relaxed text-muted  ${expanded ? "" : "line-clamp-4"}`}>
           {data.description ?? "No description available (N/A)."}
         </p>
         {data.profileSource !== "Yahoo Finance" && (
-          <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+          <p className="mt-2 text-xs text-muted">
             Company profile from {data.profileSource} (Yahoo's profile is unavailable right now), so a few figures may be N/A.
           </p>
         )}
         {data.description && data.description.length > 400 && (
-          <button onClick={() => setExpanded(!expanded)} className="mt-2 text-sm text-blue-600 hover:underline dark:text-blue-400">
+          <button onClick={() => setExpanded(!expanded)} className="mt-2 text-sm text-accent hover:underline">
             {expanded ? "Show less" : "Show more"}
           </button>
         )}
@@ -168,7 +168,7 @@ function OverviewTab({ data, theme }: { data: Overview; theme: Theme }) {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between py-2">
-      <dt className="text-slate-500 dark:text-slate-400">{label}</dt>
+      <dt className="text-muted">{label}</dt>
       <dd className="font-medium">{value}</dd>
     </div>
   );
@@ -176,7 +176,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 function Tag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+    <span className="rounded bg-subtle px-2 py-0.5 text-xs text-muted">
       {children}
     </span>
   );
@@ -190,15 +190,15 @@ function RangeBar({ low, high, current, currency }: { low: number | null; high: 
       : null;
   return (
     <div>
-      <div className="relative h-1.5 rounded-full bg-slate-200 dark:bg-slate-700">
+      <div className="relative h-1.5 rounded-full bg-subtle">
         {position !== null && (
           <div
-            className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-blue-600 dark:border-slate-900"
-            style={{ left: `${position}%` }}
+            className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-surface bg-accent"
+            style={{ left: `${position}%`}}
           />
         )}
       </div>
-      <div className="mt-1.5 flex justify-between text-xs text-slate-500 dark:text-slate-400">
+      <div className="mt-1.5 flex justify-between text-xs text-muted">
         <span>{fmt.price(low, currency)}</span>
         <span>{fmt.price(high, currency)}</span>
       </div>
@@ -210,8 +210,8 @@ function NotFound({ ticker, error }: { ticker: string; error: ApiError }) {
   const notFound = error.status === 404;
   return (
     <div className="mx-auto max-w-xl px-4 pt-16 text-center">
-      <h1 className="text-xl font-semibold">{notFound ? `We couldn't find "${ticker}"` : "Something went wrong"}</h1>
-      <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+      <h1 className="text-xl font-semibold">{notFound ? `We couldn't find"${ticker}"`: "Something went wrong"}</h1>
+      <p className="mt-2 text-sm text-muted">
         {notFound
           ? "Check the symbol. TSX tickers end in .TO (e.g. SHOP.TO) and TSX Venture in .V."
           : `${error.message}. The data provider may be busy, so try again in a minute.`}
@@ -224,7 +224,7 @@ function NotFound({ ticker, error }: { ticker: string; error: ApiError }) {
 }
 
 function Skeleton() {
-  const block = "animate-pulse rounded-lg bg-slate-200 dark:bg-slate-800";
+  const block = "animate-pulse rounded bg-subtle";
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
       <div className={`${block} h-5 w-40`} />
