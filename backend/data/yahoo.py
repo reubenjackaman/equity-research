@@ -20,7 +20,7 @@ import yfinance as yf
 # yfinance triggers harmless pandas deprecation warnings; hide them to keep the server log readable.
 warnings.filterwarnings("ignore", module="yfinance")
 
-from . import finnhub, wiki
+from . import finnhub, snapshot, wiki
 from .cache import DAY, MINUTE, cached
 
 
@@ -151,6 +151,12 @@ def _overview_fallback(ticker: str) -> dict:
         rate = fx_rate(profile["currency"], currency)
         market_cap = profile["marketCapitalization"] * 1e6 * rate if rate else None
 
+    # The saved snapshot knows the sector, and gives a market-cap estimate when Finnhub has none
+    # (TSX-only companies): snapshot market cap scaled by the price move since then.
+    snap = snapshot.lookup(ticker, us_symbol)
+    if market_cap is None and snap and snap["symbol"] == ticker and snap["marketCap"] and snap["price"]:
+        market_cap = snap["marketCap"] * price / snap["price"]
+
     try:
         description = wiki.company_summary(profile.get("name") or name)
     except Exception:
@@ -162,7 +168,7 @@ def _overview_fallback(ticker: str) -> dict:
         "name": name,
         "exchange": meta.get("fullExchangeName") or meta.get("exchangeName"),
         "currency": currency,
-        "sector": None,
+        "sector": snap["sector"] if snap else None,
         "industry": profile.get("finnhubIndustry"),
         "description": description,
         "website": profile.get("weburl"),

@@ -11,13 +11,12 @@ Filters map to Yahoo screener fields. Two clean-ups for Canada: Yahoo lists CDRs
 preferred shares on the TSX, so those are removed to leave real Canadian companies.
 """
 
-import json
 import re
-from pathlib import Path
 
 import yfinance as yf
 from yfinance import EquityQuery
 
+from . import snapshot
 from .cache import DAY, MINUTE, cached
 from .yahoo import clean
 
@@ -47,7 +46,6 @@ SECTORS = [
     "Basic Materials", "Communication Services", "Consumer Cyclical", "Consumer Defensive", "Energy",
     "Financial Services", "Healthcare", "Industrials", "Real Estate", "Technology", "Utilities",
 ]
-SNAPSHOT = Path(__file__).resolve().parent / "screener_snapshot.json"
 
 
 @cached("screener-options", 7 * DAY)
@@ -131,9 +129,9 @@ def _in_range(value, bounds) -> bool:
 
 def _from_snapshot(country, sector, industry, cap, pe, dividend, growth, sort) -> dict:
     """Same filters, applied to the saved snapshot (used when the live screener is unavailable)."""
-    if not SNAPSHOT.exists():
+    snap = snapshot.load()
+    if not snap["rows"]:
         raise RuntimeError("the live screener is unavailable and no snapshot has been saved")
-    snap = json.loads(SNAPSHOT.read_text())
     rows = [r for r in snap["rows"] if r["country"] == country and (not sector or r["sector"] == sector)]
     rows = [r for r in rows if _in_range(r["marketCap"], MARKET_CAPS.get(cap, (300e6, None)))]
     if pe in PE_RANGES:
