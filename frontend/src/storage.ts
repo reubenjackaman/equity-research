@@ -60,6 +60,7 @@ export const keys = {
   saved: "saved-tickers",
   recent: "recent-tickers",
   game: (puzzle: number) => `game-v2:${puzzle}`, // v2: puzzle #1's answer changed, so old progress is ignored
+  gameHints: (puzzle: number) => `game-hints:${puzzle}`,
   gameStats: "game-stats",
 };
 

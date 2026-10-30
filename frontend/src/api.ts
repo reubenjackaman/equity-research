@@ -309,6 +309,15 @@ export type GameGuess = {
   answer: GameCompany | null; // only sent once the game is over
 };
 
+export type GameHintKind = "news" | "product" | "industry" | "letter";
+
+export type GameHint = {
+  kind: GameHintKind;
+  label: string;
+  text: string; // hidden words are already blacked out by the server
+  attempt: number; // which of the six turns it used up
+};
+
 export type GameToday = {
   puzzle: number;
   maxGuesses: number;
@@ -318,6 +327,7 @@ export type GameToday = {
 
 export const gameApi = {
   today: () => get<GameToday>("/api/game/today"),
+  hint: (puzzle: number, kind: GameHintKind) => get<Omit<GameHint, "attempt">>(`/api/game/hint?puzzle=${puzzle}&kind=${kind}`),
   guess: (puzzle: number, attempt: number, symbol: string) =>
     get<GameGuess>(`/api/game/guess?puzzle=${puzzle}&attempt=${attempt}&symbol=${encodeURIComponent(symbol)}`),
 };
