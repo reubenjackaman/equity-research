@@ -39,7 +39,7 @@ export default function Company({ theme }: { theme: Theme }) {
   }, [ticker]);
 
   useEffect(() => {
-    document.title = data ? `${data.symbol} · ${data.name}` : "Equity Research";
+    document.title = data ? `${data.symbol} · ${data.name}` : "Value Finch";
     if (data) addRecent(data.symbol);
   }, [data]);
   const { isSaved, toggle } = useSaved();

@@ -102,7 +102,7 @@ function Sheet({
       {/* Header */}
       <header className="flex items-end justify-between border-b-2 border-slate-900 pb-2">
         <div>
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-blue-700">Equity research · tear sheet</div>
+          <div className="text-[10px] font-semibold uppercase tracking-wider text-blue-700">Value Finch · tear sheet</div>
           <h1 className="text-2xl font-bold leading-tight text-slate-900">{o.name}</h1>
           <div className="text-slate-600">
             {o.symbol} · {o.exchange ?? "N/A"} · {o.sector ?? "N/A"} / {o.industry ?? "N/A"}

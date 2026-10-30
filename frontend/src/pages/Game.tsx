@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { HintFinch } from "../components/Finch";
 import { Clue, GameCompany, GameGuess, GameHint, GameHintKind, GameToday, gameApi } from "../api";
 import * as fmt from "../format";
 import { keys, load, save, useStored } from "../storage";
@@ -30,7 +31,7 @@ export default function Game() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    document.title = "Mystery Company · Reuben Jackaman";
+    document.title = "Mystery Company · Value Finch";
     gameApi.today().then(setToday).catch((e) => setError(e.message));
   }, []);
 
@@ -174,7 +175,9 @@ function Board({ today }: { today: GameToday }) {
 function HintPicker({ hints, lastTurn, busy, onPick }: { hints: GameHint[]; lastTurn: boolean; busy: boolean; onPick: (k: GameHintKind) => void }) {
   return (
     <div className="rounded-xl border border-dashed border-slate-300 p-3 dark:border-slate-700">
-      <div className="text-sm font-semibold">💡 Need a hint? Each one uses up a guess.</div>
+      <div className="flex items-center gap-2 text-sm font-semibold">
+        <HintFinch className="h-9 w-8 shrink-0" /> Need a hint? Each one uses up a guess.
+      </div>
       <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
         {HINTS.map((h) => (
           <button
@@ -196,7 +199,9 @@ function HintRow({ h }: { h: GameHint }) {
   const parts = h.text.split("█████");
   return (
     <div className="card border-l-4 border-l-pink-500 p-3 sm:p-3">
-      <div className="text-[10px] font-semibold uppercase tracking-wide text-pink-600 dark:text-pink-400">💡 {h.label}</div>
+      <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-pink-600 dark:text-pink-400">
+        <HintFinch className="h-6 w-5" /> {h.label}
+      </div>
       <p className="mt-1 text-sm leading-relaxed">
         {parts.map((part, i) => (
           <span key={i}>
