@@ -24,7 +24,7 @@ FACTS_URL = "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik:010d}.json"
 
 
 def _get(url: str) -> dict:
-    agent = os.getenv("SEC_USER_AGENT") or "EquityResearchApp (educational project)"
+    agent = os.getenv("SEC_USER_AGENT") or "ValueFinch (educational project)"
     res = requests.get(url, headers={"User-Agent": agent}, timeout=20)
     res.raise_for_status()
     return res.json()

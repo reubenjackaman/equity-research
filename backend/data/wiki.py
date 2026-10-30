@@ -18,8 +18,8 @@ SUMMARY = "https://en.wikipedia.org/api/rest_v1/page/summary/{}"
 
 def _headers() -> dict:
     # Wikimedia asks apps to identify themselves with a contact; reuse the one given to the SEC.
-    contact = os.getenv("SEC_USER_AGENT") or "EquityResearchApp (educational project)"
-    return {"User-Agent": f"{contact} equity-research-app/1.0"}
+    contact = os.getenv("SEC_USER_AGENT") or "ValueFinch (educational project)"
+    return {"User-Agent": f"{contact} value-finch/1.0"}
 
 
 GENERIC = {"the", "inc", "corp", "corporation", "company", "co", "ltd", "limited", "plc", "group", "holdings"}
