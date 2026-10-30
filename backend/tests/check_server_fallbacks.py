@@ -60,8 +60,11 @@ for t in ["AAPL", "CNR.TO", "BRK-B", "TSM"]:
 m = dcf.model("AAPL", None)
 check("DCF AAPL", m["valuation"] is not None, f"value {m['valuation']['perShareTrading']:.2f} | beta {m['assumptions']['beta']}")
 
-c = comps.build("AAPL", "")
-check("comps AAPL", len(c["peers"]) >= 3, f"{[p['symbol'] for p in c['peers']]} | {c['basis']}")
+for t in ["AAPL", "TSM", "SHOP.TO", "RY.TO", "CNR.TO", "ATD.TO", "BRK-B"]:
+    c = comps.build(t, "")
+    check(f"comps {t}", len(c["peers"]) >= 3 and not c["failed"],
+          f"{[p['symbol'] for p in c['peers']]} | failed {c['failed']} | {c['basis']}")
+    check(f"sector {t}", yahoo.overview(t)["sector"] is not None, str(yahoo.overview(t)["sector"]))
 
 n = news.company_news("AAPL", yahoo.overview("AAPL")["name"])
 check("news AAPL", len(n["articles"]) > 10, f"{len(n['articles'])} articles from {n['sources']}")
