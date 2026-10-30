@@ -21,6 +21,26 @@ body {
   @apply inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800;
 }
 
+/* The Mystery Company result card pops in when the game ends. */
+@keyframes result-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.result-pop {
+  animation: result-pop 0.3s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .result-pop {
+    animation: none;
+  }
+}
+
 /* Printing: keep chart colours (browsers drop backgrounds by default) and use a full page. */
 @page {
   size: letter;

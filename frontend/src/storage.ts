@@ -59,7 +59,7 @@ export const keys = {
   peers: (ticker: string) => `peers:${ticker}`,
   saved: "saved-tickers",
   recent: "recent-tickers",
-  game: (puzzle: number) => `game:${puzzle}`,
+  game: (puzzle: number) => `game-v2:${puzzle}`, // v2: puzzle #1's answer changed, so old progress is ignored
   gameStats: "game-stats",
 };
 
