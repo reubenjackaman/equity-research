@@ -59,6 +59,8 @@ export const keys = {
   peers: (ticker: string) => `peers:${ticker}`,
   saved: "saved-tickers",
   recent: "recent-tickers",
+  game: (puzzle: number) => `game:${puzzle}`,
+  gameStats: "game-stats",
 };
 
 const MAX_RECENT = 8;

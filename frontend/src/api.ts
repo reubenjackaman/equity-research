@@ -288,3 +288,36 @@ export const screenerApi = {
   run: (f: ScreenerFilters, signal?: AbortSignal) =>
     get<{ total: number; results: ScreenerRow[]; note: string | null }>(`/api/screener?${new URLSearchParams(f).toString()}`, signal),
 };
+
+export type Clue = "match" | "miss" | "higher" | "lower" | "unknown";
+
+export type GameCompany = {
+  symbol: string;
+  name: string;
+  sector: string;
+  country: string;
+  marketCapUsd: number | null;
+  pe: number | null;
+  dividendYield: number;
+  yearChangePercent: number | null;
+};
+
+export type GameGuess = {
+  guess: GameCompany;
+  clues: Record<"sector" | "country" | "marketCap" | "pe" | "dividend" | "yearReturn", Clue>;
+  correct: boolean;
+  answer: GameCompany | null; // only sent once the game is over
+};
+
+export type GameToday = {
+  puzzle: number;
+  maxGuesses: number;
+  snapshotDate: string;
+  companies: { symbol: string; name: string }[];
+};
+
+export const gameApi = {
+  today: () => get<GameToday>("/api/game/today"),
+  guess: (puzzle: number, attempt: number, symbol: string) =>
+    get<GameGuess>(`/api/game/guess?puzzle=${puzzle}&attempt=${attempt}&symbol=${encodeURIComponent(symbol)}`),
+};

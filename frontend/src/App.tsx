@@ -1,6 +1,7 @@
 import { Route, Routes, useLocation } from "react-router-dom";
 import TopBar from "./components/TopBar";
 import Company from "./pages/Company";
+import Game from "./pages/Game";
 import Home from "./pages/Home";
 import TearSheet from "./pages/TearSheet";
 import { useTheme } from "./theme";
@@ -26,6 +27,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/company/:ticker" element={<Company theme={theme} />} />
+          <Route path="/game" element={<Game />} />
         </Routes>
       </main>
 
