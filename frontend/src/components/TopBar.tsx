@@ -24,7 +24,7 @@ export default function TopBar({ theme, onToggleTheme }: { theme: Theme; onToggl
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-slate-950/90">
-      <div className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-2 sm:gap-3">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-2 sm:flex-nowrap sm:gap-3">
         <Link
           to="/"
           aria-label="Home"
@@ -43,12 +43,20 @@ export default function TopBar({ theme, onToggleTheme }: { theme: Theme; onToggl
           <button onClick={goExplore} className={`hidden sm:block ${link(false)}`}>
             Explore
           </button>
-          <Link to="/game" className={link(pathname === "/game")}>
-            Game
+          <Link
+            to="/game"
+            className={`ml-1 rounded-lg bg-linear-to-r from-pink-600 to-orange-500 px-3.5 py-1.5 text-base font-bold whitespace-nowrap text-white shadow-md transition hover:brightness-110 ${
+              pathname === "/game" ? "ring-2 ring-pink-300 ring-offset-2 ring-offset-white dark:ring-offset-slate-950" : ""
+            }`}
+          >
+            Play Game
           </Link>
         </nav>
-        <div className="mx-auto w-full max-w-md">{!onHome && <SearchBar />}</div>
-        <SavedMenu />
+        {/* On phones the search box gets its own full-width row. */}
+        <div className="order-last w-full sm:order-none sm:mx-auto sm:max-w-md">{!onHome && <SearchBar />}</div>
+        <span className="ml-auto sm:ml-0">
+          <SavedMenu />
+        </span>
         <button
           onClick={onToggleTheme}
           aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
