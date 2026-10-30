@@ -30,7 +30,7 @@ export default function CompsTab({ ticker, price, currency }: { ticker: string; 
     return (
       <div className="mt-6 space-y-2">
         <div className="h-96 animate-pulse rounded-xl bg-slate-200 dark:bg-slate-800" />
-        <p className="text-xs text-slate-500">Loading peers. The first load fetches every company's filings and can take ~10 seconds.</p>
+        <p className="text-xs text-slate-500">Loading peers. The first time a company is opened, this fetches every peer's filings and can take up to a minute; after that it's quick.</p>
       </div>
     );
 
