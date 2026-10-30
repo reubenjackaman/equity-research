@@ -206,34 +206,66 @@ function Result({ today, guesses, won, answer }: { today: GameToday; guesses: Ga
   }
 
   return (
-    <div className="card">
-      <div className="text-lg font-semibold">{won ? `Solved in ${guesses.length}!` : "Out of guesses"}</div>
-      {answer && (
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-          The mystery company was{" "}
-          <Link to={`/company/${encodeURIComponent(answer.symbol)}`} className="font-semibold text-blue-600 hover:underline dark:text-blue-400">
-            {answer.name} ({answer.symbol})
-          </Link>
-          .
-        </p>
-      )}
-      <dl className="mt-3 grid grid-cols-4 gap-2 text-center">
-        {[
-          ["Played", stats.played],
-          ["Won", stats.played ? `${Math.round((stats.won / stats.played) * 100)}%` : "0%"],
-          ["Streak", stats.streak],
-          ["Best", stats.best],
-        ].map(([label, value]) => (
-          <div key={label} className="rounded-lg bg-slate-50 py-2 dark:bg-slate-800/50">
-            <dd className="text-lg font-semibold">{value}</dd>
-            <dt className="text-xs text-slate-500 dark:text-slate-400">{label}</dt>
+    <div className="result-pop overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg dark:border-slate-800 dark:bg-slate-900">
+      <div className={`px-5 py-7 text-center text-white ${won ? "bg-linear-to-r from-pink-600 to-orange-500" : "bg-slate-700"}`}>
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-white text-3xl font-bold shadow-md">
+          <span className={won ? "text-pink-600" : "text-slate-700"}>{won ? "✓" : "✕"}</span>
+        </div>
+        <div className="mt-3 text-3xl font-bold tracking-tight">{won ? "You got it!" : "So close!"}</div>
+        <div className="mt-1 text-white/90">
+          {won ? `Solved in ${guesses.length} of ${today.maxGuesses} guesses` : `Out of guesses. Better luck tomorrow.`}
+        </div>
+        <div className="mt-3 flex justify-center gap-1.5" aria-hidden>
+          {Array.from({ length: today.maxGuesses }).map((_, i) => (
+            <span key={i} className={`h-2.5 w-2.5 rounded-full ${i < guesses.length ? "bg-white" : "bg-white/30"}`} />
+          ))}
+        </div>
+      </div>
+
+      <div className="p-5">
+        {answer && (
+          <div className="text-center">
+            <div className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">The mystery company was</div>
+            <div className="mt-1 text-xl font-bold">{answer.name}</div>
+            <Link
+              to={`/company/${encodeURIComponent(answer.symbol)}`}
+              className="mt-1 inline-block text-sm font-semibold text-blue-600 hover:underline dark:text-blue-400"
+            >
+              Research {answer.symbol} →
+            </Link>
           </div>
-        ))}
-      </dl>
-      <button onClick={share} className="mt-3 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
-        {copied ? "Copied!" : "Share result"}
-      </button>
-      {fallback && <pre className="mt-3 whitespace-pre-wrap rounded-lg bg-slate-100 p-3 text-sm dark:bg-slate-800">{fallback}</pre>}
+        )}
+
+        <dl className="mt-5 grid grid-cols-4 gap-2 text-center">
+          {[
+            ["Played", stats.played],
+            ["Win rate", stats.played ? `${Math.round((stats.won / stats.played) * 100)}%` : "0%"],
+            ["Streak", stats.streak],
+            ["Best", stats.best],
+          ].map(([label, value]) => (
+            <div key={label} className="rounded-lg bg-slate-50 py-2 dark:bg-slate-800/50">
+              <dd className="text-xl font-bold">{value}</dd>
+              <dt className="text-xs text-slate-500 dark:text-slate-400">{label}</dt>
+            </div>
+          ))}
+        </dl>
+
+        <button
+          onClick={share}
+          className="mt-4 w-full rounded-lg bg-linear-to-r from-pink-600 to-orange-500 px-4 py-3 text-base font-bold text-white shadow-md transition hover:brightness-110"
+        >
+          {copied ? "Copied! Paste it to your friends" : "Share with friends"}
+        </button>
+        {fallback && <pre className="mt-3 whitespace-pre-wrap rounded-lg bg-slate-100 p-3 text-sm dark:bg-slate-800">{fallback}</pre>}
+        <p className="mt-3 text-center text-xs text-slate-500 dark:text-slate-400">Next puzzle in {untilNextPuzzle()}</p>
+      </div>
     </div>
   );
+}
+
+/** Time left until midnight in Toronto, when the next puzzle starts. */
+function untilNextPuzzle() {
+  const toronto = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Toronto" }));
+  const minutes = 24 * 60 - (toronto.getHours() * 60 + toronto.getMinutes());
+  return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
 }
