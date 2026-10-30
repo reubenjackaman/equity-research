@@ -15,7 +15,8 @@ from datetime import date, datetime
 from functools import lru_cache
 from zoneinfo import ZoneInfo
 
-from . import snapshot, yahoo
+from . import news, snapshot, wiki, yahoo
+from .cache import DAY, cached
 
 LAUNCH = date(2026, 10, 30)  # puzzle #1
 MAX_GUESSES = 6
@@ -137,3 +138,114 @@ def guess(puzzle: int, attempt: int, symbol: str) -> dict:
     finished = correct or attempt >= MAX_GUESSES
     return {"guess": g, "clues": clues, "correct": correct, "answer": a if finished else None}
 
+
+# ---------- Hints: each one uses up a guess (the page counts it) ----------
+
+HINTS = {
+    "news": "Recent headline",
+    "product": "What they sell",
+    "industry": "Industry",
+    "letter": "First letter",
+}
+BLOCK = "█████"
+# Headlines where a bank or analyst is rating some other company.
+ABOUT_OTHERS = re.compile(r"\b(target|upgrade|downgrade|rating|picks?|says|praises|recommends|lifts|raises .* to)\b", re.IGNORECASE)
+
+# Capitalized words that don't give a company away, so they stay readable.
+SAFE_WORDS = set("""
+    A After All Amid An Analyst Analysts And Are As At Before But By CEO CFO COO Can Could Earnings EPS ETF For From Fund GDP
+    Has Have How IPO If In Inc Investors Is It Its Market Markets New No Not Of On Or Revenue Sales Shares Should Stock
+    Stocks That The These This To Top U.S. US USA UK Wall Street What When Where Why Will With Would AI American Canadian
+    Chinese European January February March April May June July August September October November December Monday Tuesday
+    Wednesday Thursday Friday Saturday Sunday Dow Nasdaq NYSE Fed S&P
+""".split())
+GENERIC_NAME_WORDS = {"inc", "incorporated", "corp", "corporation", "company", "co", "ltd", "limited", "plc", "group", "holdings", "the", "of", "and"}
+
+
+def _name_words(row: dict) -> list:
+    words = re.findall(r"[A-Za-z0-9&'-]+", row["name"])
+    return [w for w in words if len(w) > 1 and w.lower() not in GENERIC_NAME_WORDS]
+
+
+def _ticker(row: dict) -> str:
+    return row["symbol"].split(".")[0].split("-")[0]
+
+
+def _redact(text: str, row: dict) -> str:
+    """Blacks out the company's name, ticker and anything else capitalized (products, people, places)."""
+    for word in sorted(_name_words(row), key=len, reverse=True):
+        text = re.sub(rf"\b{re.escape(word)}(?:'s|’s)?\b", BLOCK, text, flags=re.IGNORECASE)
+    # Exact case only: the ticker COST shouldn't hide the word "cost".
+    text = re.sub(rf"\b{re.escape(_ticker(row))}(?:'s|’s)?\b", BLOCK, text)
+
+    def mask(match):
+        word = match.group(0).rstrip(".,")
+        tail = match.group(0)[len(word):]
+        bare = re.sub(r"(?:'s|’s)$", "", word)
+        keep = bare in SAFE_WORDS or match.group(0) in SAFE_WORDS or re.fullmatch(r"Q[1-4]|\d.*", bare)
+        return (word if keep else BLOCK) + tail
+
+    # Any word with a capital in it, so "iPhone" and "McDonald" are caught as well as "Azure".
+    text = re.sub(r"[A-Za-z0-9&'’.-]*[A-Z][A-Za-z0-9&'’.-]*", mask, text)
+    text = re.sub(rf"{BLOCK}(?:[\s,&]+{BLOCK})+", BLOCK, text)
+    return re.sub(rf"{BLOCK},? Inc\b\.?", BLOCK, text)
+
+
+def _hidden_share(text: str) -> float:
+    return text.count(BLOCK) / max(len(text.split()), 1)
+
+
+def _names_company(headline: str, row: dict) -> bool:
+    """Only headlines that actually name the answer: others are often about a different company."""
+    if re.search(rf"\b{re.escape(_ticker(row))}\b", headline):
+        return True
+    return any(re.search(rf"\b{re.escape(w)}\b", headline, re.IGNORECASE) for w in _name_words(row)[:2])
+
+
+def _news_hint(row: dict) -> str:
+    articles = news.company_news(row["symbol"], row["name"])["articles"]
+    options = [
+        _redact(a["headline"], row) for a in articles[:80]
+        if 40 <= len(a["headline"]) <= 130 and _names_company(a["headline"], row) and not ABOUT_OTHERS.search(a["headline"])
+    ]
+    # Fewest blanks first: one blank means the only thing hidden is the company itself.
+    readable = [o for o in options if o.count(BLOCK) <= 2 and _hidden_share(o) <= 0.3]
+    if not readable:
+        raise ValueError("No usable headline right now. Try a different hint.")
+    return min(readable, key=lambda o: (o.count(BLOCK), _hidden_share(o)))
+
+
+def _product_hint(row: dict) -> str:
+    company = yahoo.overview(row["symbol"])
+    text = company.get("description") or wiki.company_summary(row["name"])
+    if not text:
+        raise ValueError("No description available right now. Try a different hint.")
+    # A period after "Inc" doesn't end a sentence.
+    sentences = [_redact(t, row) for t in re.split(r"(?<!\bInc\.)(?<!\bCo\.)(?<!\bCorp\.)(?<!\bLtd\.)(?<=[.!?])\s+", text)]
+    kept = sentences[0]
+    if len(kept) > 260:
+        return kept[:260].rsplit(" ", 1)[0].rstrip(",;") + "…"
+    for sentence in sentences[1:4]:
+        if len(kept) + len(sentence) < 260 and _hidden_share(sentence) <= 0.2:
+            kept += " " + sentence
+    return kept
+
+
+@cached("game-hint", DAY)
+def hint(puzzle: int, kind: str) -> dict:
+    if not 1 <= puzzle <= today_number():
+        raise ValueError("That puzzle isn't available.")
+    if kind not in HINTS:
+        raise ValueError("Unknown hint.")
+    row = _answer(puzzle)
+    if kind == "news":
+        text = _news_hint(row)
+    elif kind == "product":
+        text = _product_hint(row)
+    elif kind == "industry":
+        text = yahoo.overview(row["symbol"]).get("industry")
+        if not text:
+            raise ValueError("No industry available right now. Try a different hint.")
+    else:
+        text = f"The company's name starts with {row['name'][0].upper()}"
+    return {"kind": kind, "label": HINTS[kind], "text": text}
