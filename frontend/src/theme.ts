@@ -17,3 +17,8 @@ export function useTheme() {
 
   return { theme, toggle: () => setTheme((t) => (t === "dark" ? "light" : "dark")) };
 }
+
+/** A colour from index.css, for code that draws its own colours (the price chart). */
+export function cssVar(name: string) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
