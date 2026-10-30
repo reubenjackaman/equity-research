@@ -84,7 +84,7 @@ client = TestClient(main.app)
 for url in ["/api/health", "/api/market", "/api/search?q=apple", "/api/company/AAPL/overview",
             "/api/company/AAPL/history?range=1M", "/api/company/AAPL/statements?period=quarterly",
             "/api/company/AAPL/ratios", "/api/company/AAPL/news", "/api/company/AAPL/comps",
-            "/api/screener/options", "/api/screener?sector=Energy"]:
+            "/api/screener/options", "/api/screener?sector=Energy", "/api/game/today"]:
     code = client.get(url).status_code
     check(f"route {url}", code == 200, f"HTTP {code}")
 code = client.post("/api/company/AAPL/dcf", json={"assumptions": {}}).status_code
