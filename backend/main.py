@@ -145,6 +145,12 @@ def game_guess(puzzle: int, attempt: int, symbol: str):
     return fetch(game.guess, puzzle, attempt, symbol)
 
 
+@app.get("/api/game/hint")
+def game_hint(puzzle: int, kind: str):
+    """A hint about the answer. The page counts it as one of the six guesses."""
+    return fetch(game.hint, puzzle, kind)
+
+
 # ---------- The website itself (production) ----------
 # If the frontend has been built (frontend/dist), serve it from here too. Any path that isn't
 # an API route or a real file gets index.html, so React can show the right page
