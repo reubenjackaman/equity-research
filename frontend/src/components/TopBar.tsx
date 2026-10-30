@@ -39,10 +39,13 @@ export default function TopBar({ theme, onToggleTheme }: { theme: Theme; onToggl
           </svg>
           <span className="hidden sm:inline">Home</span>
         </Link>
-        <nav className="hidden items-center sm:flex">
-          <button onClick={goExplore} className={link(false)}>
+        <nav className="flex shrink-0 items-center">
+          <button onClick={goExplore} className={`hidden sm:block ${link(false)}`}>
             Explore
           </button>
+          <Link to="/game" className={link(pathname === "/game")}>
+            Game
+          </Link>
         </nav>
         <div className="mx-auto w-full max-w-md">{!onHome && <SearchBar />}</div>
         <SavedMenu />
