@@ -1,0 +1,14 @@
+# Secrets: never commit API keys
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+backend/cache.sqlite
+
+# Node
+node_modules/
+frontend/dist/
+
+.DS_Store
