@@ -26,7 +26,7 @@ from statistics import mean, median, quantiles
 
 import yfinance as yf
 
-from data import yahoo
+from data import finnhub, yahoo
 from data.cache import DAY, MINUTE, cached
 from finance import ratios
 
@@ -54,10 +54,24 @@ def _same_company(a: str, b: str) -> bool:
 
 @cached("peers", DAY)
 def suggest_peers(ticker: str) -> dict:
-    info = yf.Ticker(ticker).info or {}
+    try:
+        return _yahoo_peers(ticker)
+    except Exception:
+        return _finnhub_peers(ticker)  # Yahoo's industry data refuses many cloud servers
+
+
+def _finnhub_peers(ticker: str) -> dict:
+    """Fallback: the companies Finnhub groups with this one (same country and industry)."""
+    symbol = yahoo.us_listing(ticker)
+    found = [p for p in finnhub.peers(symbol) if "." not in p and not _same_company(p, ticker)] if symbol else []
+    return {"peers": found[:MAX_PEERS], "basis": "Similar companies according to Finnhub", "industry": None}
+
+
+def _yahoo_peers(ticker: str) -> dict:
+    info = yahoo.info(ticker)
     industry_key, sector_key = info.get("industryKey"), info.get("sectorKey")
     if not industry_key:
-        return {"peers": [], "basis": None, "industry": None}
+        raise LookupError("no Yahoo industry for this company")
 
     table = yf.Industry(industry_key).top_companies
     weights = {sym: float(row["market weight"]) for sym, row in table.iterrows()} if table is not None else {}

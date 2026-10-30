@@ -138,7 +138,7 @@ def _load_facts(ticker: str, currency: str):
     cik = edgar.cik_for(symbol) if symbol else None
     if not cik:
         return None
-    facts = edgar.company_facts(cik, currency or "USD")
+    facts = edgar.company_facts(cik, currency)  # currency None = detect it from the filings
     # Nothing usable, e.g. a company that just re-registered under a new SEC ID (ExxonMobil, 2026).
     if not any(edgar.annual_series(facts, t, False) for t in edgar.PROFIT_TAGS):
         return None
@@ -219,7 +219,7 @@ def sec_ttm(ticker: str):
     Returns {"end": date, "current": {key: value}, "prior": {key: balance a year earlier}}.
     Every item is measured at the same period end so the figures are consistent.
     """
-    facts = _load_facts(ticker, yahoo.statements(ticker, "annual").get("currency"))
+    facts = _load_facts(ticker, yahoo.statements(ticker, "annual").get("currency"))  # None -> detected
     if not facts:
         return None
     try:
@@ -275,6 +275,22 @@ def sec_ttm(ticker: str):
                 current[key] = _calculate(key, current)
                 prior[key] = _calculate(key, prior)
     return {"end": end, "current": current, "prior": prior}
+
+
+def _reporting_currency(ticker: str, yf_data: dict, facts) -> str:
+    """Yahoo's figure if available, else the currency of the SEC filings, else Finnhub's, else the listing's."""
+    if yf_data.get("currency"):
+        return yf_data["currency"]
+    if facts:
+        return facts.currency
+    try:
+        sec = _load_facts(ticker, None)
+        if sec:
+            return sec.currency
+    except Exception:
+        pass
+    o = yahoo.overview(ticker)
+    return o.get("reportingCurrency") or o.get("currency") or "USD"
 
 
 def _column_label(end: str, period: str) -> str:
@@ -366,7 +382,7 @@ def build(ticker: str, period: str) -> dict:
     return {
         "symbol": ticker,
         "period": period,
-        "currency": yf_data.get("currency") or "USD",
+        "currency": _reporting_currency(ticker, yf_data, facts),
         "source": source,
         "columns": columns,
         "statements": {
