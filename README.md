@@ -211,8 +211,8 @@ and recently viewed companies with live prices. These are remembered in your bro
 A new hidden company every day at `/game`, with six guesses. Each guess shows clues comparing
 it with the answer: sector, listing country, market cap, P/E, dividend yield and 1-year return.
 It runs entirely on the saved snapshot (`backend/data/game.py`), so it works without Yahoo.
-Answers are companies over $30B, taken in a fixed shuffled order so none repeats until all
-have been used. Progress and streaks are saved in each player's browser. Check the logic with
+Answers are companies over $400B, taken in a fixed shuffled order so none repeats until all
+have been used. To hand-pick a day's answer, add it to `OVERRIDES` in `game.py`. Progress and streaks are saved in each player's browser. Check the logic with
 `.venv/bin/python -m tests.check_game`.
 
 ## Explore (home page)
