@@ -74,6 +74,7 @@ export default function Explore() {
   const [industries, setIndustries] = useState<Record<string, string[]>>({});
   const [rows, setRows] = useState<ScreenerRow[] | null>(null);
   const [total, setTotal] = useState(0);
+  const [note, setNote] = useState<string | null>(null); // set when results come from the saved snapshot
   const [error, setError] = useState<string | null>(null);
   const [shown, setShown] = useState(PAGE);
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -99,6 +100,7 @@ export default function Explore() {
       .then((r) => {
         setRows(r.results);
         setTotal(r.total);
+        setNote(r.note);
       })
       .catch((e) => e.name !== "AbortError" && setError(e.message));
     return () => controller.abort();
@@ -214,6 +216,11 @@ export default function Explore() {
       </div>
 
       {/* Results */}
+      {note && (
+        <p className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900 dark:border-amber-700/60 dark:bg-amber-950/40 dark:text-amber-200">
+          {note}
+        </p>
+      )}
       <div className="card mt-3 overflow-hidden p-0 sm:p-0">
         {error && <p className="p-5 text-sm text-slate-500">Couldn't load stocks: {error}. Yahoo may be busy, so try again in a minute.</p>}
         {!error && !rows && (
