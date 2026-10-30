@@ -3,6 +3,7 @@ Simulates a cloud server where Yahoo refuses its company-profile, screener and i
 endpoints (what happens on Render), and checks every part of the app still works.
 
 Run from the backend folder:  .venv/bin/python -m tests.check_server_fallbacks
+(The route checks at the end need `httpx`, which is in requirements.txt.)
 """
 import tempfile
 from pathlib import Path
@@ -70,5 +71,20 @@ for args in [("us", "Technology", "", "", "", "", "", "marketcap"), ("ca", "Ener
     r = screener.screen.__wrapped__(*args)
     check(f"explore {args[0]} {args[1]}", len(r["results"]) > 0,
           f"{len(r['results'])} results, first {[x['symbol'] for x in r['results'][:3]]} | note: {bool(r['note'])}")
+
+# Every API route answers (catches a route whose code went missing, like the market strip once did).
+from fastapi.testclient import TestClient  # noqa: E402
+
+import main  # noqa: E402
+
+client = TestClient(main.app)
+for url in ["/api/health", "/api/market", "/api/search?q=apple", "/api/company/AAPL/overview",
+            "/api/company/AAPL/history?range=1M", "/api/company/AAPL/statements?period=quarterly",
+            "/api/company/AAPL/ratios", "/api/company/AAPL/news", "/api/company/AAPL/comps",
+            "/api/screener/options", "/api/screener?sector=Energy"]:
+    code = client.get(url).status_code
+    check(f"route {url}", code == 200, f"HTTP {code}")
+code = client.post("/api/company/AAPL/dcf", json={"assumptions": {}}).status_code
+check("route POST /api/company/AAPL/dcf", code == 200, f"HTTP {code}")
 
 print("\nproblems:", problems or "none")
