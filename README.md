@@ -22,6 +22,7 @@ news and valuation models.
 | + | Explore by sector on the home page, with filters | ✅ Done |
 | + | Top bar: navigation, saved & recent companies, market strip | ✅ Done |
 | + | One-server production mode (ready for hosting) | ✅ Done |
+| + | Mystery Company daily game | ✅ Done |
 
 ## Project layout
 
@@ -204,6 +205,15 @@ Every page has a bar with Home, Explore, a **Saved** menu and search, plus a str
 headline markets (S&P 500, Nasdaq, TSX, USD/CAD, US 10-year yield; refreshed every few
 minutes). Click the ☆ next to a company's name to save it; the Saved menu shows your saved
 and recently viewed companies with live prices. These are remembered in your browser.
+
+## Mystery Company (daily game)
+
+A new hidden company every day at `/game`, with six guesses. Each guess shows clues comparing
+it with the answer: sector, listing country, market cap, P/E, dividend yield and 1-year return.
+It runs entirely on the saved snapshot (`backend/data/game.py`), so it works without Yahoo.
+Answers are companies over $30B, taken in a fixed shuffled order so none repeats until all
+have been used. Progress and streaks are saved in each player's browser. Check the logic with
+`.venv/bin/python -m tests.check_game`.
 
 ## Explore (home page)
 
