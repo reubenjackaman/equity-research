@@ -1,14 +1,23 @@
+import { useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
+import Footer from "./components/Footer";
 import TopBar from "./components/TopBar";
 import Company from "./pages/Company";
 import Game from "./pages/Game";
 import Home from "./pages/Home";
+import { About, Contact, HowItWorks, NotFound, Privacy, Terms } from "./pages/Info";
 import TearSheet from "./pages/TearSheet";
 import { useTheme } from "./theme";
 
 export default function App() {
   const { theme, toggle } = useTheme();
-  const path = useLocation().pathname;
+  const { pathname: path, hash } = useLocation();
+
+  // New pages start at the top; links to a section (like #disclaimer) go to that section.
+  useEffect(() => {
+    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView();
+    else window.scrollTo(0, 0);
+  }, [path, hash]);
 
   // The tear sheet is a standalone printable page, without the site header and footer.
   if (path.endsWith("/tearsheet")) {
@@ -28,13 +37,16 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/company/:ticker" element={<Company theme={theme} />} />
           <Route path="/game" element={<Game />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
 
-      <footer className="border-t border-slate-200 px-4 py-4 text-center text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
-        Built by Reuben Jackaman · For educational purposes only. Not investment advice. Data from SEC EDGAR,
-        Yahoo Finance and Finnhub may be delayed or incomplete.
-      </footer>
+      <Footer />
     </div>
   );
 }
