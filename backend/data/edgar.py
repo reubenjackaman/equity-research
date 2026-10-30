@@ -52,21 +52,36 @@ PROFIT_TAGS = ("NetIncomeLoss", "ProfitLoss", "ProfitLossAttributableToOwnersOfP
 
 
 class Facts(dict):
-    """{tag: [entries]} for one accounting standard and currency. `.taxonomy` says which."""
+    """{tag: [entries]} for one accounting standard and currency. `.taxonomy` and `.currency` say which."""
 
     taxonomy = "us-gaap"
+    currency = "USD"
 
 
-def company_facts(cik: int, currency: str = "USD") -> Facts:
+def _profit_currency(raw: dict):
+    """The currency a company reports its annual profit in (e.g. CAD for CN, TWD for TSMC)."""
+    counts = {}
+    for taxonomy in ("us-gaap", "ifrs-full"):
+        for tag in PROFIT_TAGS:
+            for unit, entries in raw.get(taxonomy, {}).get(tag, {}).get("units", {}).items():
+                if "/" not in unit and unit != "shares":
+                    counts[unit] = counts.get(unit, 0) + sum(e.get("form") in ANNUAL_FORMS for e in entries)
+    return max(counts, key=counts.get) if counts else None
+
+
+def company_facts(cik: int, currency: str | None = "USD") -> Facts:
     """A company's tagged numbers in `currency`, from US GAAP if it reports that way, else IFRS.
+    With currency=None, the reporting currency is detected from the filings.
 
     Not cached on purpose: the file is several MB. We cache the much smaller statements
     built from it instead (see finance/statements.py).
     """
     raw = _get(FACTS_URL.format(cik=cik))["facts"]
+    currency = currency or _profit_currency(raw) or "USD"
     for taxonomy in ("us-gaap", "ifrs-full"):
         facts = Facts()
         facts.taxonomy = taxonomy
+        facts.currency = currency
         for tag, body in raw.get(taxonomy, {}).items():
             units = body["units"]
             entries = units.get(currency) or units.get(f"{currency}/shares") or units.get("shares")

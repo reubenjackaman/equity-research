@@ -1,12 +1,19 @@
 """
 Stock screener for the "Explore" section of the home page, using Yahoo Finance's screener.
 
+If Yahoo's live screener refuses the request (it blocks many cloud servers, e.g. Render),
+results come from a saved snapshot instead (data/screener_snapshot.json, refreshed with
+`python -m tools.make_screener_snapshot`). The snapshot can't filter by industry or revenue
+growth, and its prices are as of the snapshot date; the page says so.
+
 Filters map to Yahoo screener fields. Two clean-ups for Canada: Yahoo lists CDRs
 (Canadian Depositary Receipts of US companies, e.g. "APPLE CDR (CAD HEDGED)") and
 preferred shares on the TSX, so those are removed to leave real Canadian companies.
 """
 
+import json
 import re
+from pathlib import Path
 
 import yfinance as yf
 from yfinance import EquityQuery
@@ -34,6 +41,13 @@ SORTS = {
     "dividend": ("forward_dividend_yield", False),
     "growth": ("totalrevenues1yrgrowth.lasttwelvemonths", False),
 }
+
+
+SECTORS = [
+    "Basic Materials", "Communication Services", "Consumer Cyclical", "Consumer Defensive", "Energy",
+    "Financial Services", "Healthcare", "Industrials", "Real Estate", "Technology", "Utilities",
+]
+SNAPSHOT = Path(__file__).resolve().parent / "screener_snapshot.json"
 
 
 @cached("screener-options", 7 * DAY)
@@ -83,24 +97,58 @@ def screen(country: str, sector: str, industry: str, cap: str, pe: str, dividend
         parts += _between("totalrevenues1yrgrowth.lasttwelvemonths", *GROWTH[growth])
 
     field, ascending = SORTS.get(sort, SORTS["marketcap"])
-    result = yf.screen(EquityQuery("and", parts), sortField=field, sortAsc=ascending, size=MAX_RESULTS)
+    try:
+        result = yf.screen(EquityQuery("and", parts), sortField=field, sortAsc=ascending, size=MAX_RESULTS)
+    except Exception:
+        return _from_snapshot(country, sector, industry, cap, pe, dividend, growth, sort)
     quotes = [q for q in result.get("quotes", []) if q.get("quoteType") == "EQUITY"]
     if country == "ca":
         quotes = [q for q in quotes if _is_real_tsx_company(q)]
 
-    rows = [
-        {
-            "symbol": q["symbol"],
-            "name": q.get("longName") or q.get("shortName") or q["symbol"],
-            "exchange": q.get("fullExchangeName") or q.get("exchange"),
-            "currency": q.get("currency"),
-            "price": clean(q.get("regularMarketPrice")),
-            "changePercent": clean(q.get("regularMarketChangePercent")),
-            "marketCap": clean(q.get("marketCap")),
-            "pe": clean(q.get("trailingPE")),
-            "dividendYield": clean(q.get("dividendYield")),  # percent, e.g. 0.46 = 0.46%
-            "yearChangePercent": clean(q.get("fiftyTwoWeekChangePercent")),
-        }
-        for q in quotes
-    ]
-    return {"total": result.get("total", len(rows)), "results": rows}
+    rows = [_row(q) for q in quotes]
+    return {"total": result.get("total", len(rows)), "results": rows, "note": None}
+
+
+def _row(q: dict) -> dict:
+    return {
+        "symbol": q["symbol"],
+        "name": q.get("longName") or q.get("shortName") or q["symbol"],
+        "exchange": q.get("fullExchangeName") or q.get("exchange"),
+        "currency": q.get("currency"),
+        "price": clean(q.get("regularMarketPrice")),
+        "changePercent": clean(q.get("regularMarketChangePercent")),
+        "marketCap": clean(q.get("marketCap")),
+        "pe": clean(q.get("trailingPE")),
+        "dividendYield": clean(q.get("dividendYield")),  # percent, e.g. 0.46 = 0.46%
+        "yearChangePercent": clean(q.get("fiftyTwoWeekChangePercent")),
+    }
+
+
+def _in_range(value, bounds) -> bool:
+    low, high = bounds
+    return value is not None and (low is None or value >= low) and (high is None or value < high)
+
+
+def _from_snapshot(country, sector, industry, cap, pe, dividend, growth, sort) -> dict:
+    """Same filters, applied to the saved snapshot (used when the live screener is unavailable)."""
+    if not SNAPSHOT.exists():
+        raise RuntimeError("the live screener is unavailable and no snapshot has been saved")
+    snap = json.loads(SNAPSHOT.read_text())
+    rows = [r for r in snap["rows"] if r["country"] == country and (not sector or r["sector"] == sector)]
+    rows = [r for r in rows if _in_range(r["marketCap"], MARKET_CAPS.get(cap, (300e6, None)))]
+    if pe in PE_RANGES:
+        rows = [r for r in rows if _in_range(r["pe"], PE_RANGES[pe])]
+    if dividend in DIVIDENDS:
+        rows = [r for r in rows if _in_range(r["dividendYield"], DIVIDENDS[dividend])]
+
+    key = {"change": "changePercent", "pe": "pe", "dividend": "dividendYield"}.get(sort, "marketCap")
+    present = [r for r in rows if r[key] is not None]
+    present.sort(key=lambda r: r[key], reverse=sort != "pe")
+    rows = present + [r for r in rows if r[key] is None]
+
+    skipped = [name for name, used in (("industry", industry), ("revenue growth", growth), ("revenue-growth sorting", sort == "growth")) if used]
+    note = (f"Live screener unavailable, so these results come from a saved snapshot ({snap['date']}); "
+            "prices and daily moves are as of that date.")
+    if skipped:
+        note += f" The {' and '.join(skipped)} filter isn't available in the snapshot and was ignored."
+    return {"total": len(rows), "results": rows[:MAX_RESULTS], "note": note}
