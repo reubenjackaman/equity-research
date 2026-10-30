@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { Dcf, DcfAssumptions, DcfYear, dcfApi } from "../api";
-import * as fmt from "../format";
-import { keys, useStored } from "../storage";
-import InfoTip from "./InfoTip";
+import { useEffect, useRef, useState } from"react";
+import { Dcf, DcfAssumptions, DcfYear, dcfApi } from"../api";
+import * as fmt from"../format";
+import { keys, useStored } from"../storage";
+import InfoTip from"./InfoTip";
 
 type Key = keyof DcfAssumptions;
 
@@ -62,8 +62,8 @@ export default function DcfTab({ ticker }: { ticker: string }) {
     URL.revokeObjectURL(url);
   }
 
-  if (error && !data) return <p className="card mt-6 text-sm text-slate-500">DCF unavailable: {error}</p>;
-  if (!data) return <div className="mt-6 h-96 animate-pulse rounded-xl bg-slate-200 dark:bg-slate-800" />;
+  if (error && !data) return <p className="card mt-6 text-sm text-muted">DCF unavailable: {error}</p>;
+  if (!data) return <div className="mt-6 h-96 animate-pulse rounded bg-subtle" />;
 
   const set = (key: Key, value: number | null) => setOverrides((o) => ({ ...o, [key]: value }));
   const a = data.assumptions;
@@ -75,7 +75,7 @@ export default function DcfTab({ ticker }: { ticker: string }) {
         <div className="card space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold">Assumptions</h2>
-            <button onClick={() => setOverrides({})} className="text-xs text-blue-600 hover:underline dark:text-blue-400">
+            <button onClick={() => setOverrides({})} className="text-xs text-accent hover:underline">
               Reset to defaults
             </button>
           </div>
@@ -84,7 +84,7 @@ export default function DcfTab({ ticker }: { ticker: string }) {
             <select
               value={a.years}
               onChange={(e) => set("years", Number(e.target.value))}
-              className="rounded-md border border-slate-300 bg-white px-2 py-1 text-sm dark:border-slate-700 dark:bg-slate-900"
+              className="rounded border border-line-strong bg-surface px-2 py-1 text-sm"
             >
               {[3, 4, 5, 6, 7, 8, 9, 10].map((y) => (
                 <option key={y}>{y}</option>
@@ -95,7 +95,7 @@ export default function DcfTab({ ticker }: { ticker: string }) {
             <Field key={f.key} field={f} value={a[f.key] as number} fallback={data.defaults[f.key] as number} onChange={(v) => set(f.key, v)} />
           ))}
 
-          <h3 className="border-t border-slate-200 pt-3 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:text-slate-400">
+          <h3 className="border-t border-line pt-3 text-xs font-semibold text-muted">
             Discount rate (WACC)
           </h3>
           {WACC_FIELDS.map((f) => (
@@ -109,7 +109,7 @@ export default function DcfTab({ ticker }: { ticker: string }) {
       <Sensitivity data={data} />
       <ForecastTable data={data} />
 
-      <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+      <p className="text-xs leading-relaxed text-muted">
         Unlevered free cash flow = EBIT × (1 − tax) + D&A − Capex − Increase in working capital, discounted at WACC at the end of
         each year. Terminal value uses the Gordon growth formula. Debt, cash and share count are as of {data.balanceAsOf}.{" "}
         {data.currency !== data.tradingCurrency &&
@@ -133,16 +133,16 @@ function Summary({ data, onExport }: { data: Dcf; onExport: () => void }) {
         </button>
       </div>
       {!v ? (
-        <p className="mt-3 text-sm text-rose-600 dark:text-rose-400">
+        <p className="mt-3 text-sm text-loss">
           WACC ({fmt.pct(data.wacc.used * 100)}) must be higher than terminal growth ({fmt.pct(data.assumptions.terminal_growth * 100)}),
           otherwise the terminal value is infinite.
         </p>
       ) : (
         <>
-          <div className="mt-2 text-3xl font-semibold">{fmt.price(v.perShareTrading, data.tradingCurrency)}</div>
-          <div className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          <div className="mt-2 font-serif text-2xl font-semibold">{fmt.price(v.perShareTrading, data.tradingCurrency)}</div>
+          <div className="mt-1 text-sm text-muted">
             vs. current price {fmt.price(v.price, data.tradingCurrency)}{" "}
-            <span className={`font-semibold ${up ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
+            <span className={`font-semibold ${up ? "text-gain" : "text-loss"}`}>
               {v.upside === null
                 ? (v.perShareTrading ?? 0) <= 0
                   ? "(equity value is negative, see notes below)"
@@ -150,7 +150,7 @@ function Summary({ data, onExport }: { data: Dcf; onExport: () => void }) {
                 : `${up ? "+" : ""}${(v.upside * 100).toFixed(1)}% ${up ? "upside" : "downside"}`}
             </span>
           </div>
-          <dl className="mt-4 divide-y divide-slate-100 text-sm dark:divide-slate-800">
+          <dl className="mt-4 divide-y divide-line text-sm">
             <Row label="PV of forecast cash flows" value={fmt.big(v.pvFcf)} />
             <Row label="PV of terminal value" value={fmt.big(v.pvTerminal)} />
             <Row label="Enterprise value" value={fmt.big(v.enterpriseValue)} bold />
@@ -160,13 +160,13 @@ function Summary({ data, onExport }: { data: Dcf; onExport: () => void }) {
             <Row label="÷ Shares" value={fmt.big(v.shares)} />
             <Row label="Terminal value share of EV" value={v.terminalShare === null ? "N/A" : `${(v.terminalShare * 100).toFixed(0)}%`} />
           </dl>
-          <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{data.currency} amounts.</p>
+          <p className="mt-2 text-xs text-muted">{data.currency} amounts.</p>
         </>
       )}
       {data.warnings.length > 0 && (
         <ul className="mt-3 space-y-2">
           {data.warnings.map((w) => (
-            <li key={w} className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900 dark:border-amber-700/60 dark:bg-amber-950/40 dark:text-amber-200">
+            <li key={w} className="rounded border border-warn bg-warn-soft px-3 py-2 text-xs text-warn">
               {w}
             </li>
           ))}
@@ -179,7 +179,7 @@ function Summary({ data, onExport }: { data: Dcf; onExport: () => void }) {
 function Row({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
   return (
     <div className={`flex justify-between py-1.5 ${bold ? "font-semibold" : ""}`}>
-      <dt className={bold ? "" : "text-slate-500 dark:text-slate-400"}>{label}</dt>
+      <dt className={bold ? "" : "text-muted"}>{label}</dt>
       <dd>{value}</dd>
     </div>
   );
@@ -209,7 +209,7 @@ function Field({
   return (
     <label className="flex items-center justify-between gap-3 text-sm">
       <span className="min-w-0">
-        <InfoTip content={<>{field.help}<div className="mt-1 text-slate-500">Default: {+(fallback * scale).toFixed(2)}{field.kind === "pct" ? "%" : ""}</div></>}>
+        <InfoTip content={<>{field.help}<div className="mt-1 text-muted">Default: {+(fallback * scale).toFixed(2)}{field.kind === "pct" ? "%" : ""}</div></>}>
           {field.label}
         </InfoTip>
       </span>
@@ -228,11 +228,11 @@ function Field({
             const n = parseFloat(e.target.value);
             if (!Number.isNaN(n)) onChange(n / scale);
           }}
-          className={`w-20 rounded-md border bg-white px-2 py-1 text-right text-sm outline-none focus:border-blue-500 dark:bg-slate-900 ${
-            changed ? "border-blue-400 text-blue-700 dark:border-blue-500 dark:text-blue-300" : "border-slate-300 dark:border-slate-700"
+          className={`w-20 rounded border bg-surface px-2 py-1 text-right text-sm outline-none focus:border-accent  ${
+            changed ? "border-accent text-accent" : "border-line-strong"
           }`}
         />
-        <span className="w-3 text-xs text-slate-500">{field.kind === "pct" ? "%" : ""}</span>
+        <span className="w-3 text-xs text-muted">{field.kind === "pct" ? "%" : ""}</span>
       </span>
     </label>
   );
@@ -242,7 +242,7 @@ function WaccField({ data, onChange }: { data: Dcf; onChange: (v: number | null)
   const w = data.wacc;
   const overridden = data.assumptions.wacc_override !== null;
   return (
-    <div className="rounded-lg bg-slate-50 p-3 text-sm dark:bg-slate-800/50">
+    <div className="rounded bg-subtle p-3 text-sm">
       <Field
         field={{
           key: "wacc_override",
@@ -254,7 +254,7 @@ function WaccField({ data, onChange }: { data: Dcf; onChange: (v: number | null)
         fallback={w.computed}
         onChange={(v) => onChange(v)}
       />
-      <div className="mt-2 space-y-0.5 text-xs text-slate-500 dark:text-slate-400">
+      <div className="mt-2 space-y-0.5 text-xs text-muted">
         <div>
           Cost of equity = {fmt.pct(data.assumptions.risk_free * 100)} + {data.assumptions.beta.toFixed(2)} × {fmt.pct(data.assumptions.erp * 100)} ={" "}
           {fmt.pct(w.costOfEquity * 100)}
@@ -264,9 +264,9 @@ function WaccField({ data, onChange }: { data: Dcf; onChange: (v: number | null)
           Weights: equity {(w.equityWeight * 100).toFixed(1)}% / debt {(w.debtWeight * 100).toFixed(1)}%
         </div>
         <div>
-          CAPM WACC = <span className="font-medium text-slate-700 dark:text-slate-200">{fmt.pct(w.computed * 100)}</span>
+          CAPM WACC = <span className="font-medium text-ink">{fmt.pct(w.computed * 100)}</span>
           {overridden && (
-            <button onClick={() => onChange(null)} className="ml-2 text-blue-600 hover:underline dark:text-blue-400">
+            <button onClick={() => onChange(null)} className="ml-2 text-accent hover:underline">
               use this
             </button>
           )}
@@ -281,19 +281,19 @@ function Sensitivity({ data }: { data: Dcf }) {
   const price = data.price;
   // Diverging tint: green above today's price, red below, neutral near it. The numbers stay in normal text colour.
   function tint(v: number | null) {
-    if (v === null || !price) return "";
+    if (v === null || !price) return"";
     const diff = v / price - 1;
     const strength = Math.min(Math.abs(diff) / 0.5, 1);
-    if (Math.abs(diff) < 0.05) return "bg-slate-100 dark:bg-slate-800";
+    if (Math.abs(diff) < 0.05) return"bg-subtle";
     const level = strength > 0.66 ? 3 : strength > 0.33 ? 2 : 1;
-    const up = ["", "bg-emerald-50 dark:bg-emerald-950/40", "bg-emerald-100 dark:bg-emerald-900/50", "bg-emerald-200 dark:bg-emerald-800/60"];
-    const down = ["", "bg-rose-50 dark:bg-rose-950/40", "bg-rose-100 dark:bg-rose-900/50", "bg-rose-200 dark:bg-rose-800/60"];
+    const up = ["", "bg-gain-soft", "bg-gain-soft", "bg-gain-soft"];
+    const down = ["", "bg-loss-soft", "bg-loss-soft", "bg-loss-soft"];
     return diff > 0 ? up[level] : down[level];
   }
   return (
     <div className="card overflow-hidden">
       <h2 className="text-sm font-semibold">Sensitivity: value per share ({data.tradingCurrency})</h2>
-      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+      <p className="mt-1 text-xs text-muted">
         Rows: WACC. Columns: terminal growth. Green is above today's price ({fmt.price(price, data.tradingCurrency)}), red is
         below. The outlined cell is your base case.
       </p>
@@ -301,7 +301,7 @@ function Sensitivity({ data }: { data: Dcf }) {
         <table className="w-full border-separate border-spacing-0.5 text-center text-sm">
           <thead>
             <tr>
-              <th className="px-2 py-1.5 text-left text-xs font-medium text-slate-500">WACC \ g</th>
+              <th className="px-2 py-1.5 text-left text-xs font-medium text-muted">WACC \ g</th>
               {s.growths.map((g) => (
                 <th key={g} className="px-2 py-1.5 text-xs font-semibold">
                   {(g * 100).toFixed(1)}%
@@ -316,7 +316,7 @@ function Sensitivity({ data }: { data: Dcf }) {
                 {s.values[i].map((v, j) => (
                   <td
                     key={j}
-                    className={`rounded px-2 py-1.5 tabular-nums ${tint(v)} ${i === 2 && j === 2 ? "font-semibold ring-2 ring-blue-500" : ""}`}
+                    className={`rounded px-2 py-1.5 tabular-nums ${tint(v)} ${i === 2 && j === 2 ? "font-semibold ring-2 ring-accent" : ""}`}
                   >
                     {v === null ? "N/A" : v.toLocaleString("en-US", { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
                   </td>
@@ -357,10 +357,10 @@ function ForecastTable({ data }: { data: Dcf }) {
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="border-b border-slate-200 text-xs dark:border-slate-800">
-              <th className="sticky left-0 z-10 bg-white px-4 py-2 text-left dark:bg-slate-900" />
+            <tr className="border-b border-line text-xs">
+              <th className="sticky left-0 z-10 bg-surface px-4 py-2 text-left" />
               {cols.map((c) => (
-                <th key={c.label} className={`whitespace-nowrap px-3 py-2 text-right font-semibold ${c.actual ? "text-slate-400" : ""}`}>
+                <th key={c.label} className={`whitespace-nowrap px-3 py-2 text-right font-semibold ${c.actual ? "text-muted" : ""}`}>
                   {c.label}
                   {c.actual && <div className="font-normal">actual</div>}
                 </th>
@@ -369,10 +369,10 @@ function ForecastTable({ data }: { data: Dcf }) {
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.label} className={`border-b border-slate-100 last:border-0 dark:border-slate-800/60 ${r.bold ? "font-semibold" : ""}`}>
-                <td className="sticky left-0 z-10 whitespace-nowrap bg-white px-4 py-1.5 dark:bg-slate-900">{r.label}</td>
+              <tr key={r.label} className={`border-b border-line last:border-0  ${r.bold ? "font-semibold" : ""}`}>
+                <td className="sticky left-0 z-10 whitespace-nowrap bg-surface px-4 py-1.5">{r.label}</td>
                 {cols.map((c) => (
-                  <td key={c.label} className={`whitespace-nowrap px-3 py-1.5 text-right ${c.actual ? "text-slate-400 dark:text-slate-500" : ""}`}>
+                  <td key={c.label} className={`whitespace-nowrap px-3 py-1.5 text-right ${c.actual ? "text-muted" : ""}`}>
                     {r.forecastOnly && c.actual ? "" : r.get(c)}
                   </td>
                 ))}

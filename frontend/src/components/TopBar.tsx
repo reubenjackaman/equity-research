@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { api, Overview } from "../api";
-import * as fmt from "../format";
-import { keys, useSaved, useStored } from "../storage";
-import type { Theme } from "../theme";
-import { Birdhouse } from "./Finch";
-import SearchBar from "./SearchBar";
+import { useEffect, useRef, useState } from"react";
+import { Link, useLocation, useNavigate } from"react-router-dom";
+import { api, Overview } from"../api";
+import * as fmt from"../format";
+import { keys, useSaved, useStored } from"../storage";
+import type { Theme } from"../theme";
+import { Birdhouse } from"./Finch";
+import SearchBar from"./SearchBar";
 
 /** The bar at the top of every page: navigation, saved companies, search, theme and a market strip. */
 export default function TopBar({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void }) {
@@ -19,20 +19,20 @@ export default function TopBar({ theme, onToggleTheme }: { theme: Theme; onToggl
   }
 
   const link = (active: boolean) =>
-    `rounded-md px-2.5 py-1.5 text-sm font-medium transition ${
-      active ? "text-slate-900 dark:text-white" : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+    `rounded px-2.5 py-1.5 text-sm font-medium transition-colors ${
+      active ? "text-ink" : "text-muted hover:text-ink"
     }`;
 
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-slate-950/90">
+    <header className="sticky top-0 z-30 border-b border-line bg-bg">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-2 sm:flex-nowrap sm:gap-3">
         <Link
           to="/"
           aria-label="Value Finch home"
-          className="flex shrink-0 items-center gap-1.5 rounded-lg px-1.5 py-1 font-semibold tracking-tight transition hover:bg-slate-100 dark:hover:bg-slate-800"
+          className="tap flex shrink-0 items-center gap-2 rounded px-1 py-1 transition-colors hover:text-accent"
         >
-          <Birdhouse className="h-8 w-8" />
-          <span className="hidden whitespace-nowrap lg:inline">Value Finch</span>
+          <Birdhouse className="h-7 w-7 text-accent" />
+          <span className="hidden whitespace-nowrap font-serif text-lg font-semibold md:inline">Value Finch</span>
         </Link>
         <nav className="flex shrink-0 items-center">
           <button onClick={goExplore} className={`hidden sm:block ${link(false)}`}>
@@ -40,11 +40,9 @@ export default function TopBar({ theme, onToggleTheme }: { theme: Theme; onToggl
           </button>
           <Link
             to="/game"
-            className={`ml-1 rounded-lg bg-linear-to-r from-pink-600 to-orange-500 px-3.5 py-1.5 text-base font-bold whitespace-nowrap text-white shadow-md transition hover:brightness-110 ${
-              pathname === "/game" ? "ring-2 ring-pink-300 ring-offset-2 ring-offset-white dark:ring-offset-slate-950" : ""
-            }`}
+            className="ml-1 tap rounded bg-accent px-3 py-1.5 text-sm font-medium whitespace-nowrap text-on-accent transition-colors hover:bg-accent-hover"
           >
-            Play Game
+            Play game
           </Link>
         </nav>
         {/* On phones the search box gets its own full-width row. */}
@@ -55,7 +53,7 @@ export default function TopBar({ theme, onToggleTheme }: { theme: Theme; onToggl
         <button
           onClick={onToggleTheme}
           aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-          className="shrink-0 rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+          className="min-w-11 shrink-0 rounded p-2 text-muted sm:min-w-0 hover:bg-subtle"
         >
           {theme === "dark" ? (
             <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 2Zm0 13a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 15Zm0-9a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm7.25 3.25a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1 0-1.5h1.5ZM4.25 10a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h1.5a.75.75 0 0 1 .75.75Zm11.06-5.31a.75.75 0 0 1 0 1.06l-1.06 1.06a.75.75 0 1 1-1.06-1.06l1.06-1.06a.75.75 0 0 1 1.06 0ZM6.81 13.19a.75.75 0 0 1 0 1.06l-1.06 1.06a.75.75 0 0 1-1.06-1.06l1.06-1.06a.75.75 0 0 1 1.06 0Zm8.5 2.12a.75.75 0 0 1-1.06 0l-1.06-1.06a.75.75 0 1 1 1.06-1.06l1.06 1.06a.75.75 0 0 1 0 1.06ZM6.81 6.81a.75.75 0 0 1-1.06 0L4.69 5.75a.75.75 0 0 1 1.06-1.06l1.06 1.06a.75.75 0 0 1 0 1.06Z" /></svg>
@@ -117,20 +115,20 @@ function SavedMenu() {
       <button
         onClick={() => setOpen(!open)}
         aria-expanded={open}
-        className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium transition ${
-          open ? "bg-slate-100 dark:bg-slate-800" : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+        className={`flex items-center gap-1.5 rounded px-2.5 py-1.5 text-sm font-medium transition-colors ${
+          open ? "bg-subtle" : "text-muted hover:bg-subtle"
         }`}
       >
-        <StarIcon filled={saved.length > 0} className="h-4 w-4 text-amber-500" />
+        <StarIcon filled={saved.length > 0} className="h-4 w-4 text-warn" />
         <span className="hidden sm:inline">Saved</span>
-        {saved.length > 0 && <span className="rounded-full bg-slate-200 px-1.5 text-xs dark:bg-slate-700">{saved.length}</span>}
+        {saved.length > 0 && <span className="rounded bg-subtle px-1.5 text-xs">{saved.length}</span>}
       </button>
 
       {open && (
-        <div className="fixed inset-x-3 top-14 z-40 max-h-[70vh] overflow-auto rounded-xl border border-slate-200 bg-white p-2 shadow-xl sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96 dark:border-slate-700 dark:bg-slate-900">
+        <div className="fixed inset-x-3 top-14 z-40 max-h-[70vh] overflow-auto rounded border border-line bg-surface p-2 shadow-sm sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96">
           <Section title="Saved companies">
             {saved.length === 0 ? (
-              <p className="px-2 py-3 text-sm text-slate-500 dark:text-slate-400">
+              <p className="px-2 py-3 text-sm text-muted">
                 Nothing saved yet. Click the <StarIcon filled={false} className="inline h-3.5 w-3.5" /> next to a company's name to keep it here.
               </p>
             ) : (
@@ -153,7 +151,7 @@ function SavedMenu() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="py-1">
-      <div className="px-2 pb-1 pt-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">{title}</div>
+      <div className="px-2 pb-1 pt-1.5 text-xs font-semibold text-muted">{title}</div>
       {children}
     </div>
   );
@@ -162,16 +160,16 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function QuoteRow({ symbol, quote, onRemove }: { symbol: string; quote: Overview | null | undefined; onRemove?: () => void }) {
   const change = quote?.changePercent ?? null;
   return (
-    <div className="group flex items-center rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">
+    <div className="group flex items-center rounded hover:bg-subtle">
       <Link to={`/company/${encodeURIComponent(symbol)}`} className="flex min-w-0 flex-1 items-center gap-3 px-2 py-2">
         <div className="min-w-0 flex-1">
           <div className="text-sm font-semibold">{symbol}</div>
-          <div className="truncate text-xs text-slate-500 dark:text-slate-400">{quote?.name ?? (quote === null ? "Loading…" : "")}</div>
+          <div className="truncate text-xs text-muted">{quote?.name ?? (quote === null ? "Loading…" : "")}</div>
         </div>
         <div className="text-right text-sm tabular-nums">
           <div>{quote ? fmt.price(quote.price, quote.currency) : ""}</div>
           {change !== null && (
-            <div className={`text-xs ${change >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
+            <div className={`text-xs ${change >= 0 ? "text-gain" : "text-loss"}`}>
               {fmt.signed(change)}%
             </div>
           )}
@@ -181,7 +179,7 @@ function QuoteRow({ symbol, quote, onRemove }: { symbol: string; quote: Overview
         <button
           onClick={onRemove}
           aria-label={`Remove ${symbol} from saved`}
-          className="mr-1 rounded-md px-2 py-1 text-slate-400 hover:bg-slate-200 hover:text-slate-700 dark:hover:bg-slate-700 dark:hover:text-slate-200"
+          className="mr-1 rounded px-2 py-1 text-muted hover:bg-subtle hover:text-ink"
         >
           ×
         </button>
@@ -209,7 +207,7 @@ function MarketStrip() {
 
   if (!items) return null;
   return (
-    <div className="border-t border-slate-100 dark:border-slate-800/80">
+    <div className="border-t border-line">
       <div className="mx-auto flex max-w-6xl gap-5 overflow-x-auto px-4 py-1.5 text-xs [scrollbar-width:none]">
         {items.map((m) => {
           const move = m.changeBp ?? m.changePercent;
@@ -218,17 +216,16 @@ function MarketStrip() {
             m.value === null
               ? "N/A"
               : m.symbol === "^TNX"
-                ? `${m.value.toFixed(2)}%`
-                : m.symbol === "CAD=X"
+                ? `${m.value.toFixed(2)}%`: m.symbol === "CAD=X"
                   ? m.value.toFixed(4)
                   : m.value.toLocaleString("en-US", { maximumFractionDigits: 0 });
           return (
             <span key={m.symbol} className="flex shrink-0 items-center gap-1.5 whitespace-nowrap">
-              <span className="text-slate-500 dark:text-slate-400">{m.label}</span>
+              <span className="text-muted">{m.label}</span>
               <span className="font-medium tabular-nums">{value}</span>
               {move !== null && (
-                <span className={`tabular-nums ${up ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
-                  {m.changeBp !== undefined ? `${up ? "+" : ""}${m.changeBp.toFixed(1)} bp` : `${fmt.signed(m.changePercent)}%`}
+                <span className={`tabular-nums ${up ? "text-gain" : "text-loss"}`}>
+                  {m.changeBp !== undefined ? `${up ? "+" : ""}${m.changeBp.toFixed(1)} bp`: `${fmt.signed(m.changePercent)}%`}
                 </span>
               )}
             </span>

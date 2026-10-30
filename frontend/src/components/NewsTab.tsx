@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { News, newsApi } from "../api";
+import { useEffect, useState } from"react";
+import { News, newsApi } from"../api";
 
 function timeAgo(iso: string) {
   const minutes = (Date.now() - new Date(iso).getTime()) / 60000;
@@ -27,8 +27,8 @@ export default function NewsTab({ ticker }: { ticker: string }) {
     };
   }, [ticker]);
 
-  if (error) return <p className="card mt-6 text-sm text-slate-500">News unavailable: {error}</p>;
-  if (!data) return <div className="mt-6 h-96 animate-pulse rounded-xl bg-slate-200 dark:bg-slate-800" />;
+  if (error) return <p className="card mt-6 text-sm text-muted">News unavailable: {error}</p>;
+  if (!data) return <div className="mt-6 h-96 animate-pulse rounded bg-subtle" />;
 
   const aboutCount = data.articles.filter((a) => a.about).length;
   // If nothing names the company in the headline, fall back to showing everything.
@@ -38,41 +38,41 @@ export default function NewsTab({ ticker }: { ticker: string }) {
   return (
     <div className="mt-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex rounded-lg bg-slate-100 p-0.5 dark:bg-slate-800">
+        <div className="flex rounded bg-subtle p-0.5">
           {[
-            { all: false, label: `About ${data.matchName || ticker} (${aboutCount})` },
-            { all: true, label: `All mentions (${data.articles.length})` },
+            { all: false, label: `About ${data.matchName || ticker} (${aboutCount})`},
+            { all: true, label: `All mentions (${data.articles.length})`},
           ].map((o) => (
             <button
               key={o.label}
               onClick={() => setShowAll(o.all)}
-              className={`whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium transition ${
-                (filtering ? !o.all : o.all) ? "bg-white shadow-sm dark:bg-slate-700" : "text-slate-500 hover:text-slate-900 dark:hover:text-slate-100"
+              className={`whitespace-nowrap rounded px-3 py-1.5 text-xs font-medium transition-colors ${
+                (filtering ? !o.all : o.all) ? "bg-surface" : "text-muted hover:text-ink"
               }`}
             >
               {o.label}
             </button>
           ))}
         </div>
-        <span className="text-xs text-slate-500 dark:text-slate-400">Newest first</span>
+        <span className="text-xs text-muted">Newest first</span>
       </div>
 
-      <ul className="card divide-y divide-slate-100 p-0 sm:p-0 dark:divide-slate-800">
-        {articles.length === 0 && <li className="p-5 text-sm text-slate-500">No recent news found.</li>}
+      <ul className="card divide-y divide-line p-0 sm:p-0">
+        {articles.length === 0 && <li className="p-5 text-sm text-muted">No recent news found.</li>}
         {articles.map((a) => (
           <li key={a.url}>
             <a
               href={a.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group block px-4 py-3 hover:bg-slate-50 sm:px-5 dark:hover:bg-slate-800/40"
+              className="group block px-4 py-3 hover:bg-subtle sm:px-5"
             >
-              <div className="text-sm font-medium leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400">
+              <div className="text-sm font-medium leading-snug group-hover:text-accent">
                 {a.headline}
               </div>
-              {a.summary && <p className="mt-1 line-clamp-2 text-xs text-slate-500 dark:text-slate-400">{a.summary}</p>}
-              <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                <span className="font-medium text-slate-600 dark:text-slate-300">{a.source ?? "N/A"}</span>
+              {a.summary && <p className="mt-1 line-clamp-2 text-xs text-muted">{a.summary}</p>}
+              <div className="mt-1 text-xs text-muted">
+                <span className="font-medium text-muted">{a.source ?? "N/A"}</span>
                 <span className="mx-1.5">·</span>
                 <time dateTime={a.published} title={new Date(a.published).toLocaleString()}>
                   {timeAgo(a.published)}
@@ -83,7 +83,7 @@ export default function NewsTab({ ticker }: { ticker: string }) {
         ))}
       </ul>
 
-      <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+      <p className="text-xs leading-relaxed text-muted">
         Sources: {data.sources.join(" + ") || "none available"}. "About" means the headline names the company or its
         ticker; "All mentions" includes articles that only reference it.
         {!data.sources.includes("Finnhub") &&

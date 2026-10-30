@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from"react";
 
 /**
  * A tiny trend line. Missing values (null) break the line instead of being drawn as zero.
@@ -20,7 +20,7 @@ export default function Sparkline({
   const [hover, setHover] = useState<number | null>(null);
   const present = values.filter((v): v is number => v !== null);
   if (present.length < 2) {
-    return <span className="text-xs text-slate-400">–</span>;
+    return <span className="text-xs text-muted">–</span>;
   }
 
   const pad = 4;
@@ -51,7 +51,7 @@ export default function Sparkline({
       <svg
         width={width}
         height={height}
-        className="block overflow-visible text-blue-600 dark:text-blue-400"
+        className="block overflow-visible text-accent"
         onMouseLeave={() => setHover(null)}
         role="img"
         aria-label={`Trend from ${labels[0]} to ${labels[labels.length - 1]}`}
@@ -60,7 +60,7 @@ export default function Sparkline({
           <path key={i} d={d} fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinejoin="round" strokeLinecap="round" />
         ))}
         {values[shown] !== null && (
-          <circle cx={x(shown)} cy={y(values[shown] as number)} r={3} fill="currentColor" className="stroke-white dark:stroke-slate-900" strokeWidth={1.5} />
+          <circle cx={x(shown)} cy={y(values[shown] as number)} r={3} fill="currentColor" className="stroke-surface" strokeWidth={1.5} />
         )}
         {/* Invisible full-height hit areas, one per period, wider than the line itself. */}
         {values.map((_, i) => (
@@ -76,7 +76,7 @@ export default function Sparkline({
         ))}
       </svg>
       {hover !== null && (
-        <div className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-1 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-900 px-2 py-1 text-xs text-white shadow-lg dark:bg-slate-700">
+        <div className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-1 -translate-x-1/2 whitespace-nowrap rounded bg-ink px-2 py-1 text-xs text-on-accent shadow-sm">
           {labels[hover]}: {values[hover] === null ? "N/A" : format(values[hover] as number)}
         </div>
       )}

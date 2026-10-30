@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { AreaSeries, ColorType, createChart } from "lightweight-charts";
-import { api, PricePoint, Range } from "../api";
-import { pct } from "../format";
-import type { Theme } from "../theme";
+import { useEffect, useRef, useState } from"react";
+import { AreaSeries, ColorType, createChart } from"lightweight-charts";
+import { api, PricePoint, Range } from"../api";
+import { pct } from"../format";
+import { cssVar, type Theme } from"../theme";
 
 const RANGES: Range[] = ["1M", "6M", "1Y", "5Y"];
 
@@ -34,18 +34,18 @@ export default function PriceChart({ ticker, theme }: { ticker: string; theme: T
   useEffect(() => {
     if (!containerRef.current || !data?.length) return;
     const dark = theme === "dark";
-    const line = up ? "#10b981" : "#f43f5e";
+    const line = cssVar(up ? "--gain" : "--loss");
 
     const chart = createChart(containerRef.current, {
       autoSize: true,
       layout: {
         background: { type: ColorType.Solid, color: "transparent" },
-        textColor: dark ? "#94a3b8" : "#64748b",
+        textColor: cssVar("--muted"),
         attributionLogo: false,
       },
       grid: {
         vertLines: { visible: false },
-        horzLines: { color: dark ? "#1e293b" : "#f1f5f9" },
+        horzLines: { color: cssVar("--line") },
       },
       rightPriceScale: { borderVisible: false },
       timeScale: { borderVisible: false },
@@ -70,21 +70,21 @@ export default function PriceChart({ ticker, theme }: { ticker: string; theme: T
         <div className="text-sm">
           <span className="font-semibold">Price</span>
           {rangeReturn !== null && (
-            <span className={`ml-2 ${up ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
+            <span className={`ml-2 ${up ? "text-gain" : "text-loss"}`}>
               {up ? "+" : ""}
               {pct(rangeReturn)} over {range}
             </span>
           )}
         </div>
-        <div className="flex rounded-lg bg-slate-100 p-0.5 dark:bg-slate-800">
+        <div className="flex rounded bg-subtle p-0.5">
           {RANGES.map((r) => (
             <button
               key={r}
               onClick={() => setRange(r)}
-              className={`rounded-md px-3 py-1 text-xs font-medium transition ${
+              className={`rounded px-3 py-1 text-xs font-medium transition-colors ${
                 r === range
-                  ? "bg-white shadow-sm dark:bg-slate-700"
-                  : "text-slate-500 hover:text-slate-900 dark:hover:text-slate-100"
+                  ? "bg-surface"
+                  : "text-muted hover:text-ink"
               }`}
             >
               {r}
@@ -93,8 +93,8 @@ export default function PriceChart({ ticker, theme }: { ticker: string; theme: T
         </div>
       </div>
       <div className="relative h-64 sm:h-80">
-        {error && <p className="p-4 text-sm text-slate-500">Price history unavailable: {error}</p>}
-        {!error && !data && <div className="h-full animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" />}
+        {error && <p className="p-4 text-sm text-muted">Price history unavailable: {error}</p>}
+        {!error && !data && <div className="h-full animate-pulse rounded bg-subtle" />}
         <div ref={containerRef} className="absolute inset-0" />
       </div>
     </div>

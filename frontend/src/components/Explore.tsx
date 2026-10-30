@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { ScreenerFilters, ScreenerRow, screenerApi } from "../api";
-import * as fmt from "../format";
+import { useEffect, useRef, useState } from"react";
+import { Link, useLocation, useSearchParams } from"react-router-dom";
+import { ScreenerFilters, ScreenerRow, screenerApi } from"../api";
+import * as fmt from"../format";
 
 // What each sector covers, shown on the tiles.
 const SECTORS: { name: string; blurb: string }[] = [
@@ -84,7 +84,7 @@ export default function Explore() {
     screenerApi.options().then(setIndustries).catch(() => {});
   }, []);
 
-  // Arriving from the top bar's "Explore" link (/#explore): scroll down to this section.
+  // Arriving from the top bar's"Explore" link (/#explore): scroll down to this section.
   const { hash } = useLocation();
   useEffect(() => {
     if (hash === "#explore") document.getElementById("explore")?.scrollIntoView({ behavior: "smooth" });
@@ -113,26 +113,26 @@ export default function Explore() {
   }
 
   const select =
-    "min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-blue-500 dark:border-slate-700 dark:bg-slate-900";
+    "min-w-0 rounded border border-line-strong bg-surface px-2.5 py-1.5 text-sm outline-none focus:border-accent";
   const active = JSON.stringify({ ...filters, sort: "", country: "" }) !== JSON.stringify({ ...DEFAULTS, sort: "", country: "" });
 
   return (
     <section id="explore" className="mx-auto mt-16 max-w-6xl scroll-mt-28 px-4 pb-10">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-xl font-semibold tracking-tight">Explore by sector</h2>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Pick a sector, then narrow it down with the filters.</p>
+          <h2 className="text-xl">Explore by sector</h2>
+          <p className="mt-1 text-sm text-muted">Pick a sector, then narrow it down with the filters.</p>
         </div>
-        <div className="flex rounded-lg bg-slate-200/70 p-0.5 dark:bg-slate-800">
+        <div className="flex gap-4 border-b border-line">
           {[
             ["us", "United States"],
             ["ca", "Canada (TSX)"],
           ].map(([value, label]) => (
             <button
               key={value}
-              onClick={() => set({ country: value as "us" | "ca" })}
-              className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${
-                filters.country === value ? "bg-white shadow-sm dark:bg-slate-700" : "text-slate-500 hover:text-slate-900 dark:hover:text-slate-100"
+              onClick={() => set({ country: value as"us" | "ca" })}
+              className={`-mb-px border-b-2 py-1.5 text-sm font-medium transition-colors ${
+                filters.country === value ? "border-accent text-ink" : "border-transparent text-muted hover:text-ink"
               }`}
             >
               {label}
@@ -142,7 +142,7 @@ export default function Explore() {
       </div>
 
       {/* Sector tiles */}
-      <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="mt-6 grid gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
         {SECTORS.map((s) => {
           const on = filters.sector === s.name;
           return (
@@ -150,14 +150,10 @@ export default function Explore() {
               key={s.name}
               onClick={() => pickSector(s.name)}
               aria-pressed={on}
-              className={`rounded-xl border p-3 text-left transition ${
-                on
-                  ? "border-blue-500 bg-blue-50 ring-1 ring-blue-500 dark:bg-blue-950/40"
-                  : "border-slate-200 bg-white hover:border-blue-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-blue-700"
-              }`}
+              className={`border-t border-line py-3 text-left transition-colors hover:text-accent ${on ? "text-accent" : ""}`}
             >
-              <div className="text-sm font-semibold">{s.name}</div>
-              <div className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{s.blurb}</div>
+              <div className="font-medium">{s.name}</div>
+              <div className="text-sm text-muted">{s.blurb}</div>
             </button>
           );
         })}
@@ -208,7 +204,7 @@ export default function Explore() {
             ))}
           </select>
           {active && (
-            <button onClick={() => setParams(filters.country === "ca" ? { country: "ca" } : {}, { replace: true })} className="text-xs text-blue-600 hover:underline dark:text-blue-400">
+            <button onClick={() => setParams(filters.country === "ca" ? { country: "ca" } : {}, { replace: true })} className="text-xs text-accent hover:underline">
               Clear filters
             </button>
           )}
@@ -217,27 +213,27 @@ export default function Explore() {
 
       {/* Results */}
       {note && (
-        <p className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900 dark:border-amber-700/60 dark:bg-amber-950/40 dark:text-amber-200">
+        <p className="mt-3 rounded border border-warn bg-warn-soft px-3 py-2 text-xs text-warn">
           {note}
         </p>
       )}
       <div className="card mt-3 overflow-hidden p-0 sm:p-0">
-        {error && <p className="p-5 text-sm text-slate-500">Couldn't load stocks: {error}. Yahoo may be busy, so try again in a minute.</p>}
+        {error && <p className="p-5 text-sm text-muted">Couldn't load stocks: {error}. Yahoo may be busy, so try again in a minute.</p>}
         {!error && !rows && (
           <div className="space-y-2 p-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-9 animate-pulse rounded bg-slate-100 dark:bg-slate-800" />
+              <div key={i} className="h-9 animate-pulse rounded bg-subtle" />
             ))}
           </div>
         )}
-        {rows && rows.length === 0 && <p className="p-5 text-sm text-slate-500">No companies match these filters. Try loosening one.</p>}
+        {rows && rows.length === 0 && <p className="p-5 text-sm text-muted">No companies match these filters. Try loosening one.</p>}
         {rows && rows.length > 0 && <ResultsTable rows={rows.slice(0, shown)} />}
       </div>
       {rows && rows.length > 0 && (
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
           <span>
             Showing {Math.min(shown, rows.length)} of {rows.length}
-            {total > rows.length && filters.country === "us" ? ` (top ${rows.length} of ${total.toLocaleString()} matches)` : ""} companies.
+            {total > rows.length && filters.country === "us" ? `(top ${rows.length} of ${total.toLocaleString()} matches)`: ""} companies.
             Market caps in the listing currency ({filters.country === "ca" ? "CAD" : "USD"}). Click a row to research it.
           </span>
           {shown < rows.length && (
@@ -253,14 +249,14 @@ export default function Explore() {
 
 function ResultsTable({ rows }: { rows: ScreenerRow[] }) {
   const pct = (v: number | null) =>
-    v === null ? <span className="text-slate-400">N/A</span> : <span className={v >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}>{fmt.signed(v, 1)}%</span>;
+    v === null ? <span className="text-muted">N/A</span> : <span className={v >= 0 ? "text-gain" : "text-loss"}>{fmt.signed(v, 1)}%</span>;
   const th = "whitespace-nowrap px-3 py-2 text-right font-medium";
   return (
     <div className="overflow-x-auto">
       <table className="w-full border-collapse text-sm">
         <thead>
-          <tr className="border-b border-slate-200 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
-            <th className="sticky left-0 z-10 bg-white px-4 py-2 text-left font-medium dark:bg-slate-900">Company</th>
+          <tr className="border-b border-line text-xs text-muted">
+            <th className="sticky left-0 z-10 bg-surface px-4 py-2 text-left font-medium">Company</th>
             <th className={th}>Price</th>
             <th className={th}>Today</th>
             <th className={th}>1 year</th>
@@ -271,19 +267,19 @@ function ResultsTable({ rows }: { rows: ScreenerRow[] }) {
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.symbol} className="group border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-slate-800/60 dark:hover:bg-slate-800/40">
-              <td className="sticky left-0 z-10 bg-white px-4 py-2 group-hover:bg-slate-50 dark:bg-slate-900 dark:group-hover:bg-slate-800">
+            <tr key={r.symbol} className="group border-b border-line last:border-0 hover:bg-subtle">
+              <td className="sticky left-0 z-10 bg-surface px-4 py-2 group-hover:bg-subtle">
                 <Link to={`/company/${encodeURIComponent(r.symbol)}`} className="block">
-                  <div className="font-semibold text-blue-600 group-hover:underline dark:text-blue-400">{r.symbol}</div>
-                  <div className="max-w-[11rem] truncate text-xs text-slate-500 sm:max-w-[18rem] dark:text-slate-400">{r.name}</div>
+                  <div className="font-semibold text-accent group-hover:underline">{r.symbol}</div>
+                  <div className="max-w-[11rem] truncate text-xs text-muted sm:max-w-[18rem]">{r.name}</div>
                 </Link>
               </td>
               <td className="whitespace-nowrap px-3 py-2 text-right">{fmt.price(r.price, r.currency)}</td>
               <td className="whitespace-nowrap px-3 py-2 text-right">{pct(r.changePercent)}</td>
               <td className="whitespace-nowrap px-3 py-2 text-right">{pct(r.yearChangePercent)}</td>
               <td className="whitespace-nowrap px-3 py-2 text-right">{fmt.big(r.marketCap)}</td>
-              <td className="whitespace-nowrap px-3 py-2 text-right">{r.pe === null ? <span className="text-slate-400">N/A</span> : `${r.pe.toFixed(1)}x`}</td>
-              <td className="whitespace-nowrap px-3 py-2 text-right">{r.dividendYield ? fmt.pct(r.dividendYield) : <span className="text-slate-400">–</span>}</td>
+              <td className="whitespace-nowrap px-3 py-2 text-right">{r.pe === null ? <span className="text-muted">N/A</span> : `${r.pe.toFixed(1)}x`}</td>
+              <td className="whitespace-nowrap px-3 py-2 text-right">{r.dividendYield ? fmt.pct(r.dividendYield) : <span className="text-muted">–</span>}</td>
             </tr>
           ))}
         </tbody>

@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { api, SearchResult } from "../api";
+import { useEffect, useRef, useState } from"react";
+import { useNavigate } from"react-router-dom";
+import { api, SearchResult } from"../api";
 
 /**
  * Ticker / company-name search with autocomplete.
@@ -78,7 +78,7 @@ export default function SearchBar({ large = false }: { large?: boolean }) {
   return (
     <div ref={boxRef} className="relative w-full">
       <svg
-        className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-slate-400 ${large ? "left-4 h-5 w-5" : "left-3 h-4 w-4"}`}
+        className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-muted ${large ? "left-4 h-5 w-5" : "left-3 h-4 w-4"}`}
         viewBox="0 0 20 20"
         fill="currentColor"
         aria-hidden
@@ -101,12 +101,12 @@ export default function SearchBar({ large = false }: { large?: boolean }) {
         aria-label="Search ticker or company"
         autoComplete="off"
         spellCheck={false}
-        className={`w-full rounded-lg border border-slate-300 bg-white text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 ${
+        className={`w-full rounded border border-line-strong bg-surface text-ink outline-none transition-colors placeholder:text-muted focus:border-accent focus:ring-2 focus:ring-accent/20    ${
           large ? "py-3.5 pl-12 pr-4 text-base" : "py-2 pl-9 pr-3 text-sm"
         }`}
       />
       {showDropdown && (
-        <ul className="absolute z-20 mt-1 max-h-80 w-full overflow-auto rounded-lg border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-900">
+        <ul className="absolute z-20 mt-1 max-h-80 w-full overflow-auto rounded border border-line bg-surface py-1 shadow-sm">
           {results.map((r, i) => (
             <li key={r.symbol}>
               <button
@@ -114,22 +114,22 @@ export default function SearchBar({ large = false }: { large?: boolean }) {
                 onClick={() => go(r.symbol)}
                 onMouseEnter={() => setActive(i)}
                 className={`flex w-full items-center gap-3 px-3 py-2 text-left text-sm ${
-                  i === active ? "bg-slate-100 dark:bg-slate-800" : ""
+                  i === active ? "bg-subtle" : ""
                 }`}
               >
                 <span className="w-20 shrink-0 font-semibold">{r.symbol}</span>
-                <span className="min-w-0 flex-1 truncate text-slate-600 dark:text-slate-300">{r.name}</span>
-                <span className="shrink-0 text-xs text-slate-400">{r.exchange}</span>
+                <span className="min-w-0 flex-1 truncate text-muted">{r.name}</span>
+                <span className="shrink-0 text-xs text-muted">{r.exchange}</span>
               </button>
             </li>
           ))}
           {!loading && results.length === 0 && (
-            <li className="px-3 py-2 text-sm text-slate-500">
-              No matches. Press Enter to try "{query.trim().toUpperCase()}" as a ticker.
+            <li className="px-3 py-2 text-sm text-muted">
+              No matches. Press Enter to try"{query.trim().toUpperCase()}" as a ticker.
             </li>
           )}
           {loading && results.length === 0 && (
-            <li className="px-3 py-2 text-sm text-slate-500">Searching…</li>
+            <li className="px-3 py-2 text-sm text-muted">Searching…</li>
           )}
         </ul>
       )}

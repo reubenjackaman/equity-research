@@ -1,9 +1,9 @@
-import { useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { useRef, useState } from"react";
+import { createPortal } from"react-dom";
 
 /**
  * Hover (or tap, on phones) to show a small popover. It's positioned relative to the
- * window and rendered at the end of <body> (a "portal"), so scrolling tables and
+ * window and rendered at the end of <body> (a"portal"), so scrolling tables and
  * sticky columns can't clip or cover it.
  */
 export default function InfoTip({ children, content }: { children: React.ReactNode; content: React.ReactNode }) {
@@ -29,7 +29,7 @@ export default function InfoTip({ children, content }: { children: React.ReactNo
         onFocus={show}
         onBlur={() => setPos(null)}
         onClick={() => (pos ? setPos(null) : show())}
-        className="cursor-help text-left underline decoration-slate-300 decoration-dotted underline-offset-4 dark:decoration-slate-600"
+        className="cursor-help text-left underline decoration-line-strong decoration-dotted underline-offset-4"
       >
         {children}
       </button>
@@ -38,7 +38,7 @@ export default function InfoTip({ children, content }: { children: React.ReactNo
         <div
           role="tooltip"
           style={pos}
-          className="fixed z-50 w-72 rounded-lg border border-slate-200 bg-white p-3 text-xs font-normal leading-relaxed text-slate-700 shadow-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+          className="fixed z-50 w-72 rounded border border-line bg-surface p-3 text-xs font-normal leading-relaxed text-ink shadow-sm"
         >
           {content}
         </div>,
