@@ -21,12 +21,13 @@ Implied value per share = peer median multiple × the target's own metric:
     EV/EBITDA  -> (median EV/EBITDA × EBITDA − Net debt) ÷ Shares,  Net debt = EV − Market cap
 """
 
+import math
 from concurrent.futures import ThreadPoolExecutor
 from statistics import mean, median, quantiles
 
 import yfinance as yf
 
-from data import finnhub, yahoo
+from data import finnhub, snapshot, yahoo
 from data.cache import DAY, MINUTE, cached
 from finance import ratios
 
@@ -48,8 +49,13 @@ METRICS = [
 ]
 
 
+def _company_key(symbol: str) -> str:
+    """SHOP.TO -> SHOP, BRK-B -> BRK, BBD-A.TO -> BBD: share classes and listings of one company."""
+    return symbol.split(".")[0].split("-")[0].upper()
+
+
 def _same_company(a: str, b: str) -> bool:
-    return a.split(".")[0].upper() == b.split(".")[0].upper()
+    return _company_key(a) == _company_key(b)
 
 
 @cached("peers", DAY)
@@ -57,14 +63,43 @@ def suggest_peers(ticker: str) -> dict:
     try:
         return _yahoo_peers(ticker)
     except Exception:
-        return _finnhub_peers(ticker)  # Yahoo's industry data refuses many cloud servers
+        return _fallback_peers(ticker)  # Yahoo's industry data refuses many cloud servers
 
 
-def _finnhub_peers(ticker: str) -> dict:
-    """Fallback: the companies Finnhub groups with this one (same country and industry)."""
-    symbol = yahoo.us_listing(ticker)
-    found = [p for p in finnhub.peers(symbol) if "." not in p and not _same_company(p, ticker)] if symbol else []
-    return {"peers": found[:MAX_PEERS], "basis": "Similar companies according to Finnhub", "industry": None}
+def _fallback_peers(ticker: str) -> dict:
+    """Used when Yahoo's industry data is unavailable. Finnhub's industry peers come first,
+    but only real, sizeable US/TSX companies (those in the saved snapshot), closest in size
+    first; the rest is filled with same-sector companies of similar size from the snapshot."""
+    target = yahoo.overview(ticker)
+    us = yahoo.us_listing(ticker)
+    snap = snapshot.lookup(ticker, us)
+    cap = target.get("marketCap") or (snap or {}).get("marketCap")
+    exclude = {ticker, us, (snap or {}).get("symbol")}
+
+    peers = []
+    try:
+        candidates = finnhub.peers(us) if us else []
+    except Exception:
+        candidates = []
+    rows = [snapshot.lookup(c, c.replace(".", "-")) for c in candidates]
+    rows = [r for r in rows if r and r["symbol"] not in exclude and not _same_company(r["symbol"], ticker)]
+    if cap:
+        rows.sort(key=lambda r: abs(math.log(r["marketCap"] / cap)) if r["marketCap"] else 99)
+    peers = [r["symbol"] for r in rows][:MAX_PEERS]
+
+    sector = (snap or {}).get("sector") or target.get("sector")
+    if len(peers) < MAX_PEERS and sector:
+        more = snapshot.similar(sector, cap, exclude | set(peers), (snap or {}).get("country"), n=MAX_PEERS * 3)
+        peers += [p for p in more if not _same_company(p, ticker)]
+    # One entry per company (BBD-A.TO and BBD-B.TO are the same business).
+    unique, seen = [], set()
+    for p in peers:
+        if _company_key(p) not in seen:
+            seen.add(_company_key(p))
+            unique.append(p)
+    peers = unique[:MAX_PEERS]
+    basis = f"Similar-size companies in {sector}" if sector else "Similar companies according to Finnhub"
+    return {"peers": peers, "basis": basis, "industry": target.get("industry")}
 
 
 def _yahoo_peers(ticker: str) -> dict:
