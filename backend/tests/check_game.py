@@ -38,4 +38,37 @@ for bad in [(n + 1, 1, first["symbol"]), (n, 1, "NOT-A-TICKER")]:
         raise SystemExit(f"should have been refused: {bad}")
     except ValueError:
         pass
+
+# Hints: redaction must hide the company but leave ordinary words readable.
+intel = game._companies()["INTC"]
+apple = game._companies()["AAPL"]
+cost = game._companies()["COST"]
+assert "Intel" not in game._redact("Intel's new chip beats Nvidia in tests", intel)
+assert "Nvidia" not in game._redact("Intel's new chip beats Nvidia in tests", intel)
+assert "iPhone" not in game._redact("Apple sells more iPhone units", apple)
+assert "new chip" in game._redact("Intel's new chip beats Nvidia in tests", intel)
+assert "cost" in game._redact("Rising cost of goods hits Costco", cost), "a ticker must not hide an ordinary word"
+assert "5B" in game._redact("Intel to spend 5B on plants", intel)
+assert game.hint(1, "letter")["text"].endswith(" I")
+for bad in [(n + 1, "letter"), (n, "nonsense")]:
+    try:
+        game.hint.__wrapped__(*bad) if hasattr(game.hint, "__wrapped__") else game.hint(*bad)
+        raise SystemExit(f"should have been refused: {bad}")
+    except ValueError:
+        pass
+
+# Real hints for every possible answer: none may contain the name or the ticker.
+import re
+checked = 0
+for row in pool + [intel]:
+    for fn in (game._news_hint, game._product_hint):
+        try:
+            text = fn(row)
+        except ValueError:
+            continue  # the page says so and no guess is used
+        checked += 1
+        for word in game._name_words(row):
+            assert not re.search(rf"\b{re.escape(word)}\b", text, re.IGNORECASE), (row["symbol"], word, text)
+        assert not re.search(rf"\b{re.escape(game._ticker(row))}\b", text), (row["symbol"], text)
+print("hints checked:", checked)
 print("all game checks passed")
