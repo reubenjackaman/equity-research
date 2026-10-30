@@ -276,3 +276,23 @@ def us_listing(ticker: str):
     if "." not in ticker:
         return ticker
     return _us_symbol(ticker, overview(ticker)["name"])
+
+
+MARKET = [("^GSPC", "S&P 500"), ("^IXIC", "Nasdaq"), ("^GSPTSE", "TSX"), ("CAD=X", "USD/CAD"), ("^TNX", "US 10Y")]
+
+
+@cached("market", 10 * MINUTE)
+def market() -> list:
+    """Latest level and daily change for a few headline markets (shown in the top bar)."""
+    out = []
+    for symbol, label in MARKET:
+        try:
+            closes = yf.Ticker(symbol).history(period="5d")["Close"].dropna()
+            last, prev = float(closes.iloc[-1]), float(closes.iloc[-2])
+            item = {"symbol": symbol, "label": label, "value": last, "changePercent": (last / prev - 1) * 100}
+            if symbol == "^TNX":  # a yield (in %): its daily move is quoted in basis points
+                item["changeBp"] = (last - prev) * 100
+            out.append(item)
+        except Exception:
+            out.append({"symbol": symbol, "label": label, "value": None, "changePercent": None})
+    return out
