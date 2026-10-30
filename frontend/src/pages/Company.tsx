@@ -150,6 +150,11 @@ function OverviewTab({ data, theme }: { data: Overview; theme: Theme }) {
         <p className={`text-sm leading-relaxed text-slate-600 dark:text-slate-300 ${expanded ? "" : "line-clamp-4"}`}>
           {data.description ?? "No description available (N/A)."}
         </p>
+        {data.profileSource !== "Yahoo Finance" && (
+          <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+            Company profile from {data.profileSource} (Yahoo's profile is unavailable right now), so a few figures may be N/A.
+          </p>
+        )}
         {data.description && data.description.length > 400 && (
           <button onClick={() => setExpanded(!expanded)} className="mt-2 text-sm text-blue-600 hover:underline dark:text-blue-400">
             {expanded ? "Show less" : "Show more"}
