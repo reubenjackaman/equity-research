@@ -35,6 +35,18 @@ export default function Home() {
           ))}
         </div>
       </div>
+      <div className="mx-auto mt-10 max-w-2xl px-4">
+        <Link
+          to="/game"
+          className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-blue-400 dark:border-slate-800 dark:bg-slate-900"
+        >
+          <span>
+            <span className="block font-semibold">Mystery Company</span>
+            <span className="block text-sm text-slate-500 dark:text-slate-400">Today's hidden company. Six guesses. Can you read the numbers?</span>
+          </span>
+          <span className="shrink-0 text-sm font-semibold text-blue-600 dark:text-blue-400">Play →</span>
+        </Link>
+      </div>
       <Explore />
     </>
   );
