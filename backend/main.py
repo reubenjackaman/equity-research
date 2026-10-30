@@ -16,7 +16,7 @@ from fastapi import Body, FastAPI, HTTPException, Query, Response
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from data import news, screener, yahoo
+from data import game, news, screener, yahoo
 from exports import dcf_excel, excel
 from finance import comps, dcf, ratios, statements
 
@@ -131,6 +131,18 @@ def health():
 def market_route():
     """Headline markets for the top bar: S&P 500, Nasdaq, TSX, USD/CAD, US 10-year yield."""
     return fetch(yahoo.market)
+
+
+@app.get("/api/game/today")
+def game_today():
+    """Today's Mystery Company puzzle number and the list of companies you can guess."""
+    return fetch(game.today)
+
+
+@app.get("/api/game/guess")
+def game_guess(puzzle: int, attempt: int, symbol: str):
+    """Clues for one guess. The answer is only included once the game is over."""
+    return fetch(game.guess, puzzle, attempt, symbol)
 
 
 # ---------- The website itself (production) ----------
