@@ -16,7 +16,7 @@ services:
         value: "3.12.7"
       - key: NODE_VERSION
         value: "22"
-      - key: SEC_USER_AGENT # e.g. "Equity Research Student App you@example.com"
+      - key: SEC_USER_AGENT # e.g. "Value Finch you@example.com"
         sync: false
       - key: FINNHUB_API_KEY
         sync: false

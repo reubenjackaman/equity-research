@@ -1,4 +1,4 @@
-# Equity Research
+# Value Finch
 
 A project by Reuben Jackaman.
 
