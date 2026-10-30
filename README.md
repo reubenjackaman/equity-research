@@ -115,6 +115,18 @@ the start command (`cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT`)
 
 During development keep using the two-terminal setup above, which reloads as you edit.
 
+**Hosting note: Yahoo blocks some requests from cloud servers.** On hosts like Render,
+Yahoo's company-profile and screener endpoints often refuse requests (prices, history,
+search and statements still work). The app falls back automatically:
+- Company profile is rebuilt from price-chart data plus Finnhub (industry, market cap,
+  beta, dividend yield) and Wikipedia (description). Analyst price targets aren't available.
+- Comparable-company peers come from Finnhub.
+- Explore uses a saved snapshot (`backend/data/screener_snapshot.json`). Refresh it from
+  your own computer with `.venv/bin/python -m tools.make_screener_snapshot`.
+
+`.venv/bin/python -m tests.check_server_fallbacks` simulates the blocked endpoints locally
+and checks every page still works.
+
 ## API keys
 
 Keys go in `backend/.env`, which is in `.gitignore` so it is never committed.
