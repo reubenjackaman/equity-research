@@ -22,7 +22,7 @@ from finance import comps, dcf, ratios, statements
 
 load_dotenv()
 
-app = FastAPI(title="Equity Research API")
+app = FastAPI(title="Value Finch API")
 
 
 def fetch(fn, *args):
