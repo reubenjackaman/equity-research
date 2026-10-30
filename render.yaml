@@ -1,0 +1,22 @@
+# Render "Blueprint": tells Render how to build and run this app as one web service.
+# In Render: New → Blueprint → pick this GitHub repository. You'll be asked for the two
+# secret values below (they are never stored in this repository).
+services:
+  - type: web
+    name: reuben-equity-research
+    runtime: python
+    plan: free # sleeps after ~15 min without visitors; switch to "starter" to keep it always on
+    # 1) install Python packages, 2) build the website into frontend/dist
+    buildCommand: pip install -r backend/requirements.txt && cd frontend && npm ci && npm run build
+    # One server: FastAPI serves the API and the built website
+    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: NODE_VERSION
+        value: "22"
+      - key: SEC_USER_AGENT # e.g. "Equity Research Student App you@example.com"
+        sync: false
+      - key: FINNHUB_API_KEY
+        sync: false
