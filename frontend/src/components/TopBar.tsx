@@ -4,6 +4,7 @@ import { api, Overview } from "../api";
 import * as fmt from "../format";
 import { keys, useSaved, useStored } from "../storage";
 import type { Theme } from "../theme";
+import { Birdhouse } from "./Finch";
 import SearchBar from "./SearchBar";
 
 /** The bar at the top of every page: navigation, saved companies, search, theme and a market strip. */
@@ -27,17 +28,11 @@ export default function TopBar({ theme, onToggleTheme }: { theme: Theme; onToggl
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-2 sm:flex-nowrap sm:gap-3">
         <Link
           to="/"
-          aria-label="Home"
-          className={`flex shrink-0 items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium transition ${
-            onHome
-              ? "bg-blue-600 text-white"
-              : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
-          }`}
+          aria-label="Value Finch home"
+          className="flex shrink-0 items-center gap-1.5 rounded-lg px-1.5 py-1 font-semibold tracking-tight transition hover:bg-slate-100 dark:hover:bg-slate-800"
         >
-          <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-            <path d="M10.7 2.3a1 1 0 0 0-1.4 0l-6.5 6.5a1 1 0 0 0 1.4 1.4l.3-.3V16a1.5 1.5 0 0 0 1.5 1.5h2.5V13a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v4.5H15a1.5 1.5 0 0 0 1.5-1.5V9.9l.3.3a1 1 0 0 0 1.4-1.4l-6.5-6.5Z" />
-          </svg>
-          <span className="hidden sm:inline">Home</span>
+          <Birdhouse className="h-8 w-8" />
+          <span className="hidden whitespace-nowrap lg:inline">Value Finch</span>
         </Link>
         <nav className="flex shrink-0 items-center">
           <button onClick={goExplore} className={`hidden sm:block ${link(false)}`}>
