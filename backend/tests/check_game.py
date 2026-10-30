@@ -6,13 +6,16 @@ from data import game
 
 pool = game._answer_pool()
 print("companies to guess:", len(game._companies()), "| possible answers:", len(pool))
-assert len(pool) > 100
+assert len(pool) >= 20
 
 n = game.today_number()
 first = game._answer(n)
 assert first == game._answer(n), "same puzzle must give the same answer"
-answers = [game._answer(i)["symbol"] for i in range(1, 366)]
-print("distinct answers in 365 days:", len(set(answers)), "| next few:", answers[:5])
+answers = [game._answer(i)["symbol"] for i in range(2, 2 + len(pool))]
+assert len(set(answers)) == len(pool), "every company gets a turn before any repeats"
+assert all((game._cap_usd(r) or 0) >= game.MIN_ANSWER_CAP_USD for r in pool)
+assert game._answer(1)["symbol"] == "INTC"
+print("answers cycle every", len(pool), "days | next few:", answers[:5])
 
 r = game.guess(n, 1, first["symbol"])
 assert r["correct"] and r["answer"]["symbol"] == first["symbol"]
