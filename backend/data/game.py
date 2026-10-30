@@ -19,7 +19,8 @@ from . import snapshot, yahoo
 
 LAUNCH = date(2026, 10, 30)  # puzzle #1
 MAX_GUESSES = 6
-MIN_ANSWER_CAP_USD = 30e9  # answers are companies people have a fair chance of knowing
+MIN_ANSWER_CAP_USD = 400e9  # answers are companies almost everyone has heard of
+OVERRIDES = {1: "INTC"}  # hand-picked answers, by puzzle number
 FALLBACK_CAD_USD = 0.72
 
 
@@ -71,6 +72,8 @@ def today_number() -> int:
 
 
 def _answer(puzzle: int) -> dict:
+    if puzzle in OVERRIDES:
+        return _companies()[OVERRIDES[puzzle]]
     pool = _answer_pool()
     return pool[(puzzle - 1) % len(pool)]
 
