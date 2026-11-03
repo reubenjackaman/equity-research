@@ -18,9 +18,9 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from data import game, gemini, news, screener, warmup, yahoo
+from data import game, gemini, markets, news, screener, warmup, yahoo
 from exports import dcf_excel, excel
-from finance import assistant, comps, dcf, ratios, statements, valuation_history
+from finance import assistant, comps, dcf, ratios, statements, street, valuation_history
 from finance import health as health_scores
 
 load_dotenv()
@@ -61,6 +61,25 @@ def history(ticker: str, range: str = "1Y"):
     if range not in yahoo.RANGES:
         raise HTTPException(400, f"range must be one of {list(yahoo.RANGES)}")
     return fetch(yahoo.history, yahoo.normalize(ticker), range)
+
+
+@app.get("/api/company/{ticker}/bars")
+def bars(ticker: str, range: str = "1Y"):
+    """Candlestick bars (open, high, low, close, volume) for the chart screen."""
+    if range not in yahoo.BAR_RANGES:
+        raise HTTPException(400, f"range must be one of {list(yahoo.BAR_RANGES)}")
+    return fetch(yahoo.bars, yahoo.normalize(ticker), range)
+
+
+@app.get("/api/company/{ticker}/insiders")
+def insiders_route(ticker: str):
+    return fetch(street.insiders, yahoo.normalize(ticker))
+
+
+@app.get("/api/company/{ticker}/estimates")
+def estimates_route(ticker: str):
+    """Analyst ratings, earnings surprises, the next report date and price targets."""
+    return fetch(street.estimates, yahoo.normalize(ticker))
 
 
 @app.get("/api/company/{ticker}/statements")
@@ -152,6 +171,36 @@ def market_route():
     return fetch(yahoo.market)
 
 
+@app.get("/api/markets/board")
+def board_route():
+    """World indices, currencies, commodities, crypto and yields."""
+    return fetch(markets.board)
+
+
+@app.get("/api/markets/movers")
+def movers_route():
+    """Biggest gainers, losers and most traded among the largest US and TSX companies."""
+    return fetch(markets.movers)
+
+
+@app.get("/api/markets/rates")
+def rates_route():
+    """US and Canadian yield curves, the 10Y-2Y spread and central bank policy rates."""
+    return fetch(markets.rates)
+
+
+@app.get("/api/markets/economy")
+def economy_route():
+    """Headline US and Canadian economic indicators."""
+    return fetch(markets.economy)
+
+
+@app.get("/api/markets/earnings")
+def earnings_calendar_route():
+    """Upcoming earnings reports from large US and TSX companies."""
+    return fetch(markets.earnings_calendar)
+
+
 @app.get("/api/game/today")
 def game_today():
     """Today's Mystery Company puzzle number and the list of companies you can guess."""
@@ -171,7 +220,7 @@ def game_hint(puzzle: int, kind: str):
 
 
 class AskBody(BaseModel):
-    symbol: str = Field(max_length=15)
+    symbol: str = Field(default="", max_length=15)  # empty on the market screens
     tab: str = Field(default="Overview", max_length=20)
     question: str = Field(max_length=2000)
     history: list = Field(default=[], max_length=20)
