@@ -220,6 +220,13 @@ and recently viewed companies with live prices. These are remembered in your bro
   Needs `GEMINI_API_KEY` in `backend/.env` locally and in Render's environment settings; without it the feature turns
   itself off. Limits: 200 questions a day site-wide, 20 a day and 5 a minute per visitor. Check: `python -m tests.check_assistant`.
 
+## Speed on Render's free plan
+
+`backend/data/warmup.py` runs only on Render. Every 10 minutes the server visits its own public address so the free
+plan doesn't put it to sleep (which would also empty the cache), and every 12 hours it preloads ~30 popular companies
+(and the competitors of the biggest), so first visits are fast. One always-on service uses about 744 of the free
+plan's 750 monthly hours, so a second free service would run out of hours.
+
 ## Mystery Company (daily game)
 
 A new hidden company every day at `/game`, with six guesses. Each guess shows clues comparing
