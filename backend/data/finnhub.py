@@ -53,3 +53,9 @@ def metrics(ticker: str) -> dict:
 def peers(ticker: str) -> list:
     """Companies Finnhub groups with this one (same country and industry)."""
     return [p for p in _get("stock/peers", symbol=_symbol(ticker)) if p != _symbol(ticker)]
+
+
+@cached("fh-recommendations", DAY)
+def recommendations(ticker: str) -> list:
+    """Monthly counts of analyst ratings (strong buy ... strong sell), newest first. US listings on the free plan."""
+    return _get("stock/recommendation", symbol=_symbol(ticker))
