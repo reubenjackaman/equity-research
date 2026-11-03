@@ -1,7 +1,7 @@
-import { useEffect } from"react";
-import { Link } from"react-router-dom";
-import Explore from"../components/Explore";
-import SearchBar from"../components/SearchBar";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import Explore from "../components/Explore";
+import SearchBar from "../components/SearchBar";
 
 const EXAMPLES = ["AAPL", "MSFT", "NVDA", "SHOP.TO", "RY.TO", "CNR.TO"];
 

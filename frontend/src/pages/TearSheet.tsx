@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from"react";
-import { useParams } from"react-router-dom";
-import { api, Overview, PricePoint, Ratios, ratiosApi, Statements, statementsApi } from"../api";
-import FootballField from"../components/FootballField";
-import * as fmt from"../format";
-import { buildValuationRows, useValuationData } from"../valuation";
+import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+import { api, Overview, PricePoint, Ratios, ratiosApi, Statements, statementsApi } from "../api";
+import FootballField from "../components/FootballField";
+import * as fmt from "../format";
+import { buildValuationRows, useValuationData } from "../valuation";
 
 /**
  * One-page research summary, laid out for printing. "Save as PDF" uses the browser's
- * print dialog (choose"Save as PDF" as the destination).
+ * print dialog (choose "Save as PDF" as the destination).
  */
 export default function TearSheet() {
   const ticker = (useParams().ticker ?? "").toUpperCase();
@@ -48,10 +48,10 @@ export default function TearSheet() {
   const ready = overview && history && statements && ratios && !valuation.loading;
 
   return (
-    //"force-light": paper is white, so this page ignores dark mode (see index.css).
+    // "force-light": paper is white, so this page ignores dark mode (see index.css).
     <div className="tearsheet force-light min-h-screen bg-subtle py-6 print:bg-white print:py-0">
       <div className="mx-auto mb-4 flex max-w-[8.5in] items-center justify-between px-4 print:hidden">
-        <span className="text-sm text-muted">{ready ? "Ready to print." : "Gathering data…"} Use"Save as PDF" in the print dialog.</span>
+        <span className="text-sm text-muted">{ready ? "Ready to print." : "Gathering data…"} Use "Save as PDF" in the print dialog.</span>
         <button
           onClick={() => window.print()}
           disabled={!ready}

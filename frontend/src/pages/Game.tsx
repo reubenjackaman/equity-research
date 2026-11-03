@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from"react";
-import { Link } from"react-router-dom";
-import { HintFinch } from"../components/Finch";
-import { Clue, GameCompany, GameGuess, GameHint, GameHintKind, GameToday, gameApi } from"../api";
-import * as fmt from"../format";
-import { keys, load, save, useStored } from"../storage";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { HintFinch } from "../components/Finch";
+import { Clue, GameCompany, GameGuess, GameHint, GameHintKind, GameToday, gameApi } from "../api";
+import * as fmt from "../format";
+import { keys, load, save, useStored } from "../storage";
 
 type Stats = { played: number; won: number; streak: number; best: number };
 const NO_STATS: Stats = { played: 0, won: 0, streak: 0, best: 0 };

@@ -1,8 +1,8 @@
-import { ReactNode, useEffect } from"react";
-import { Link } from"react-router-dom";
-import { FinchLogo } from"../components/Finch";
+import { ReactNode, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { FinchLogo } from "../components/Finch";
 
-const UPDATED = "October 30, 2026";
+const UPDATED = "November 3, 2026";
 const GITHUB = "https://github.com/reubenjackaman";
 const REPO = `${GITHUB}/equity-research`;
 
@@ -88,8 +88,35 @@ export function HowItWorks() {
         page. Hints use up a guess, and the server hides names and other capitalized words before a hint reaches your browser.
       </p>
 
+      <H2>What's priced in (reverse DCF)</H2>
+      <p>
+        The DCF tab also runs the model backwards: it searches for the constant annual revenue growth that makes the DCF value equal
+        today's share price, holding your other assumptions fixed, and compares it with the growth the company has actually delivered.
+      </p>
+
+      <H2>Financial health scores</H2>
+      <p>
+        The Health tab applies four published models to the latest annual report: the Piotroski F-Score (nine tests), the original
+        1968 Altman Z-Score, the 8-variable Beneish M-Score and the accruals ratio. Each shows its formula and inputs. These models were
+        built for industrial companies, so for banks and insurers some inputs are missing and the results are flagged.
+      </p>
+
+      <H2>Valuation history</H2>
+      <p>
+        The Summary tab compares today's P/E, EV/EBITDA and P/S with each one's own fiscal-year history, showing the average and a band
+        of one standard deviation either side.
+      </p>
+
+      <H2>Ask Finch</H2>
+      <p>
+        Ask Finch answers questions using only the data on the page you're viewing, through Google's Gemini model. It's told not to
+        guess, to say when the page doesn't have the answer, and never to give investment advice. It can still make mistakes, so check
+        important figures on the page itself. To keep the free service available, it answers up to 200 questions a day across the site
+        and 20 per visitor.
+      </p>
+
       <H2>How the math is checked</H2>
-      <p>Statements, ratios and the Excel model are tested against Apple's reported figures. That catches formula mistakes, but it can't promise every number for every company is right.</p>
+      <p>Statements, ratios and the Excel model are tested against Apple's reported figures, and the reverse DCF, health scores and valuation history are each checked against a worked example calculated separately by hand. That catches formula mistakes, but it can't promise every number for every company is right.</p>
 
       <H2>Known limits</H2>
       <Bullets
@@ -198,6 +225,14 @@ export function Privacy() {
 
       <H2>Other services</H2>
       <p>The site's fonts load from Google Fonts, so your browser also contacts Google, which receives your IP address. Tickers you look up are sent from the server to data providers such as SEC EDGAR, Yahoo Finance and Finnhub to fetch results. Opening a news link takes you to that publisher's site, under its own privacy policy.</p>
+
+      <H2>Ask Finch</H2>
+      <p>
+        When you ask Ask Finch a question, the server sends your question, your recent questions and answers in that chat, and the
+        company data shown on the page (including any DCF assumptions and peers you've chosen) to Google's Gemini service to write the
+        answer. Google's free tier may use this content to improve its products, so please don't type personal information into it.
+        The site doesn't save your questions.
+      </p>
 
       <H2>Questions</H2>
       <p>See the <Link to="/contact" className="font-medium text-accent underline">contact page</Link>.</p>

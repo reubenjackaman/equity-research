@@ -1,20 +1,22 @@
-import { useEffect, useState } from"react";
-import { useParams, useSearchParams } from"react-router-dom";
-import { api, ApiError, Overview } from"../api";
-import * as fmt from"../format";
-import CompsTab from"../components/CompsTab";
-import DcfTab from"../components/DcfTab";
-import FinancialsTab from"../components/FinancialsTab";
-import NewsTab from"../components/NewsTab";
-import PriceChart from"../components/PriceChart";
-import RatiosTab from"../components/RatiosTab";
-import SearchBar from"../components/SearchBar";
-import SummaryTab from"../components/SummaryTab";
-import { StarIcon } from"../components/TopBar";
-import { addRecent, useSaved } from"../storage";
-import type { Theme } from"../theme";
+import { useEffect, useState } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
+import { api, ApiError, Overview } from "../api";
+import * as fmt from "../format";
+import AskFinch from "../components/AskFinch";
+import CompsTab from "../components/CompsTab";
+import DcfTab from "../components/DcfTab";
+import FinancialsTab from "../components/FinancialsTab";
+import NewsTab from "../components/NewsTab";
+import PriceChart from "../components/PriceChart";
+import HealthTab from "../components/HealthTab";
+import RatiosTab from "../components/RatiosTab";
+import SearchBar from "../components/SearchBar";
+import SummaryTab from "../components/SummaryTab";
+import { StarIcon } from "../components/TopBar";
+import { addRecent, useSaved } from "../storage";
+import type { Theme } from "../theme";
 
-const TABS = ["Overview", "Financials", "Ratios", "News", "DCF", "Comps", "Summary"] as const;
+const TABS = ["Overview", "Financials", "Ratios", "Health", "News", "DCF", "Comps", "Summary"] as const;
 
 export default function Company({ theme }: { theme: Theme }) {
   const ticker = (useParams().ticker ?? "").toUpperCase();
@@ -50,8 +52,8 @@ export default function Company({ theme }: { theme: Theme }) {
   const up = (data.change ?? 0) >= 0;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
-      {/* Header: name, price, day change */}
+    <div className="mx-auto max-w-6xl px-4 pt-6 pb-24">
+      {/* Header: name, price, day change. Bottom padding keeps the Ask Finch button off the last line. */}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-sm text-muted">
@@ -103,10 +105,12 @@ export default function Company({ theme }: { theme: Theme }) {
       {tab === "Overview" && <OverviewTab data={data} theme={theme} />}
       {tab === "Financials" && <FinancialsTab ticker={data.symbol} tradingCurrency={data.currency} />}
       {tab === "Ratios" && <RatiosTab ticker={data.symbol} />}
+      {tab === "Health" && <HealthTab ticker={data.symbol} />}
       {tab === "News" && <NewsTab ticker={data.symbol} />}
       {tab === "DCF" && <DcfTab ticker={data.symbol} />}
       {tab === "Comps" && <CompsTab ticker={data.symbol} price={data.price} currency={data.currency} />}
       {tab === "Summary" && <SummaryTab data={data} />}
+      <AskFinch symbol={data.symbol} name={data.name} tab={tab} />
     </div>
   );
 }
@@ -210,7 +214,7 @@ function NotFound({ ticker, error }: { ticker: string; error: ApiError }) {
   const notFound = error.status === 404;
   return (
     <div className="mx-auto max-w-xl px-4 pt-16 text-center">
-      <h1 className="text-xl font-semibold">{notFound ? `We couldn't find"${ticker}"`: "Something went wrong"}</h1>
+      <h1 className="text-xl font-semibold">{notFound ? `We couldn't find "${ticker}"`: "Something went wrong"}</h1>
       <p className="mt-2 text-sm text-muted">
         {notFound
           ? "Check the symbol. TSX tickers end in .TO (e.g. SHOP.TO) and TSX Venture in .V."
