@@ -12,7 +12,7 @@ function Page({ title, intro, children }: { title: string; intro?: string; child
   }, [title]);
 
   return (
-    <article className="mx-auto max-w-6xl px-4 py-12">
+    <article className="mx-auto max-w-screen-2xl px-4 py-12">
       <h1 className="text-3xl sm:text-4xl">{title}</h1>
       {intro && <p className="prose-width mt-4 text-lg text-muted">{intro}</p>}
       <div className="prose-width mt-8 space-y-4">{children}</div>
@@ -54,11 +54,32 @@ export function HowItWorks() {
         items={[
           <><b>SEC EDGAR:</b> financial statements for companies that file with the US regulator, taken from the filings themselves.</>,
           <><b>Yahoo Finance:</b> share prices, price history, and statements for companies EDGAR doesn't cover, including most TSX listings.</>,
-          <><b>Finnhub:</b> company news and peer lists, plus backup company details.</>,
+          <><b>Finnhub:</b> company news, peer lists, analyst ratings, earnings estimates and surprises, insider trades and the earnings calendar.</>,
+          <><b>FRED (St. Louis Fed) and the Bank of Canada:</b> government bond yields, policy rates and economic indicators.</>,
           <><b>Wikipedia:</b> a backup company description when no other is available.</>,
         ]}
       />
       <p>Prices and overviews are refreshed about every 15 minutes, so they can lag the market. Anything that can't be found shows as N/A rather than a guess.</p>
+
+      <H2>The command line</H2>
+      <p>
+        Value Finch works like a market terminal. Type a ticker and a function code in the bar at the top and press Enter: AAPL GP opens
+        Apple's chart, RY.TO DCF opens Royal Bank's valuation, and WEI opens world markets. The HELP screen lists every code.
+      </p>
+
+      <H2>Market screens</H2>
+      <p>
+        World markets, movers, rates, the economy and the earnings calendar use end-of-day and delayed data. Movers are measured among
+        the 60 largest US and 60 largest TSX companies. Yield curves compare today with one month and one year ago.
+      </p>
+
+      <H2>Chart, analysts and insiders</H2>
+      <p>
+        The chart shows candles with optional moving averages, Bollinger bands (20-day average plus or minus two standard deviations),
+        volume, the 14-day RSI and a comparison with the S&P 500 or S&P/TSX. Volatility is the standard deviation of returns scaled to a
+        year; max drawdown is the largest fall from a high. Analyst ratings and insider trades come from Finnhub, which covers US
+        filings: TSX companies use their US listing, and Canadian insiders mostly report on SEDI instead, so that tab may be empty.
+      </p>
 
       <H2>Ratios</H2>
       <p>
@@ -111,7 +132,8 @@ export function HowItWorks() {
       <p>
         Ask Finch is an AI research assistant powered by Google's Gemini model. For every question it reads everything the site has on
         the company, whichever tab you're on: ratios, competitors and their multiples, the DCF with your own assumptions, the reverse
-        DCF, health scores, valuation history, analyst ratings from Finnhub and recent news. It can add general knowledge about the
+        DCF, health scores, valuation history, analyst ratings and earnings surprises, insider trades and recent news. On the market
+        screens it reads world markets, movers, yield curves, economic data and the earnings calendar instead. It can add general knowledge about the
         company and its industry, and it will give a reasoned view on whether a stock looks expensive or cheap. It doesn't search the
         web live, so current figures come only from the site's data. It can make mistakes, and its views are analysis, not investment
         advice. To keep the free service available, it answers up to 200 questions a day across the site and 20 per visitor.

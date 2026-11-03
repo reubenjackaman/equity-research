@@ -12,11 +12,15 @@ import HealthTab from "../components/HealthTab";
 import RatiosTab from "../components/RatiosTab";
 import SearchBar from "../components/SearchBar";
 import SummaryTab from "../components/SummaryTab";
+import ChartTab from "../components/ChartTab";
+import { AnalystsTab, InsidersTab } from "../components/StreetTabs";
+import { Change } from "../components/Terminal";
 import { StarIcon } from "../components/TopBar";
+import { COMPANY_TABS, CompanyTab, tabCode } from "../functions";
 import { addRecent, useSaved } from "../storage";
 import type { Theme } from "../theme";
 
-const TABS = ["Overview", "Financials", "Ratios", "Health", "News", "DCF", "Comps", "Summary"] as const;
+const TABS = COMPANY_TABS;
 
 export default function Company({ theme }: { theme: Theme }) {
   const ticker = (useParams().ticker ?? "").toUpperCase();
@@ -25,7 +29,7 @@ export default function Company({ theme }: { theme: Theme }) {
   // The open tab lives in the URL (?tab=Ratios) so a reload or shared link keeps it.
   const [params, setParams] = useSearchParams();
   const tab = TABS.find((t) => t === params.get("tab")) ?? "Overview";
-  const setTab = (t: (typeof TABS)[number]) => setParams(t === "Overview" ? {} : { tab: t }, { replace: true });
+  const setTab = (t: CompanyTab) => setParams(t === "Overview" ? {} : { tab: t }, { replace: true });
 
   useEffect(() => {
     let cancelled = false;
@@ -49,60 +53,75 @@ export default function Company({ theme }: { theme: Theme }) {
   if (error) return <NotFound ticker={ticker} error={error} />;
   if (!data) return <Skeleton />;
 
-  const up = (data.change ?? 0) >= 0;
+  const country = data.symbol.endsWith(".TO") || data.symbol.endsWith(".V") ? "CN" : "US";
+  const range = data.fiftyTwoWeekLow !== null && data.fiftyTwoWeekHigh !== null ? `${fmt.num(data.fiftyTwoWeekLow)} – ${fmt.num(data.fiftyTwoWeekHigh)}` : "N/A";
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pt-6 pb-24">
-      {/* Header: name, price, day change. Bottom padding keeps the Ask Finch button off the last line. */}
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 text-sm text-muted">
-            <span className="font-semibold text-ink">{data.symbol}</span>
-            <span>·</span>
-            <span>{data.exchange ?? "N/A"}</span>
-            <span>·</span>
-            <span>{data.currency ?? "N/A"}</span>
+    <div className="mx-auto max-w-screen-2xl px-3 pt-3 pb-24">
+      {/* Header: the security line, price and a strip of key figures. Bottom padding keeps the Ask Finch button off the last line. */}
+      <div className="border border-line bg-surface">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 px-3 py-2">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 font-mono text-xs">
+              <span className="font-semibold text-accent">{data.symbol} {country} EQUITY</span>
+              <span className="text-muted">{data.exchange ?? "N/A"} · {data.currency ?? "N/A"}</span>
+            </div>
+            <div className="mt-0.5 flex items-center gap-1.5">
+              <h1 className="truncate text-xl">{data.name}</h1>
+              <button
+                onClick={() => toggle(data.symbol)}
+                aria-pressed={isSaved(data.symbol)}
+                aria-label={isSaved(data.symbol) ? `Remove ${data.symbol} from watchlist`: `Add ${data.symbol} to watchlist`}
+                title={isSaved(data.symbol) ? "On your watchlist (MON): click to remove" : "Add to your watchlist (MON)"}
+                className={`shrink-0 rounded-sm p-1 transition-colors hover:bg-subtle ${isSaved(data.symbol) ? "text-warn" : "text-muted hover:text-warn"}`}
+              >
+                <StarIcon filled={isSaved(data.symbol)} className="h-5 w-5" />
+              </button>
+            </div>
           </div>
-          <div className="mt-1 flex items-center gap-2">
-            <h1 className="truncate text-xl sm:text-2xl">{data.name}</h1>
-            <button
-              onClick={() => toggle(data.symbol)}
-              aria-pressed={isSaved(data.symbol)}
-              aria-label={isSaved(data.symbol) ? `Remove ${data.symbol} from saved`: `Save ${data.symbol}`}
-              title={isSaved(data.symbol) ? "Saved: click to remove" : "Save to your list"}
-              className={`shrink-0 rounded p-1.5 transition-colors hover:bg-subtle  ${
-                isSaved(data.symbol) ? "text-warn" : "text-muted hover:text-warn"
-              }`}
-            >
-              <StarIcon filled={isSaved(data.symbol)} className="h-6 w-6" />
-            </button>
-          </div>
-        </div>
-        <div className="sm:text-right">
-          <div className="text-xl font-semibold sm:text-2xl">{fmt.price(data.price, data.currency)}</div>
-          <div className={`text-sm font-medium ${up ? "text-gain" : "text-loss"}`}>
-            {fmt.signed(data.change)} ({fmt.signed(data.changePercent)}%) today
+          <div className="flex items-baseline gap-3 font-mono">
+            <span className="text-2xl font-semibold">{fmt.price(data.price, data.currency)}</span>
+            <span className={`text-sm ${(data.change ?? 0) >= 0 ? "text-gain" : "text-loss"}`}>{fmt.signed(data.change)}</span>
+            <Change value={data.changePercent} className="text-sm" />
           </div>
         </div>
+        <dl className="grid grid-cols-2 border-t border-line font-mono text-xs sm:grid-cols-3 lg:grid-cols-6">
+          {[
+            ["Mkt cap", fmt.big(data.marketCap)],
+            ["52-wk range", range],
+            ["Volume", fmt.big(data.volume)],
+            ["Avg vol (3M)", fmt.big(data.averageVolume)],
+            ["Beta", fmt.num(data.beta)],
+            ["Div. yield", fmt.pct(data.dividendYield)],
+          ].map(([label, value]) => (
+            <div key={label} className="flex justify-between gap-2 border-line px-3 py-1.5 lg:border-l lg:first:border-l-0">
+              <dt className="font-sans text-muted">{label}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
 
-      <nav className="mt-6 flex gap-1 overflow-x-auto border-b [scrollbar-width:none] border-line">
+      <nav aria-label="Company functions" className="mt-3 flex gap-px overflow-x-auto border-b border-line [scrollbar-width:none]">
         {TABS.map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`-mb-px whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium ${
-              t === tab
-                ? "border-accent text-accent"
-                : "border-transparent text-muted hover:text-ink"
+            aria-current={t === tab ? "page" : undefined}
+            className={`-mb-px flex items-center gap-1.5 border-b-2 px-2.5 py-1.5 text-xs whitespace-nowrap transition-colors ${
+              t === tab ? "border-accent bg-surface text-ink" : "border-transparent text-muted hover:bg-surface hover:text-ink"
             }`}
           >
+            <span className={`font-mono font-semibold ${t === tab ? "text-accent" : "text-accent/70"}`}>{tabCode(t)}</span>
             {t}
           </button>
         ))}
       </nav>
 
       {tab === "Overview" && <OverviewTab data={data} theme={theme} />}
+      {tab === "Chart" && <ChartTab ticker={data.symbol} currency={data.currency} theme={theme} />}
+      {tab === "Analysts" && <AnalystsTab ticker={data.symbol} price={data.price} currency={data.currency} />}
+      {tab === "Insiders" && <InsidersTab ticker={data.symbol} currency={data.currency} />}
       {tab === "Financials" && <FinancialsTab ticker={data.symbol} tradingCurrency={data.currency} />}
       {tab === "Ratios" && <RatiosTab ticker={data.symbol} />}
       {tab === "Health" && <HealthTab ticker={data.symbol} />}
@@ -119,13 +138,13 @@ function OverviewTab({ data, theme }: { data: Overview; theme: Theme }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="mt-6 grid gap-4 lg:grid-cols-3">
+    <div className="mt-3 grid gap-3 lg:grid-cols-3">
       <div className="lg:col-span-2">
         <PriceChart ticker={data.symbol} theme={theme} />
       </div>
 
       <div className="card">
-        <h2 className="mb-3 text-sm font-semibold">Key statistics</h2>
+        <h2 className="mb-3 text-xs font-semibold tracking-wider text-accent uppercase">Key statistics</h2>
         <dl className="divide-y divide-line text-sm">
           <Stat label="Market cap" value={fmt.big(data.marketCap)} />
           <Stat label="Shares outstanding" value={fmt.big(data.sharesOutstanding)} />
@@ -142,7 +161,7 @@ function OverviewTab({ data, theme }: { data: Overview; theme: Theme }) {
 
       <div className="card lg:col-span-3">
         <div className="mb-3 flex flex-wrap items-center gap-2">
-          <h2 className="mr-2 text-sm font-semibold">About</h2>
+          <h2 className="mr-2 text-xs font-semibold tracking-wider text-accent uppercase">About</h2>
           {data.sector && <Tag>{data.sector}</Tag>}
           {data.industry && <Tag>{data.industry}</Tag>}
           {data.website && (
@@ -230,7 +249,7 @@ function NotFound({ ticker, error }: { ticker: string; error: ApiError }) {
 function Skeleton() {
   const block = "animate-pulse rounded bg-subtle";
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
+    <div className="mx-auto max-w-screen-2xl px-4 py-6">
       <div className={`${block} h-5 w-40`} />
       <div className={`${block} mt-2 h-8 w-72`} />
       <div className="mt-10 grid gap-4 lg:grid-cols-3">
