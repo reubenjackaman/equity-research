@@ -33,7 +33,7 @@ Accruals ratio = (Net income − Operating cash flow) ÷ Average total assets.
 """
 
 from data import yahoo
-from data.cache import MINUTE, cached
+from data.cache import DAY, cached
 from finance import ratios, statements
 
 M = 1e6
@@ -181,7 +181,7 @@ def _beneish(c: dict, p: dict) -> dict:
     return {"value": m, "flag": m > -1.78, "components": components, "reason": None}
 
 
-@cached("health", 15 * MINUTE)
+@cached("health", DAY)  # built from annual reports and year-end prices, which change rarely
 def build(ticker: str) -> dict:
     annual = statements.build(ticker, "annual")
     cols = annual["columns"]
