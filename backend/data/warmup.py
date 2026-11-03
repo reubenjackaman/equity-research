@@ -5,7 +5,7 @@ Keeps the live site quick on Render's free plan. Runs only on Render (it sets RE
    after as little as 8 minutes), and a restart empties the cache. A minute after starting, and then
    every 5 minutes, the server visits its own public address, which counts as an outside visitor.
    (Render's own health checks don't count.) One always-on service uses about 744 of the free plan's 750 hours a month.
-2. Preload: in the background, fetch the companies people look at most (and, for the biggest,
+2. Preload: in the background, fetch the market screens and the companies people look at most (and, for the biggest,
    their competitors), so the first visitor to AAPL or RY.TO doesn't wait. Repeats every
    12 hours, inside the one-day cache life of the financial statements.
 """
@@ -43,15 +43,22 @@ def _keep_awake(url: str):
 
 
 def _preload():
-    from finance import comps, dcf, health, ratios, statements, valuation_history  # after the app has started
+    from data import markets
+    from finance import comps, dcf, health, ratios, statements, street, valuation_history  # after the app has started
 
     time.sleep(START_DELAY)
     while True:
         started = time.monotonic()
+        for screen in (markets.board, markets.movers, markets.rates, markets.economy, markets.earnings_calendar):
+            try:
+                screen()
+            except Exception:
+                pass
         for i, ticker in enumerate(POPULAR):
             steps = [lambda: statements.build(ticker, "annual"), lambda: ratios.build(ticker),
                      lambda: health.build(ticker), lambda: valuation_history.build(ticker),
-                     lambda: dcf.model(ticker, {})]
+                     lambda: dcf.model(ticker, {}),
+                     lambda: street.estimates(ticker), lambda: street.insiders(ticker)]
             if i < WITH_COMPETITORS:
                 steps.append(lambda: comps.build(ticker, ""))
             for step in steps:

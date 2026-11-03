@@ -215,6 +215,38 @@ def history(ticker: str, range_: str) -> list:
     ]
 
 
+# Candlestick chart ranges -> (yfinance period, bar interval). Intraday ranges use timestamps.
+BAR_RANGES = {
+    "1D": ("1d", "5m"),
+    "5D": ("5d", "30m"),
+    "1M": ("1mo", "1d"),
+    "6M": ("6mo", "1d"),
+    "YTD": ("ytd", "1d"),
+    "1Y": ("1y", "1d"),
+    "5Y": ("5y", "1wk"),
+    "MAX": ("max", "1mo"),
+}
+
+
+@cached("bars", 5 * MINUTE)
+def bars(ticker: str, range_: str) -> dict:
+    """Open, high, low, close and volume bars for the candlestick chart. Intraday bars carry a Unix time."""
+    period, interval = BAR_RANGES[range_]
+    df = yf.Ticker(ticker).history(period=period, interval=interval, auto_adjust=True)
+    if df.empty:
+        raise TickerNotFound(ticker)
+    intraday = interval.endswith("m")
+    out = []
+    for idx, row in df.iterrows():
+        values = [clean(float(row[k])) for k in ("Open", "High", "Low", "Close")]
+        if None in values:
+            continue
+        out.append({"time": int(idx.timestamp()) if intraday else idx.strftime("%Y-%m-%d"),
+                    "open": round(values[0], 4), "high": round(values[1], 4), "low": round(values[2], 4),
+                    "close": round(values[3], 4), "volume": clean(float(row["Volume"])) or 0})
+    return {"symbol": ticker, "range": range_, "intraday": intraday, "bars": out}
+
+
 def normalize(ticker: Optional[str]) -> str:
     return (ticker or "").strip().upper()
 

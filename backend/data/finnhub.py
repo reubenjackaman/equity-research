@@ -59,3 +59,21 @@ def peers(ticker: str) -> list:
 def recommendations(ticker: str) -> list:
     """Monthly counts of analyst ratings (strong buy ... strong sell), newest first. US listings on the free plan."""
     return _get("stock/recommendation", symbol=_symbol(ticker))
+
+
+@cached("fh-insiders", DAY)
+def insider_transactions(ticker: str) -> list:
+    """Insider trades filed with the SEC (Form 4), newest first. US listings only on the free plan."""
+    return _get("stock/insider-transactions", symbol=_symbol(ticker)).get("data") or []
+
+
+@cached("fh-earnings", DAY)
+def earnings_surprises(ticker: str) -> list:
+    """Reported vs. expected EPS for the last four quarters, newest first."""
+    return _get("stock/earnings", symbol=_symbol(ticker))
+
+
+@cached("fh-next-earnings", DAY)
+def next_earnings(ticker: str, start: str, end: str) -> list:
+    """Scheduled earnings reports for one company between two dates."""
+    return _get("calendar/earnings", symbol=_symbol(ticker), **{"from": start, "to": end}).get("earningsCalendar") or []
