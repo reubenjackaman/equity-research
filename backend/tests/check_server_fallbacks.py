@@ -87,7 +87,14 @@ for url in ["/api/health", "/api/market", "/api/search?q=apple", "/api/company/A
             "/api/screener/options", "/api/screener?sector=Energy", "/api/game/today"]:
     code = client.get(url).status_code
     check(f"route {url}", code == 200, f"HTTP {code}")
-code = client.post("/api/company/AAPL/dcf", json={"assumptions": {}}).status_code
-check("route POST /api/company/AAPL/dcf", code == 200, f"HTTP {code}")
+r = client.post("/api/company/AAPL/dcf", json={"assumptions": {}})
+check("route POST /api/company/AAPL/dcf", r.status_code == 200, f"HTTP {r.status_code}")
+if r.status_code == 200:
+    rev = r.json()["reverse"]
+    check("reverse DCF AAPL", rev["growth"] is not None, f"implied growth {rev['growth']}")
+for t in ["AAPL", "RY.TO", "TSM"]:
+    for url in [f"/api/company/{t}/health", f"/api/company/{t}/valuation-history"]:
+        code = client.get(url).status_code
+        check(f"route {url}", code == 200, f"HTTP {code}")
 
 print("\nproblems:", problems or "none")
