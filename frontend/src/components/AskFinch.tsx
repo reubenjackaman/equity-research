@@ -40,6 +40,22 @@ export default function AskFinch({ symbol, name, tab }: { symbol: string; name: 
     return () => document.documentElement.classList.remove("ask-open");
   }, [open]);
 
+  // Start gathering the company's data as soon as the panel opens, so the first answer has it all.
+  // The server caches each result; the responses themselves aren't needed here.
+  useEffect(() => {
+    if (!open) return;
+    const t = encodeURIComponent(symbol);
+    const peers = (load<string[] | null>(keys.peers(symbol), null) ?? []).join(",");
+    for (const path of ["ratios", `comps?peers=${encodeURIComponent(peers)}`, "health", "valuation-history", "news"]) {
+      fetch(`/api/company/${t}/${path}`).catch(() => {});
+    }
+    fetch(`/api/company/${t}/dcf`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ assumptions: load<Partial<DcfAssumptions>>(keys.dcf(symbol), {}) }),
+    }).catch(() => {});
+  }, [open, symbol]);
+
   useEffect(() => {
     if (!open) return;
     inputRef.current?.focus({ preventScroll: true });
