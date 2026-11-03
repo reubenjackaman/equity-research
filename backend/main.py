@@ -12,13 +12,15 @@ frontend/, then this app also serves it, so the whole site lives at one address.
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import Body, FastAPI, HTTPException, Query, Response
+from fastapi import Body, FastAPI, HTTPException, Query, Request, Response
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
 
-from data import game, news, screener, yahoo
+from data import game, gemini, news, screener, yahoo
 from exports import dcf_excel, excel
-from finance import comps, dcf, ratios, statements
+from finance import assistant, comps, dcf, ratios, statements, valuation_history
+from finance import health as health_scores
 
 load_dotenv()
 
@@ -75,6 +77,16 @@ def statements_excel(ticker: str, period: str = "annual"):
 @app.get("/api/company/{ticker}/ratios")
 def ratios_route(ticker: str):
     return fetch(ratios.build, yahoo.normalize(ticker))
+
+
+@app.get("/api/company/{ticker}/health")
+def health_route(ticker: str):
+    return fetch(health_scores.build, yahoo.normalize(ticker))
+
+
+@app.get("/api/company/{ticker}/valuation-history")
+def valuation_history_route(ticker: str):
+    return fetch(valuation_history.build, yahoo.normalize(ticker))
 
 
 @app.get("/api/company/{ticker}/news")
@@ -149,6 +161,38 @@ def game_guess(puzzle: int, attempt: int, symbol: str):
 def game_hint(puzzle: int, kind: str):
     """A hint about the answer. The page counts it as one of the six guesses."""
     return fetch(game.hint, puzzle, kind)
+
+
+class AskBody(BaseModel):
+    symbol: str = Field(max_length=15)
+    tab: str = Field(default="Overview", max_length=20)
+    question: str = Field(max_length=2000)
+    history: list = Field(default=[], max_length=20)
+    assumptions: dict = Field(default={})
+    peers: list = Field(default=[], max_length=20)
+
+
+MAX_ASK_BYTES = 40_000
+
+
+@app.post("/api/ask")
+def ask(body: AskBody, request: Request):
+    """Ask Finch: a question about the company page, answered from the site's own data."""
+    if int(request.headers.get("content-length") or 0) > MAX_ASK_BYTES:
+        raise HTTPException(413, "That request is too large.")
+    # Behind Render's proxy the visitor's address is the first entry of X-Forwarded-For.
+    forwarded = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+    visitor = forwarded or (request.client.host if request.client else "unknown")
+    try:
+        return assistant.answer(visitor, body.symbol, body.tab, body.question, body.history, body.assumptions, body.peers)
+    except assistant.LimitReached as exc:
+        raise HTTPException(429, str(exc))
+    except gemini.GeminiUnavailable as exc:
+        raise HTTPException(503, str(exc))
+    except yahoo.TickerNotFound:
+        raise HTTPException(404, "No data found for that ticker.")
+    except ValueError as exc:
+        raise HTTPException(422, str(exc))
 
 
 # ---------- The website itself (production) ----------
