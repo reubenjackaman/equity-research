@@ -81,6 +81,6 @@ if saved:
     a = client.post("/api/ask", json={"symbol": "AAPL", "tab": "Ratios", "question": "What was Apple's net margin in FY2025?"})
     assert a.status_code == 200, a.text
     reply = a.json()["answer"]
-    assert saved not in reply and "**" not in reply
+    assert saved not in reply and "26.9" in reply, reply
     print("live answer:", reply[:160].replace("\n", " "), "...")
 print("all Ask Finch checks passed")
