@@ -109,10 +109,12 @@ export function HowItWorks() {
 
       <H2>Ask Finch</H2>
       <p>
-        Ask Finch answers questions using only the data on the page you're viewing, through Google's Gemini model. It's told not to
-        guess, to say when the page doesn't have the answer, and never to give investment advice. It can still make mistakes, so check
-        important figures on the page itself. To keep the free service available, it answers up to 200 questions a day across the site
-        and 20 per visitor.
+        Ask Finch is an AI research assistant powered by Google's Gemini model. For every question it reads everything the site has on
+        the company, whichever tab you're on: ratios, competitors and their multiples, the DCF with your own assumptions, the reverse
+        DCF, health scores, valuation history, analyst ratings from Finnhub and recent news. It can add general knowledge about the
+        company and its industry, and it will give a reasoned view on whether a stock looks expensive or cheap. It doesn't search the
+        web live, so current figures come only from the site's data. It can make mistakes, and its views are analysis, not investment
+        advice. To keep the free service available, it answers up to 200 questions a day across the site and 20 per visitor.
       </p>
 
       <H2>How the math is checked</H2>
@@ -229,7 +231,7 @@ export function Privacy() {
       <H2>Ask Finch</H2>
       <p>
         When you ask Ask Finch a question, the server sends your question, your recent questions and answers in that chat, and the
-        company data shown on the page (including any DCF assumptions and peers you've chosen) to Google's Gemini service to write the
+        site's data on that company (including any DCF assumptions and peers you've chosen) to Google's Gemini service to write the
         answer. Google's free tier may use this content to improve its products, so please don't type personal information into it.
         The site doesn't save your questions.
       </p>
