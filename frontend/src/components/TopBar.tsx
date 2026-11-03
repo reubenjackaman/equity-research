@@ -1,69 +1,112 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { api, Overview } from "../api";
+import { Link, useLocation } from "react-router-dom";
+import { api, marketsApi, Overview } from "../api";
 import * as fmt from "../format";
 import { keys, useSaved, useStored } from "../storage";
 import type { Theme } from "../theme";
+import { useApi } from "../useApi";
+import CommandBar from "./CommandBar";
 import { Birdhouse } from "./Finch";
-import SearchBar from "./SearchBar";
+import { Change, level } from "./Terminal";
 
-/** The bar at the top of every page: navigation, saved companies, search, theme and a market strip. */
+const NAV: [string, string, string][] = [
+  ["MKTS", "Markets", "/"],
+  ["WEI", "World", "/wei"],
+  ["MOST", "Movers", "/most"],
+  ["GC", "Rates", "/rates"],
+  ["ECO", "Economy", "/eco"],
+  ["EVTS", "Earnings", "/earnings"],
+  ["MON", "Monitor", "/monitor"],
+  ["EQS", "Screener", "/screener"],
+  ["GAME", "Puzzle", "/game"],
+  ["HELP", "Help", "/help"],
+];
+
+/** The bar at the top of every page: logo, command line, market clock, saved companies, theme,
+ *  then a row of function keys and the scrolling ticker tape. */
 export default function TopBar({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void }) {
   const { pathname } = useLocation();
-  const navigate = useNavigate();
-  const onHome = pathname === "/";
-
-  function goExplore() {
-    if (onHome) document.getElementById("explore")?.scrollIntoView({ behavior: "smooth" });
-    else navigate("/#explore");
-  }
-
-  const link = (active: boolean) =>
-    `rounded px-2.5 py-1.5 text-sm font-medium transition-colors ${
-      active ? "text-ink" : "text-muted hover:text-ink"
-    }`;
 
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-bg">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-2 sm:flex-nowrap sm:gap-3">
+      <div className="mx-auto flex max-w-screen-2xl flex-wrap items-center gap-2 px-3 py-1.5 sm:flex-nowrap sm:gap-3">
         <Link
           to="/"
           aria-label="Value Finch home"
-          className="tap flex shrink-0 items-center gap-2 rounded px-1 py-1 transition-colors hover:text-accent"
+          className="tap flex shrink-0 items-center gap-1.5 rounded-sm px-1 py-1 transition-colors hover:text-accent"
         >
-          <Birdhouse className="h-7 w-7 text-accent" />
-          <span className="hidden whitespace-nowrap font-serif text-lg font-semibold md:inline">Value Finch</span>
+          <Birdhouse className="h-6 w-6 text-accent" />
+          <span className="hidden font-mono text-sm font-semibold tracking-wider whitespace-nowrap md:inline">VALUE FINCH</span>
         </Link>
-        <nav className="flex shrink-0 items-center">
-          <button onClick={goExplore} className={`hidden sm:block ${link(false)}`}>
-            Explore
-          </button>
-          <Link
-            to="/game"
-            className="ml-1 tap rounded bg-accent px-3 py-1.5 text-sm font-medium whitespace-nowrap text-on-accent transition-colors hover:bg-accent-hover"
-          >
-            Play game
-          </Link>
-        </nav>
-        {/* On phones the search box gets its own full-width row. */}
-        <div className="order-last w-full sm:order-none sm:mx-auto sm:max-w-md">{!onHome && <SearchBar />}</div>
-        <span className="ml-auto sm:ml-0">
+        {/* On phones the command line gets its own full-width row. */}
+        <div className="order-last w-full sm:order-none sm:max-w-2xl sm:flex-1">
+          <CommandBar />
+        </div>
+        <span className="ml-auto flex items-center gap-1 sm:gap-2">
+          <MarketClock />
           <SavedMenu />
+          <button
+            onClick={onToggleTheme}
+            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+            className="min-w-11 shrink-0 rounded-sm p-2 text-muted sm:min-w-0 hover:bg-subtle"
+          >
+            {theme === "dark" ? (
+              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 2Zm0 13a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 15Zm0-9a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm7.25 3.25a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1 0-1.5h1.5ZM4.25 10a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h1.5a.75.75 0 0 1 .75.75Zm11.06-5.31a.75.75 0 0 1 0 1.06l-1.06 1.06a.75.75 0 1 1-1.06-1.06l1.06-1.06a.75.75 0 0 1 1.06 0ZM6.81 13.19a.75.75 0 0 1 0 1.06l-1.06 1.06a.75.75 0 0 1-1.06-1.06l1.06-1.06a.75.75 0 0 1 1.06 0Zm8.5 2.12a.75.75 0 0 1-1.06 0l-1.06-1.06a.75.75 0 1 1 1.06-1.06l1.06 1.06a.75.75 0 0 1 0 1.06ZM6.81 6.81a.75.75 0 0 1-1.06 0L4.69 5.75a.75.75 0 0 1 1.06-1.06l1.06 1.06a.75.75 0 0 1 0 1.06Z" /></svg>
+            ) : (
+              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M7.455 2.004a.75.75 0 0 1 .26.77 7 7 0 0 0 9.958 7.967.75.75 0 0 1 1.067.853A8.5 8.5 0 1 1 6.647 1.921a.75.75 0 0 1 .808.083Z" clipRule="evenodd" /></svg>
+            )}
+          </button>
         </span>
-        <button
-          onClick={onToggleTheme}
-          aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-          className="min-w-11 shrink-0 rounded p-2 text-muted sm:min-w-0 hover:bg-subtle"
-        >
-          {theme === "dark" ? (
-            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 2Zm0 13a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 15Zm0-9a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm7.25 3.25a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1 0-1.5h1.5ZM4.25 10a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h1.5a.75.75 0 0 1 .75.75Zm11.06-5.31a.75.75 0 0 1 0 1.06l-1.06 1.06a.75.75 0 1 1-1.06-1.06l1.06-1.06a.75.75 0 0 1 1.06 0ZM6.81 13.19a.75.75 0 0 1 0 1.06l-1.06 1.06a.75.75 0 0 1-1.06-1.06l1.06-1.06a.75.75 0 0 1 1.06 0Zm8.5 2.12a.75.75 0 0 1-1.06 0l-1.06-1.06a.75.75 0 1 1 1.06-1.06l1.06 1.06a.75.75 0 0 1 0 1.06ZM6.81 6.81a.75.75 0 0 1-1.06 0L4.69 5.75a.75.75 0 0 1 1.06-1.06l1.06 1.06a.75.75 0 0 1 0 1.06Z" /></svg>
-          ) : (
-            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M7.455 2.004a.75.75 0 0 1 .26.77 7 7 0 0 0 9.958 7.967.75.75 0 0 1 1.067.853A8.5 8.5 0 1 1 6.647 1.921a.75.75 0 0 1 .808.083Z" clipRule="evenodd" /></svg>
-          )}
-        </button>
       </div>
-      <MarketStrip />
+      <nav aria-label="Functions" className="border-t border-line">
+        <div className="mx-auto flex max-w-screen-2xl gap-1 overflow-x-auto px-3 py-1 [scrollbar-width:none]">
+          {NAV.map(([code, label, to]) => {
+            const active = to === "/" ? pathname === "/" : pathname.startsWith(to);
+            return (
+              <Link
+                key={code}
+                to={to}
+                aria-current={active ? "page" : undefined}
+                className={`tap flex shrink-0 items-center gap-1.5 rounded-sm px-1.5 py-0.5 text-xs whitespace-nowrap transition-colors ${
+                  active ? "bg-subtle text-ink" : "text-muted hover:bg-subtle hover:text-ink"
+                }`}
+              >
+                <span className={`font-mono font-semibold ${active ? "text-accent" : "text-accent/80"}`}>{code}</span>
+                {label}
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+      <TickerTape />
     </header>
+  );
+}
+
+/** New York time and whether US and TSX stocks are trading (regular hours 9:30 to 4:00 ET, weekdays; holidays aren't counted). */
+function MarketClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 15_000);
+    return () => clearInterval(t);
+  }, []);
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", weekday: "short", hour: "numeric", minute: "numeric", hourCycle: "h23" })
+      .formatToParts(now)
+      .map((p) => [p.type, p.value]),
+  );
+  const minutes = Number(parts.hour) * 60 + Number(parts.minute);
+  const weekday = !["Sat", "Sun"].includes(parts.weekday);
+  const status = !weekday ? "Closed" : minutes >= 570 && minutes < 960 ? "Open" : minutes >= 240 && minutes < 570 ? "Pre-market" : minutes >= 960 && minutes < 1200 ? "After hours" : "Closed";
+  const time = `${parts.hour.padStart(2, "0")}:${parts.minute.padStart(2, "0")}`;
+  return (
+    <span className="hidden items-center gap-2 font-mono text-xs whitespace-nowrap lg:flex" title="US and TSX regular trading hours: 9:30 to 4:00 New York time, weekdays (holidays not shown)">
+      <span className="text-muted">NY {time}</span>
+      <span className={`flex items-center gap-1 ${status === "Open" ? "text-gain" : "text-muted"}`}>
+        <span className={`h-1.5 w-1.5 rounded-full ${status === "Open" ? "bg-gain" : "bg-line-strong"}`} />
+        {status.toUpperCase()}
+      </span>
+    </span>
   );
 }
 
@@ -188,49 +231,30 @@ function QuoteRow({ symbol, quote, onRemove }: { symbol: string; quote: Overview
   );
 }
 
-type MarketItem = { symbol: string; label: string; value: number | null; changePercent: number | null; changeBp?: number };
-
-/** Thin strip of headline markets under the top bar, refreshed every 5 minutes. */
-function MarketStrip() {
-  const [items, setItems] = useState<MarketItem[] | null>(null);
-
-  useEffect(() => {
-    const load = () =>
-      fetch("/api/market")
-        .then((r) => (r.ok ? r.json() : null))
-        .then((d) => d && setItems(d))
-        .catch(() => {});
-    load();
-    const timer = setInterval(load, 5 * 60 * 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  if (!items) return null;
+/** The scrolling ticker tape of world markets, refreshed every 5 minutes. Hover to pause; each item opens World markets. */
+function TickerTape() {
+  const { data } = useApi(marketsApi.board, "board", 5 * 60 * 1000);
+  if (!data) return <div className="h-7 border-t border-line" />;
+  const items = data.flatMap((g) => g.items).filter((q) => q.value !== null);
+  const strip = (copy: number) =>
+    items.map((q) => (
+      <Link
+        key={`${copy}-${q.symbol}`}
+        to="/wei"
+        tabIndex={copy ? -1 : undefined}
+        aria-hidden={copy ? true : undefined}
+        className="flex shrink-0 items-center gap-1.5 px-3 font-mono text-xs whitespace-nowrap hover:bg-subtle"
+      >
+        <span className="text-accent">{q.label.toUpperCase()}</span>
+        <span>{level(q)}</span>
+        <Change value={q.changePercent} bp={q.changeBp} />
+      </Link>
+    ));
   return (
-    <div className="border-t border-line">
-      <div className="mx-auto flex max-w-6xl gap-5 overflow-x-auto px-4 py-1.5 text-xs [scrollbar-width:none]">
-        {items.map((m) => {
-          const move = m.changeBp ?? m.changePercent;
-          const up = (move ?? 0) >= 0;
-          const value =
-            m.value === null
-              ? "N/A"
-              : m.symbol === "^TNX"
-                ? `${m.value.toFixed(2)}%`: m.symbol === "CAD=X"
-                  ? m.value.toFixed(4)
-                  : m.value.toLocaleString("en-US", { maximumFractionDigits: 0 });
-          return (
-            <span key={m.symbol} className="flex shrink-0 items-center gap-1.5 whitespace-nowrap">
-              <span className="text-muted">{m.label}</span>
-              <span className="font-medium tabular-nums">{value}</span>
-              {move !== null && (
-                <span className={`tabular-nums ${up ? "text-gain" : "text-loss"}`}>
-                  {m.changeBp !== undefined ? `${up ? "+" : ""}${m.changeBp.toFixed(1)} bp`: `${fmt.signed(m.changePercent)}%`}
-                </span>
-              )}
-            </span>
-          );
-        })}
+    <div className="tape overflow-hidden border-t border-line py-1" style={{ ["--tape-duration" as string]: `${items.length * 4}s` }}>
+      <div className="tape-track flex w-max">
+        {strip(0)}
+        {strip(1)}
       </div>
     </div>
   );

@@ -117,7 +117,7 @@ export default function Explore() {
   const active = JSON.stringify({ ...filters, sort: "", country: "" }) !== JSON.stringify({ ...DEFAULTS, sort: "", country: "" });
 
   return (
-    <section id="explore" className="mx-auto mt-16 max-w-6xl scroll-mt-28 px-4 pb-10">
+    <section id="explore" className="scroll-mt-28 pb-10">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-xl">Explore by sector</h2>
