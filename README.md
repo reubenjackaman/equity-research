@@ -206,6 +206,18 @@ headline markets (S&P 500, Nasdaq, TSX, USD/CAD, US 10-year yield; refreshed eve
 minutes). Click the ☆ next to a company's name to save it; the Saved menu shows your saved
 and recently viewed companies with live prices. These are remembered in your browser.
 
+## Analysis added in November 2026
+
+- **What's priced in (reverse DCF)** on the DCF tab: `finance/dcf.py` `implied_growth()` scans then bisects for the flat
+  revenue growth that makes the DCF value equal today's price. Check: `python -m tests.check_reverse_dcf`.
+- **Health tab**: `finance/health.py` computes the Piotroski F-Score, Altman Z (1968), Beneish M (8-variable) and the
+  accruals ratio from the annual statements. Check: `python -m tests.check_health`.
+- **Valuation history** on the Summary tab: `finance/valuation_history.py` compares P/E, EV/EBITDA and P/S with their own
+  fiscal-year average and standard deviation. Check: `python -m tests.check_valuation_history`.
+- **Ask Finch**: `finance/assistant.py` builds the page's data on the server and asks Google Gemini (`data/gemini.py`).
+  Needs `GEMINI_API_KEY` in `backend/.env` locally and in Render's environment settings; without it the feature turns
+  itself off. Limits: 200 questions a day site-wide, 20 a day and 5 a minute per visitor. Check: `python -m tests.check_assistant`.
+
 ## Mystery Company (daily game)
 
 A new hidden company every day at `/game`, with six guesses. Each guess shows clues comparing
