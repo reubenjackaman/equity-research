@@ -180,7 +180,7 @@ def _analysts(ticker: str) -> dict:
     return out
 
 
-PART_TIMEOUT = 20  # seconds to wait for slow parts (comps can take a while the first time); late ones still get cached
+PART_TIMEOUT = 45  # seconds to wait for slow parts (the free server is slow the first time); late ones still get cached
 
 
 def _context(ticker: str, tab: str, assumptions: dict, peers: list) -> tuple[dict, list]:
@@ -260,7 +260,9 @@ def answer(visitor: str, symbol: str, tab: str, question: str, history: list, as
         tab=tab, name=company.get("name", symbol), symbol=symbol,
         today=datetime.now(ZoneInfo("America/Toronto")).date().isoformat(),
         tabs=", ".join(sorted(TABS)),
-        missing=f"Not available right now (don't guess these): {', '.join(missing)}.\n" if missing else "",
+        missing=(f"Still loading on the site, so not in DATA yet: {', '.join(missing)}. Don't guess these figures. If they "
+                 "matter to the question, answer with what you have and say a fuller answer will be possible if the visitor "
+                 "asks again in a minute.\n") if missing else "",
         data=json.dumps(data, separators=(",", ":"), default=str),
     )
     # Gemini expects the conversation to start with the user.
