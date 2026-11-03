@@ -1,7 +1,8 @@
-import { Link } from"react-router-dom";
-import type { Overview } from"../api";
-import { buildValuationRows, useValuationData } from"../valuation";
-import FootballField from"./FootballField";
+import { Link } from "react-router-dom";
+import type { Overview } from "../api";
+import { buildValuationRows, useValuationData } from "../valuation";
+import FootballField from "./FootballField";
+import ValuationHistory from "./ValuationHistory";
 
 /** Brings the analysis together: valuation summary chart and the printable tear sheet. */
 export default function SummaryTab({ data }: { data: Overview }) {
@@ -37,6 +38,7 @@ export default function SummaryTab({ data }: { data: Overview }) {
           )}
         </div>
       </div>
+      <ValuationHistory ticker={data.symbol} />
     </div>
   );
 }

@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from"react";
-import { Dcf, DcfAssumptions, DcfYear, dcfApi } from"../api";
-import * as fmt from"../format";
-import { keys, useStored } from"../storage";
-import InfoTip from"./InfoTip";
+import { useEffect, useRef, useState } from "react";
+import { Dcf, DcfAssumptions, DcfYear, dcfApi } from "../api";
+import * as fmt from "../format";
+import { keys, useStored } from "../storage";
+import InfoTip from "./InfoTip";
 
 type Key = keyof DcfAssumptions;
 
@@ -106,6 +106,7 @@ export default function DcfTab({ ticker }: { ticker: string }) {
       </div>
 
       <div className="min-w-0 space-y-4">
+      <PricedIn data={data} />
       <Sensitivity data={data} />
       <ForecastTable data={data} />
 
@@ -173,6 +174,46 @@ function Summary({ data, onExport }: { data: Dcf; onExport: () => void }) {
         </ul>
       )}
     </div>
+  );
+}
+
+/** Reverse DCF: what growth today's price implies, next to what the company has actually delivered. */
+function PricedIn({ data }: { data: Dcf }) {
+  const r = data.reverse;
+  const cagr = (c?: { value: number; span: string }) => (c ? `${fmt.signed(c.value * 100, 1)}%` : "N/A");
+  return (
+    <section className="card">
+      <h2 className="text-lg">What's priced in</h2>
+      {r.growth !== null ? (
+        <p className="prose-width mt-2">
+          At {fmt.price(data.price, data.tradingCurrency)}, the market is pricing in about{" "}
+          <strong className="font-semibold">{fmt.signed(r.growth * 100, 1)}%</strong> annual revenue growth for {r.years} years,
+          with your other assumptions unchanged.
+        </p>
+      ) : (
+        <p className="prose-width mt-2">{r.reason}</p>
+      )}
+      <dl className="mt-4 grid max-w-md grid-cols-3 gap-4 text-sm">
+        <div>
+          <dt className="text-muted">Implied</dt>
+          <dd className="mt-1 text-lg font-semibold">{r.growth === null ? "N/A" : `${fmt.signed(r.growth * 100, 1)}%`}</dd>
+        </div>
+        <div>
+          <dt className="text-muted">Actual, 3-yr</dt>
+          <dd className="mt-1 text-lg font-semibold">{cagr(r.cagr.y3)}</dd>
+          {r.cagr.y3 && <dd className="text-xs text-muted">{r.cagr.y3.span}</dd>}
+        </div>
+        <div>
+          <dt className="text-muted">Actual, 5-yr</dt>
+          <dd className="mt-1 text-lg font-semibold">{cagr(r.cagr.y5)}</dd>
+          {r.cagr.y5 && <dd className="text-xs text-muted">{r.cagr.y5.span}</dd>}
+        </div>
+      </dl>
+      <p className="mt-3 text-xs text-muted">
+        Reverse DCF: the same model solved backwards. Growth is held flat for every forecast year and found by search until the value
+        per share equals today's price. Actual figures are revenue CAGRs from the annual reports.
+      </p>
+    </section>
   );
 }
 
@@ -281,10 +322,10 @@ function Sensitivity({ data }: { data: Dcf }) {
   const price = data.price;
   // Diverging tint: green above today's price, red below, neutral near it. The numbers stay in normal text colour.
   function tint(v: number | null) {
-    if (v === null || !price) return"";
+    if (v === null || !price) return "";
     const diff = v / price - 1;
     const strength = Math.min(Math.abs(diff) / 0.5, 1);
-    if (Math.abs(diff) < 0.05) return"bg-subtle";
+    if (Math.abs(diff) < 0.05) return "bg-subtle";
     const level = strength > 0.66 ? 3 : strength > 0.33 ? 2 : 1;
     const up = ["", "bg-gain-soft", "bg-gain-soft", "bg-gain-soft"];
     const down = ["", "bg-loss-soft", "bg-loss-soft", "bg-loss-soft"];

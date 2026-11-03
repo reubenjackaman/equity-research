@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from"react";
-import { Period, StatementKey, Statements, statementsApi } from"../api";
-import { statementCell } from"../format";
+import { useEffect, useRef, useState } from "react";
+import { Period, StatementKey, Statements, statementsApi } from "../api";
+import { statementCell } from "../format";
 
 const STATEMENT_TABS: { key: StatementKey; label: string }[] = [
   { key: "income", label: "Income statement" },

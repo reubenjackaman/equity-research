@@ -1,9 +1,9 @@
-import { useRef, useState } from"react";
-import { createPortal } from"react-dom";
+import { useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 /**
  * Hover (or tap, on phones) to show a small popover. It's positioned relative to the
- * window and rendered at the end of <body> (a"portal"), so scrolling tables and
+ * window and rendered at the end of <body> (a "portal"), so scrolling tables and
  * sticky columns can't clip or cover it.
  */
 export default function InfoTip({ children, content }: { children: React.ReactNode; content: React.ReactNode }) {

@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from"react";
-import { RatioRow, Ratios, ratiosApi } from"../api";
-import * as fmt from"../format";
-import InfoTip from"./InfoTip";
-import Sparkline from"./Sparkline";
+import { useEffect, useRef, useState } from "react";
+import { RatioRow, Ratios, ratiosApi } from "../api";
+import * as fmt from "../format";
+import InfoTip from "./InfoTip";
+import Sparkline from "./Sparkline";
 
 const CATEGORIES = ["Profitability", "Liquidity", "Leverage", "Efficiency", "Valuation", "Growth"];
 

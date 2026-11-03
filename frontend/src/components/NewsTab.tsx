@@ -1,5 +1,5 @@
-import { useEffect, useState } from"react";
-import { News, newsApi } from"../api";
+import { useEffect, useState } from "react";
+import { News, newsApi } from "../api";
 
 function timeAgo(iso: string) {
   const minutes = (Date.now() - new Date(iso).getTime()) / 60000;

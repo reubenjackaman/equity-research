@@ -1,5 +1,5 @@
-import * as fmt from"../format";
-import type { ValuationRow } from"../valuation";
+import * as fmt from "../format";
+import type { ValuationRow } from "../valuation";
 
 /**
  * "Football field" valuation chart: one horizontal bar per method showing the range of
@@ -25,7 +25,7 @@ export default function FootballField({
   const max = Math.max(...values);
   const span = max - min || max || 1;
   const lo = Math.max(0, min - span * 0.25);
-  const hi = max + span * 0.28; // extra room: labels like"CA$111.62" are wide
+  const hi = max + span * 0.28; // extra room: labels like "CA$111.62" are wide
   const pos = (v: number) => ((v - lo) / (hi - lo)) * 100;
   const ticks = niceTicks(lo, hi);
   const money = (v: number | null) => fmt.price(v, currency);

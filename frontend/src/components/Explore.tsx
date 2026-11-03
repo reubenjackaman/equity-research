@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from"react";
-import { Link, useLocation, useSearchParams } from"react-router-dom";
-import { ScreenerFilters, ScreenerRow, screenerApi } from"../api";
-import * as fmt from"../format";
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { ScreenerFilters, ScreenerRow, screenerApi } from "../api";
+import * as fmt from "../format";
 
 // What each sector covers, shown on the tiles.
 const SECTORS: { name: string; blurb: string }[] = [
@@ -84,7 +84,7 @@ export default function Explore() {
     screenerApi.options().then(setIndustries).catch(() => {});
   }, []);
 
-  // Arriving from the top bar's"Explore" link (/#explore): scroll down to this section.
+  // Arriving from the top bar's "Explore" link (/#explore): scroll down to this section.
   const { hash } = useLocation();
   useEffect(() => {
     if (hash === "#explore") document.getElementById("explore")?.scrollIntoView({ behavior: "smooth" });
@@ -130,7 +130,7 @@ export default function Explore() {
           ].map(([value, label]) => (
             <button
               key={value}
-              onClick={() => set({ country: value as"us" | "ca" })}
+              onClick={() => set({ country: value as "us" | "ca" })}
               className={`-mb-px border-b-2 py-1.5 text-sm font-medium transition-colors ${
                 filters.country === value ? "border-accent text-ink" : "border-transparent text-muted hover:text-ink"
               }`}
@@ -274,12 +274,12 @@ function ResultsTable({ rows }: { rows: ScreenerRow[] }) {
                   <div className="max-w-[11rem] truncate text-xs text-muted sm:max-w-[18rem]">{r.name}</div>
                 </Link>
               </td>
-              <td className="whitespace-nowrap px-3 py-2 text-right">{fmt.price(r.price, r.currency)}</td>
-              <td className="whitespace-nowrap px-3 py-2 text-right">{pct(r.changePercent)}</td>
-              <td className="whitespace-nowrap px-3 py-2 text-right">{pct(r.yearChangePercent)}</td>
-              <td className="whitespace-nowrap px-3 py-2 text-right">{fmt.big(r.marketCap)}</td>
-              <td className="whitespace-nowrap px-3 py-2 text-right">{r.pe === null ? <span className="text-muted">N/A</span> : `${r.pe.toFixed(1)}x`}</td>
-              <td className="whitespace-nowrap px-3 py-2 text-right">{r.dividendYield ? fmt.pct(r.dividendYield) : <span className="text-muted">–</span>}</td>
+              <td className= "whitespace-nowrap px-3 py-2 text-right">{fmt.price(r.price, r.currency)}</td>
+              <td className= "whitespace-nowrap px-3 py-2 text-right">{pct(r.changePercent)}</td>
+              <td className= "whitespace-nowrap px-3 py-2 text-right">{pct(r.yearChangePercent)}</td>
+              <td className= "whitespace-nowrap px-3 py-2 text-right">{fmt.big(r.marketCap)}</td>
+              <td className= "whitespace-nowrap px-3 py-2 text-right">{r.pe === null ? <span className="text-muted">N/A</span> : `${r.pe.toFixed(1)}x`}</td>
+              <td className= "whitespace-nowrap px-3 py-2 text-right">{r.dividendYield ? fmt.pct(r.dividendYield) : <span className="text-muted">–</span>}</td>
             </tr>
           ))}
         </tbody>

@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from"react";
-import { Link, useLocation, useNavigate } from"react-router-dom";
-import { api, Overview } from"../api";
-import * as fmt from"../format";
-import { keys, useSaved, useStored } from"../storage";
-import type { Theme } from"../theme";
-import { Birdhouse } from"./Finch";
-import SearchBar from"./SearchBar";
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { api, Overview } from "../api";
+import * as fmt from "../format";
+import { keys, useSaved, useStored } from "../storage";
+import type { Theme } from "../theme";
+import { Birdhouse } from "./Finch";
+import SearchBar from "./SearchBar";
 
 /** The bar at the top of every page: navigation, saved companies, search, theme and a market strip. */
 export default function TopBar({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void }) {
@@ -119,7 +119,7 @@ function SavedMenu() {
           open ? "bg-subtle" : "text-muted hover:bg-subtle"
         }`}
       >
-        <StarIcon filled={saved.length > 0} className="h-4 w-4 text-warn" />
+        <StarIcon filled={saved.length > 0} className= "h-4 w-4 text-warn" />
         <span className="hidden sm:inline">Saved</span>
         {saved.length > 0 && <span className="rounded bg-subtle px-1.5 text-xs">{saved.length}</span>}
       </button>

@@ -1,5 +1,5 @@
-import { Link } from"react-router-dom";
-import { FinchLogo } from"./Finch";
+import { Link } from "react-router-dom";
+import { FinchLogo } from "./Finch";
 
 const COLUMNS: { title: string; links: [string, string][] }[] = [
   { title: "Explore", links: [["Search companies", "/"], ["Browse by sector", "/#explore"], ["Mystery Company", "/game"]] },

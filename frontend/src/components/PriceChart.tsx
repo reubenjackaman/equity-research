@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from"react";
-import { AreaSeries, ColorType, createChart } from"lightweight-charts";
-import { api, PricePoint, Range } from"../api";
-import { pct } from"../format";
-import { cssVar, type Theme } from"../theme";
+import { useEffect, useRef, useState } from "react";
+import { AreaSeries, ColorType, createChart } from "lightweight-charts";
+import { api, PricePoint, Range } from "../api";
+import { pct } from "../format";
+import { cssVar, type Theme } from "../theme";
 
 const RANGES: Range[] = ["1M", "6M", "1Y", "5Y"];
 

@@ -1,4 +1,4 @@
-import { useState } from"react";
+import { useState } from "react";
 
 /**
  * A tiny trend line. Missing values (null) break the line instead of being drawn as zero.

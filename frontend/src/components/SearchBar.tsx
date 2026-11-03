@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from"react";
-import { useNavigate } from"react-router-dom";
-import { api, SearchResult } from"../api";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { api, SearchResult } from "../api";
 
 /**
  * Ticker / company-name search with autocomplete.
@@ -125,7 +125,7 @@ export default function SearchBar({ large = false }: { large?: boolean }) {
           ))}
           {!loading && results.length === 0 && (
             <li className="px-3 py-2 text-sm text-muted">
-              No matches. Press Enter to try"{query.trim().toUpperCase()}" as a ticker.
+              No matches. Press Enter to try "{query.trim().toUpperCase()}" as a ticker.
             </li>
           )}
           {loading && results.length === 0 && (

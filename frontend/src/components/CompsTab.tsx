@@ -1,7 +1,7 @@
-import { useEffect, useState } from"react";
-import { CompRow, Comps, compsApi } from"../api";
-import * as fmt from"../format";
-import { keys, useStored } from"../storage";
+import { useEffect, useState } from "react";
+import { CompRow, Comps, compsApi } from "../api";
+import * as fmt from "../format";
+import { keys, useStored } from "../storage";
 
 export default function CompsTab({ ticker, price, currency }: { ticker: string; price: number | null; currency: string | null }) {
   // null = use suggested peers. Your list is remembered per company (also used by the Summary tab).
@@ -139,7 +139,7 @@ function CompsTable({ data }: { data: Comps }) {
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="border-b border-line text-xs text-muted">
+            <tr className= "border-b border-line text-xs text-muted">
               <th className={`${stickyCell} text-left font-medium`}>Company</th>
               <th className="whitespace-nowrap px-3 py-2 text-right font-medium">Mkt cap</th>
               {data.metrics.map((m) => (
