@@ -2,9 +2,11 @@
 
 A project by Reuben Jackaman.
 
-A local web app for researching US and Canadian (TSX) public companies. Type a ticker
-(e.g. `AAPL`, `SHOP.TO`) and get an overview, price chart, financial statements, ratios,
-news and valuation models.
+A free research terminal for US and Canadian (TSX) markets, in the style of a professional
+market-data terminal: a command line (`AAPL GP`, `RY.TO DCF`, `WEI`), world markets, movers,
+yield curves, economic data, an earnings calendar, a watchlist, and for each company an
+overview, candlestick chart with technicals, statements, ratios, health scores, analyst
+estimates, insider trades, news, DCF and comps, with an AI assistant (Ask Finch) beside every screen.
 
 > For educational purposes only. Not investment advice.
 
@@ -23,6 +25,7 @@ news and valuation models.
 | + | Top bar: navigation, saved & recent companies, market strip | ✅ Done |
 | + | One-server production mode (ready for hosting) | ✅ Done |
 | + | Mystery Company daily game | ✅ Done |
+| + | Terminal redesign: command line, function codes, market screens, chart, analysts, insiders | ✅ Done |
 
 ## Project layout
 
@@ -199,12 +202,32 @@ period, book value of debt, operating leases not added to debt, and stock-based 
 not deducted from FCF. That last one flatters companies that pay heavily in stock. Banks and
 insurers aren't supported, because "free cash flow to the firm" isn't meaningful for them.
 
-## Top bar
+## The terminal (November 2026)
 
-Every page has a bar with Home, Explore, a **Saved** menu and search, plus a strip of
-headline markets (S&P 500, Nasdaq, TSX, USD/CAD, US 10-year yield; refreshed every few
-minutes). Click the ☆ next to a company's name to save it; the Saved menu shows your saved
-and recently viewed companies with live prices. These are remembered in your browser.
+The top bar is a command line. Type a ticker, a company name or a function code and press
+Enter; press `/` (or Ctrl/Cmd+K) anywhere to jump to it. The codes live in
+`frontend/src/functions.ts` and the full list is on the HELP screen.
+
+| Code | Screen | Data |
+|---|---|---|
+| MKTS | Markets dashboard (home) | all of the below |
+| WEI | World indices, currencies, commodities, crypto, yields | Yahoo, one batched download (`data/markets.py` `board`) |
+| MOST | Gainers, losers, most traded among the 60 largest US and 60 largest TSX companies | Yahoo |
+| GC | US and Canadian yield curves (now, 1 month and 1 year ago), 10Y-2Y spread, policy rates | FRED and Bank of Canada Valet API, no keys |
+| ECO | US and Canadian inflation, unemployment, GDP, payrolls, policy rates, VIX | FRED and Bank of Canada |
+| EVTS | Earnings calendar, next two weeks, companies over $10B | Finnhub |
+| MON | Watchlist with quotes and 52-week range (saved in the browser) | Yahoo |
+| EQS | Screener (the old Explore section) | Yahoo screener or snapshot |
+
+Company functions (`AAPL GP` and so on): DES overview, GP chart (candles, moving averages,
+Bollinger bands, volume, RSI, comparison with the S&P 500 or S&P/TSX, volatility and max
+drawdown), FA financials, RATIO, HLTH health scores, ANR analyst ratings, price targets,
+earnings surprises and next report (`finance/street.py`), INS insider trades from SEC Form 4
+(Finnhub; TSX companies use their US listing and are flagged, since Canadian insiders file on
+SEDI), CN news, DCF, RV comps, SUM summary. A ticker tape of world markets scrolls under the bar.
+
+Ask Finch works on the market screens too: with no company, it reads the board, movers, curves,
+economy and earnings calendar instead. Check everything with `python -m tests.check_terminal`.
 
 ## Analysis added in November 2026
 
@@ -222,9 +245,9 @@ and recently viewed companies with live prices. These are remembered in your bro
 
 ## Speed on Render's free plan
 
-`backend/data/warmup.py` runs only on Render. Every 10 minutes the server visits its own public address so the free
-plan doesn't put it to sleep (which would also empty the cache), and every 12 hours it preloads ~30 popular companies
-(and the competitors of the biggest), so first visits are fast. One always-on service uses about 744 of the free
+`backend/data/warmup.py` runs only on Render. A minute after starting, and then every 5 minutes, the server visits its
+own public address so the free plan doesn't put it to sleep (which would also empty the cache). Every 12 hours it
+preloads the market screens and ~30 popular companies (and the competitors of the biggest), so first visits are fast. One always-on service uses about 744 of the free
 plan's 750 monthly hours, so a second free service would run out of hours.
 
 ## Mystery Company (daily game)
@@ -236,7 +259,7 @@ Answers are companies over $400B, taken in a fixed shuffled order so none repeat
 have been used. To hand-pick a day's answer, add it to `OVERRIDES` in `game.py`. Progress and streaks are saved in each player's browser. Check the logic with
 `.venv/bin/python -m tests.check_game`.
 
-## Explore (home page)
+## Screener (EQS)
 
 Browse US or TSX stocks by sector and industry, then filter by market cap, P/E, dividend
 yield and revenue growth, and sort the results. It uses Yahoo Finance's free stock screener

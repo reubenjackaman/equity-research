@@ -1,5 +1,26 @@
 # Value Finch design notes
 
+## November 2026: terminal redesign
+
+The editorial direction below was replaced by a market-terminal look, at the owner's request
+("more like the Bloomberg or LSEG terminal"). It is inspired by those products, not a copy:
+no names, logos or layouts of theirs are used.
+
+- Dark by default (`--bg #07090c`), one amber accent (`--accent #ffa31a`) for function codes,
+  panel titles and the "now" line in charts; green and red only for up and down moves; blue
+  (`--info`) as the second series colour. The light theme keeps the same structure.
+- IBM Plex Sans for text and IBM Plex Mono for every figure and code, so columns line up.
+  The serif is gone; `--font-serif` now points at Plex Sans so older pages follow.
+- Dense 14px base and 12-13px tables; panels are bordered boxes with an amber title strip and
+  their function code (`Panel` in `components/Terminal.tsx`); 2px corners.
+- Navigation is the command line plus a row of function keys, and every screen has a code.
+- Charts follow the same rules as before: direct labels or a legend for every series, hover
+  read-outs, no dual axes (the index comparison is drawn as % change on one axis).
+
+The earlier notes are kept below for the record.
+
+---
+
 Status: implemented. Small data labels use 13px, one step below the 14px planned, because 14px did not fit the tiles.
 
 ## How the site is built
