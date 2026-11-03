@@ -214,7 +214,9 @@ and recently viewed companies with live prices. These are remembered in your bro
   accruals ratio from the annual statements. Check: `python -m tests.check_health`.
 - **Valuation history** on the Summary tab: `finance/valuation_history.py` compares P/E, EV/EBITDA and P/S with their own
   fiscal-year average and standard deviation. Check: `python -m tests.check_valuation_history`.
-- **Ask Finch**: `finance/assistant.py` builds the page's data on the server and asks Google Gemini (`data/gemini.py`).
+- **Ask Finch**: `finance/assistant.py` gathers everything the site has on the company (ratios, competitors, DCF and
+  reverse DCF, health scores, valuation history, Finnhub analyst ratings, news) and asks Google Gemini (`data/gemini.py`),
+  which may add general knowledge and give a reasoned valuation view. No live web search: Google's free tier doesn't include it.
   Needs `GEMINI_API_KEY` in `backend/.env` locally and in Render's environment settings; without it the feature turns
   itself off. Limits: 200 questions a day site-wide, 20 a day and 5 a minute per visitor. Check: `python -m tests.check_assistant`.
 
