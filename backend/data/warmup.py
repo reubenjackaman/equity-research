@@ -1,24 +1,23 @@
 """
 Keeps the live site quick on Render's free plan. Runs only on Render (it sets RENDER=true).
 
-1. Keep awake: the free plan stops the server after 15 minutes without visitors, and a restart
-   empties the cache. Every 10 minutes the server visits its own public address, which counts
-   as a visitor. One always-on service uses about 744 of the free plan's 750 hours a month.
+1. Keep awake: the free plan stops the server when it gets no outside visitors for a while (seen
+   after as little as 8 minutes), and a restart empties the cache. A minute after starting, and then
+   every 5 minutes, the server visits its own public address, which counts as an outside visitor.
+   (Render's own health checks don't count.) One always-on service uses about 744 of the free plan's 750 hours a month.
 2. Preload: in the background, fetch the companies people look at most (and, for the biggest,
    their competitors), so the first visitor to AAPL or RY.TO doesn't wait. Repeats every
    12 hours, inside the one-day cache life of the financial statements.
 """
 
-import logging
 import os
 import threading
 import time
 
 import requests
 
-log = logging.getLogger("warmup")
-
-PING_EVERY = 10 * 60
+PING_EVERY = 5 * 60
+FIRST_PING = 60
 PRELOAD_EVERY = 12 * 60 * 60
 START_DELAY = 60  # let the server finish starting before the background work
 PAUSE = 3  # seconds between companies, to stay gentle on the free CPU and the data providers
@@ -34,12 +33,13 @@ WITH_COMPETITORS = 12  # the first N also get their comps (each competitor's sta
 
 
 def _keep_awake(url: str):
+    time.sleep(FIRST_PING)
     while True:
-        time.sleep(PING_EVERY)
         try:
-            requests.get(f"{url}/api/health", timeout=30)
+            requests.get(f"{url}/api/health?from=keep-awake", timeout=30)
         except requests.RequestException as e:
-            log.warning("keep-awake ping failed: %s", type(e).__name__)
+            print(f"keep-awake ping failed: {type(e).__name__}", flush=True)
+        time.sleep(PING_EVERY)
 
 
 def _preload():
@@ -60,7 +60,7 @@ def _preload():
                 except Exception:
                     pass  # some analyses don't apply (e.g. DCF for banks); the page explains that itself
             time.sleep(PAUSE)
-        log.info("preloaded %d companies in %.0fs", len(POPULAR), time.monotonic() - started)
+        print(f"preloaded {len(POPULAR)} companies in {time.monotonic() - started:.0f}s", flush=True)
         time.sleep(PRELOAD_EVERY)
 
 
