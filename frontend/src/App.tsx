@@ -4,7 +4,9 @@ import Footer from "./components/Footer";
 import TopBar from "./components/TopBar";
 import Company from "./pages/Company";
 import Game from "./pages/Game";
-import Home from "./pages/Home";
+import {
+  EarningsScreen, EconomyScreen, HelpScreen, MarketsHome, MonitorScreen, MoversScreen, RatesScreen, ScreenerScreen, WorldScreen,
+} from "./pages/Markets";
 import { About, Contact, HowItWorks, NotFound, Privacy, Terms } from "./pages/Info";
 import TearSheet from "./pages/TearSheet";
 import { useTheme } from "./theme";
@@ -34,7 +36,15 @@ export default function App() {
 
       <main className="flex-1">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<MarketsHome />} />
+          <Route path="/wei" element={<WorldScreen />} />
+          <Route path="/most" element={<MoversScreen />} />
+          <Route path="/rates" element={<RatesScreen />} />
+          <Route path="/eco" element={<EconomyScreen />} />
+          <Route path="/earnings" element={<EarningsScreen />} />
+          <Route path="/monitor" element={<MonitorScreen />} />
+          <Route path="/screener" element={<ScreenerScreen />} />
+          <Route path="/help" element={<HelpScreen />} />
           <Route path="/company/:ticker" element={<Company theme={theme} />} />
           <Route path="/game" element={<Game />} />
           <Route path="/how-it-works" element={<HowItWorks />} />

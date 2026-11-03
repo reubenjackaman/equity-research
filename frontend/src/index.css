@@ -8,42 +8,45 @@
    and dark mode swaps the values here. */
 :root,
 .force-light {
-  --bg: #faf8f5;
-  --surface: #fffdfa;
-  --subtle: #f1ece6;
-  --line: #e2dbd3;
-  --line-strong: #b9aea6;
-  --ink: #1f1b1a;
-  --muted: #5e5450;
-  --accent: #7a2e2a;
-  --accent-hover: #63241f;
-  --accent-soft: #f4e9e6;
-  --on-accent: #fffdfa;
-  --gain: #2c6549;
-  --gain-soft: #e6efe9;
-  --loss: #9c3b1b;
-  --loss-soft: #f6e8e1;
-  --warn: #7a5a12;
-  --warn-soft: #f5eedb;
+  --bg: #eef0f3;
+  --surface: #ffffff;
+  --subtle: #e5e8ec;
+  --line: #d3d8de;
+  --line-strong: #a3acb7;
+  --ink: #0e1116;
+  --muted: #4f5a66;
+  --accent: #a85800;
+  --accent-hover: #874600;
+  --accent-soft: #fbefdf;
+  --on-accent: #ffffff;
+  --gain: #0f7a43;
+  --gain-soft: #e2f3e9;
+  --loss: #c22d24;
+  --loss-soft: #fbe6e4;
+  --warn: #7f5c00;
+  --warn-soft: #f8efd5;
+  --info: #0b63bd;
 }
+/* The terminal look: near-black panels, amber for function keys and headings, green/red for moves. */
 .dark:not(.force-light) {
-  --bg: #181513;
-  --surface: #211d1a;
-  --subtle: #2b2622;
-  --line: #3a332e;
-  --line-strong: #6b6058;
-  --ink: #f0eae4;
-  --muted: #b5a9a2;
-  --accent: #dda096;
-  --accent-hover: #e8b5ac;
-  --accent-soft: #33241f;
-  --on-accent: #181513;
-  --gain: #7fbf9e;
-  --gain-soft: #1f2e27;
-  --loss: #e8a07f;
-  --loss-soft: #352319;
-  --warn: #dcc07a;
-  --warn-soft: #30291a;
+  --bg: #07090c;
+  --surface: #0f1318;
+  --subtle: #171c23;
+  --line: #232b35;
+  --line-strong: #3b4654;
+  --ink: #e7eaee;
+  --muted: #95a1af;
+  --accent: #ffa31a;
+  --accent-hover: #ffbb52;
+  --accent-soft: #2a1e0c;
+  --on-accent: #07090c;
+  --gain: #35d07f;
+  --gain-soft: #0f2419;
+  --loss: #ff6159;
+  --loss-soft: #2c1413;
+  --warn: #f3c84b;
+  --warn-soft: #2a2310;
+  --info: #5cb8ff;
 }
 .dark .force-light {
   color: var(--ink);
@@ -67,28 +70,31 @@
   --color-loss-soft: var(--loss-soft);
   --color-warn: var(--warn);
   --color-warn-soft: var(--warn-soft);
+  --color-info: var(--info);
 }
 
 @theme {
   --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  /* The terminal design has one text face; headings that used the old serif now use Plex Sans too. */
+  --font-serif: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Type scale, ratio about 1.25 from a 17px base. */
-  --text-xs: 0.8125rem;
-  --text-xs--line-height: 1.45;
-  --text-sm: 0.875rem;
-  --text-sm--line-height: 1.5;
-  --text-base: 1.0625rem;
-  --text-base--line-height: 1.6;
-  --text-lg: 1.3125rem;
-  --text-lg--line-height: 1.3;
-  --text-xl: 1.6875rem;
+  /* Dense type scale for a data screen: 14px base. */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.4;
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: 1.45;
+  --text-base: 0.875rem;
+  --text-base--line-height: 1.55;
+  --text-lg: 1.0625rem;
+  --text-lg--line-height: 1.35;
+  --text-xl: 1.3125rem;
   --text-xl--line-height: 1.25;
-  --text-2xl: 2.0625rem;
+  --text-2xl: 1.625rem;
   --text-2xl--line-height: 1.2;
-  --text-3xl: 2.625rem;
+  --text-3xl: 2rem;
   --text-3xl--line-height: 1.15;
-  --text-4xl: 3.25rem;
+  --text-4xl: 2.5rem;
   --text-4xl--line-height: 1.1;
 
   --shadow-sm: 0 1px 2px rgb(31 27 26 / 0.08);
@@ -106,9 +112,18 @@
   h1,
   h2,
   h3 {
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     font-weight: 600;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.005em;
+  }
+  /* Figures line up in columns, like a terminal. */
+  table,
+  .mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  table th {
+    font-family: var(--font-sans);
   }
   a {
     text-underline-offset: 3px;
@@ -120,12 +135,20 @@
 }
 
 @layer components {
-  /* A section: a thin rule and space, not a floating box. */
+  /* A panel on the terminal screen: a bordered box on the surface colour. */
   .card {
-    @apply border-t border-line py-6;
+    @apply mt-3 border border-line bg-surface p-4;
+  }
+  /* A panel's title strip: amber, upper case, with an optional function code. */
+  .panel-head {
+    @apply flex items-center justify-between gap-2 border-b border-line bg-subtle px-3 py-1.5 text-xs font-semibold tracking-wider text-accent uppercase;
+  }
+  /* A function key: the short code (GP, DES, WEI...) that opens a screen. */
+  .fkey {
+    @apply inline-flex items-center rounded-sm bg-accent px-1.5 font-mono text-xs leading-5 font-semibold text-on-accent;
   }
   .btn {
-    @apply inline-flex items-center justify-center rounded border border-line-strong bg-transparent px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-subtle disabled:opacity-50;
+    @apply inline-flex items-center justify-center rounded-sm border border-line-strong bg-transparent px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-subtle disabled:opacity-50;
   }
   .prose-width {
     max-width: 65ch;
@@ -143,6 +166,28 @@
   }
   .ask-open #root {
     padding-right: 26rem;
+  }
+}
+
+/* The scrolling ticker tape under the top bar. Its content is doubled so the loop is seamless.
+   It pauses on hover, and people who prefer reduced motion get a still strip they can scroll. */
+.tape-track {
+  animation: tape var(--tape-duration, 120s) linear infinite;
+}
+.tape:hover .tape-track {
+  animation-play-state: paused;
+}
+@keyframes tape {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tape-track {
+    animation: none;
+  }
+  .tape {
+    overflow-x: auto;
   }
 }
 

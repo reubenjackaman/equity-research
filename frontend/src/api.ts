@@ -405,3 +405,115 @@ export const askApi = {
     peers: string[];
   }) => (await post("/api/ask", body)).json() as Promise<{ answer: string }>,
 };
+
+// ---------- Terminal: market screens ----------
+
+export type BoardQuote = {
+  symbol: string;
+  label: string;
+  value: number | null;
+  change: number | null;
+  changePercent: number | null;
+  changeBp?: number; // yields: the daily move in basis points
+  monthChangePercent?: number | null;
+  date?: string;
+  spark: number[];
+};
+export type BoardGroup = { group: string; items: BoardQuote[] };
+
+export type Mover = {
+  symbol: string;
+  name: string;
+  sector: string | null;
+  currency: string | null;
+  price: number;
+  changePercent: number;
+  volume: number;
+  dollarVolume: number;
+  marketCap: number | null;
+};
+export type MoversSet = { gainers: Mover[]; losers: Mover[]; active: Mover[]; advancing: number; declining: number; universe: number };
+export type Movers = { us: MoversSet; ca: MoversSet };
+
+export type CurvePoint = { tenor: string; now: number; monthAgo: number | null; yearAgo: number | null };
+export type Rates = {
+  us: { date: string; points: CurvePoint[] };
+  ca: { date: string; points: CurvePoint[] };
+  spread: { label: string; points: { time: string; value: number }[] };
+  policy: { label: string; value: number | null; date: string | null }[];
+};
+
+export type EconomyItem = { label: string; unit: string; value: number; date: string; previous: number | null; spark: number[] };
+export type Economy = { country: string; items: EconomyItem[] }[];
+
+export type EarningsEvent = {
+  date: string;
+  hour: string;
+  symbol: string;
+  name: string;
+  sector: string | null;
+  marketCap: number;
+  epsEstimate: number | null;
+  revenueEstimate: number | null;
+  quarter: number | null;
+  year: number | null;
+};
+
+export const marketsApi = {
+  board: () => get<BoardGroup[]>("/api/markets/board"),
+  movers: () => get<Movers>("/api/markets/movers"),
+  rates: () => get<Rates>("/api/markets/rates"),
+  economy: () => get<Economy>("/api/markets/economy"),
+  earnings: () => get<EarningsEvent[]>("/api/markets/earnings"),
+};
+
+// ---------- Terminal: company functions ----------
+
+export type BarRange = "1D" | "5D" | "1M" | "6M" | "YTD" | "1Y" | "5Y" | "MAX";
+export type Bar = { time: string | number; open: number; high: number; low: number; close: number; volume: number };
+export type Bars = { symbol: string; range: BarRange; intraday: boolean; bars: Bar[] };
+
+export type InsiderTrade = {
+  date: string;
+  filed: string | null;
+  name: string;
+  code: string;
+  type: string;
+  shares: number;
+  price: number | null;
+  value: number | null;
+  held: number | null;
+  derivative: boolean;
+};
+export type Insiders = {
+  symbol: string;
+  source: string;
+  days: number;
+  note: string | null;
+  summary: { buys: number; sells: number; buyValue: number; sellValue: number; buyers: number; sellers: number; netShares: number };
+  transactions: InsiderTrade[];
+};
+
+export type RatingMonth = { period: string; strongBuy: number; buy: number; hold: number; sell: number; strongSell: number };
+export type Surprise = {
+  period: string;
+  year: number;
+  quarter: number;
+  estimate: number | null;
+  actual: number | null;
+  surprise: number | null;
+  surprisePercent: number | null;
+};
+export type Estimates = {
+  symbol: string;
+  ratings: RatingMonth[];
+  surprises: Surprise[];
+  next: { date: string; hour: string; epsEstimate: number | null; revenueEstimate: number | null; quarter: number; year: number } | null;
+  targets: { low: number | null; mean: number | null; high: number | null; analysts: number | null; currency: string | null; price: number | null } | null;
+};
+
+export const companyApi = {
+  bars: (ticker: string, range: BarRange) => get<Bars>(`/api/company/${encodeURIComponent(ticker)}/bars?range=${range}`),
+  insiders: (ticker: string) => get<Insiders>(`/api/company/${encodeURIComponent(ticker)}/insiders`),
+  estimates: (ticker: string) => get<Estimates>(`/api/company/${encodeURIComponent(ticker)}/estimates`),
+};
