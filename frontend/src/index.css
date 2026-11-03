@@ -132,6 +132,20 @@
   }
 }
 
+/* Ask Finch open: the page makes room for the panel instead of hiding under it
+   (beside it on wide screens, above it on phones and tablets). */
+.ask-open #root {
+  padding-bottom: 55vh;
+}
+@media (min-width: 1024px) {
+  .ask-open #root {
+    padding-bottom: 0;
+  }
+  .ask-open #root {
+    padding-right: 26rem;
+  }
+}
+
 /* At phone width every control is at least 44px tall. */
 @media (max-width: 639px) {
   button:not(.tap-exempt),
