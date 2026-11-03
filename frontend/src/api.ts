@@ -198,6 +198,13 @@ export type Dcf = {
     terminalShare: number | null;
   } | null;
   sensitivity: { waccs: number[]; growths: number[]; values: (number | null)[][] };
+  /** Reverse DCF: the flat annual revenue growth that makes the DCF value equal today's price. */
+  reverse: {
+    growth: number | null;
+    reason: string | null; // why there's no answer, when growth is null
+    years: number;
+    cagr: { y3?: { value: number; span: string }; y5?: { value: number; span: string } };
+  };
 };
 
 async function post(path: string, body: unknown, signal?: AbortSignal): Promise<Response> {
@@ -330,4 +337,71 @@ export const gameApi = {
   hint: (puzzle: number, kind: GameHintKind) => get<Omit<GameHint, "attempt">>(`/api/game/hint?puzzle=${puzzle}&kind=${kind}`),
   guess: (puzzle: number, attempt: number, symbol: string) =>
     get<GameGuess>(`/api/game/guess?puzzle=${puzzle}&attempt=${attempt}&symbol=${encodeURIComponent(symbol)}`),
+};
+
+export type HealthComponent = { key: string; formula: string; value: number | null; calc: string | null };
+
+export type Health = {
+  symbol: string;
+  currency: string;
+  year: string; // latest fiscal year, e.g. "FY2025"
+  priorYear: string;
+  source: string;
+  financial: boolean; // bank or insurer: several scores don't apply
+  piotroski: {
+    score: number;
+    available: number; // tests that could be run (out of 9)
+    tests: { key: string; label: string; group: string; pass: boolean | null; detail: string }[];
+    caution: string | null;
+  };
+  altman: {
+    value: number | null;
+    zone: "safe" | "grey" | "distress" | null;
+    components: (HealthComponent & { weight: number })[];
+    reason: string | null;
+    caution: string | null;
+  };
+  beneish: {
+    value: number | null;
+    flag: boolean | null; // true = above -1.78
+    components: (HealthComponent & { label: string; coef: number })[];
+    reason: string | null;
+    caution: string | null;
+  };
+  accruals: { value: number | null; calc: string | null };
+};
+
+export const healthApi = {
+  get: (ticker: string) => get<Health>(`/api/company/${encodeURIComponent(ticker)}/health`),
+};
+
+export type MultipleHistory = {
+  key: "pe" | "ev_ebitda" | "ps";
+  label: string;
+  points: { label: string; value: number }[]; // one per fiscal year, at the year-end share price
+  current: number | null; // today's (TTM) value
+  currentLabel: string | null;
+  mean: number | null;
+  sd: number | null;
+  z: number | null; // standard deviations today's value sits from the average
+  reason: string | null; // why there's no average or no comparison
+  caution: string | null; // the history swings so much the average isn't a reliable guide
+};
+
+export const valuationHistoryApi = {
+  get: (ticker: string) =>
+    get<{ symbol: string; multiples: MultipleHistory[]; source: string }>(`/api/company/${encodeURIComponent(ticker)}/valuation-history`),
+};
+
+export type AskMessage = { role: "user" | "model"; text: string };
+
+export const askApi = {
+  ask: async (body: {
+    symbol: string;
+    tab: string;
+    question: string;
+    history: AskMessage[];
+    assumptions: Partial<DcfAssumptions>;
+    peers: string[];
+  }) => (await post("/api/ask", body)).json() as Promise<{ answer: string }>,
 };
