@@ -1,18 +1,18 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, ReactNode, useEffect, useRef, useState } from "react";
 import { AskMessage, DcfAssumptions, askApi } from "../api";
 import { keys, load } from "../storage";
 import { FinchLogo } from "./Finch";
 
 /** Starter questions for each tab, so it's clear what the assistant can do. */
 const STARTERS: Record<string, string[]> = {
-  Overview: ["What does this company do?", "How has the share price moved this year?", "Which ratios stand out?"],
+  Overview: ["Is it overvalued or undervalued?", "How is it valued against competitors?", "What are the main risks?"],
   Financials: ["How has revenue grown?", "Is free cash flow keeping up with net income?", "How much debt does it carry?"],
-  Ratios: ["Why is return on equity at this level?", "Are margins improving?", "How does liquidity look?"],
+  Ratios: ["Which ratios stand out, and why?", "Are margins improving?", "How do its returns compare with peers?"],
   Health: ["What does the Piotroski score say?", "Explain the Altman Z-score here.", "Is the Beneish score a concern?"],
   News: ["Summarize the recent headlines.", "What themes come up in the news?"],
   DCF: ["Why is the DCF value different from the price?", "What growth is priced in?", "Which assumption matters most?"],
   Comps: ["How does it compare with its peers?", "Which multiple looks most different from peers?"],
-  Summary: ["Summarize the valuation picture.", "How do today's multiples compare with history?"],
+  Summary: ["Is it overvalued or undervalued?", "How do today's multiples compare with history?"],
 };
 
 /** "Ask Finch": a question box that answers from the data on the current company page. */
@@ -34,9 +34,15 @@ export default function AskFinch({ symbol, name, tab }: { symbol: string; name: 
     endRef.current?.scrollIntoView({ block: "end" });
   }, [messages, busy]);
 
+  // On wide screens the panel sits beside the page instead of on top of it (see .ask-open in index.css).
+  useEffect(() => {
+    document.documentElement.classList.toggle("ask-open", open);
+    return () => document.documentElement.classList.remove("ask-open");
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
-    inputRef.current?.focus();
+    inputRef.current?.focus({ preventScroll: true });
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
@@ -89,7 +95,7 @@ export default function AskFinch({ symbol, name, tab }: { symbol: string; name: 
   return (
     <aside
       aria-label="Ask Finch"
-      className="fixed inset-x-0 bottom-0 z-40 flex h-[80vh] flex-col border-t border-line bg-surface shadow-sm sm:inset-x-auto sm:right-4 sm:bottom-4 sm:h-[34rem] sm:max-h-[calc(100vh-6rem)] sm:w-[26rem] sm:rounded sm:border"
+      className="fixed inset-x-0 bottom-0 z-40 flex h-[55vh] flex-col border-t border-line bg-surface shadow-sm lg:inset-y-0 lg:right-0 lg:left-auto lg:h-auto lg:w-[26rem] lg:border-t-0 lg:border-l lg:shadow-none"
     >
       <header className="flex items-center justify-between gap-2 border-b border-line px-4 py-2">
         <div className="flex items-center gap-2">
@@ -101,7 +107,7 @@ export default function AskFinch({ symbol, name, tab }: { symbol: string; name: 
             </p>
           </div>
         </div>
-        <button onClick={() => setOpen(false)} aria-label="Close Ask Finch" className="min-w-11 rounded p-2 text-muted hover:bg-subtle hover:text-ink">
+        <button onClick={() => setOpen(false)} aria-label="Minimize Ask Finch" title="Minimize (your chat is kept)" className="min-w-11 rounded p-2 text-muted hover:bg-subtle hover:text-ink">
           <svg className="mx-auto h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <path d="M5 5l10 10M15 5L5 15" />
           </svg>
@@ -112,7 +118,8 @@ export default function AskFinch({ symbol, name, tab }: { symbol: string; name: 
         {messages.length === 0 && (
           <div>
             <p className="text-sm text-muted">
-              Ask about the numbers on this page. Answers come only from the site's data for {symbol}.
+              Ask anything about {symbol}: valuation, competitors, risks, or what a number means. Finch reads everything the site has
+              on the company, plus analyst ratings and recent news.
             </p>
             <ul className="mt-3 space-y-2">
               {(STARTERS[tab] ?? STARTERS.Overview).map((q) => (
@@ -135,9 +142,7 @@ export default function AskFinch({ symbol, name, tab }: { symbol: string; name: 
               {m.text}
             </p>
           ) : (
-            <p key={i} className="text-sm leading-relaxed whitespace-pre-wrap">
-              {m.text}
-            </p>
+            <Answer key={i} text={m.text} />
           ),
         )}
         {busy && <p className="text-sm text-muted">Reading the page…</p>}
@@ -171,8 +176,51 @@ export default function AskFinch({ symbol, name, tab }: { symbol: string; name: 
             Ask
           </button>
         </div>
-        <p className="mt-2 text-xs text-muted">AI-generated from this page's data. It can make mistakes and isn't investment advice.</p>
+        <p className="mt-2 text-xs text-muted">
+          AI-generated from the site's data, analyst ratings, news and general knowledge. It can make mistakes and isn't investment advice.
+        </p>
       </form>
     </aside>
+  );
+}
+
+/** Renders the assistant's plain-text answer: paragraphs, "- " bullets and **bold** labels. No HTML is ever injected. */
+function Answer({ text }: { text: string }) {
+  const blocks: ReactNode[] = [];
+  let bullets: string[] = [];
+  const flush = () => {
+    if (bullets.length) {
+      blocks.push(
+        <ul key={blocks.length} className="list-disc space-y-1 pl-5">
+          {bullets.map((b, i) => (
+            <li key={i}>{inline(b)}</li>
+          ))}
+        </ul>,
+      );
+      bullets = [];
+    }
+  };
+  for (const line of text.split("\n")) {
+    const bullet = line.match(/^\s*[-*•]\s+(.*)/);
+    if (bullet) {
+      bullets.push(bullet[1]);
+      continue;
+    }
+    flush();
+    if (line.trim()) blocks.push(<p key={blocks.length}>{inline(line)}</p>);
+  }
+  flush();
+  return <div className="space-y-2 text-sm leading-relaxed">{blocks}</div>;
+}
+
+function inline(text: string): ReactNode[] {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith("**") && part.endsWith("**") ? (
+      <strong key={i} className="font-semibold">
+        {part.slice(2, -2)}
+      </strong>
+    ) : (
+      part
+    ),
   );
 }
