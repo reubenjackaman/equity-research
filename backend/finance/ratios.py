@@ -444,6 +444,8 @@ def build(ticker: str) -> dict:
         "columns": columns,
         "ratios": ratio_rows,
         "cagr": _cagrs(annual),
+        # Market value of equity per column (reporting currency, at each fiscal year-end; TTM uses today's price).
+        "marketCaps": [c.market_cap for c in periods],
         "notes": notes,
         "source": annual["source"],
     }

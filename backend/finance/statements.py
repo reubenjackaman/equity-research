@@ -66,6 +66,7 @@ BALANCE = [
     ("long_term_debt", "Long-term debt", ["LongTermDebtNoncurrent", "LongTermDebtAndCapitalLeaseObligations"], ["Long Term Debt", "Long Term Debt And Capital Lease Obligation"], {"indent": True}),
     ("total_liabilities", "Total liabilities", ["Liabilities"], ["Total Liabilities Net Minority Interest"], {"bold": True}),
     ("total_equity", "Shareholders' equity", ["StockholdersEquity", "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest"], ["Stockholders Equity", "Common Stock Equity"], {"bold": True}),
+    ("retained_earnings", "Retained earnings (deficit)", ["RetainedEarningsAccumulatedDeficit"], ["Retained Earnings"], {"indent": True}),
     ("shares_outstanding", "Shares outstanding", ["CommonStockSharesOutstanding"], ["Ordinary Shares Number", "Share Issued"], {"format": "shares"}),
     ("total_debt", "Total debt", [], [], {"calc": "Short-term debt + Long-term debt"}),
 ]
@@ -113,6 +114,7 @@ IFRS_TAGS = {
     "long_term_debt": ["NoncurrentPortionOfNoncurrentBorrowings", "LongtermBorrowings"],
     "total_liabilities": ["Liabilities"],
     "total_equity": ["EquityAttributableToOwnersOfParent", "Equity"],
+    "retained_earnings": ["RetainedEarnings"],
     "shares_outstanding": ["NumberOfSharesOutstanding"],
     "cfo": ["CashFlowsFromUsedInOperatingActivities", "CashFlowsFromUsedInOperations"],
     "dna": ["DepreciationAndAmortisationExpense", "AdjustmentsForDepreciationAndAmortisationExpense"],

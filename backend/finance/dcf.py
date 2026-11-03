@@ -328,6 +328,76 @@ def _warnings(base: dict, a: dict, result: dict) -> list:
     return out
 
 
+GROWTH_RANGE = (-0.5, 1.0)  # implied growth is searched between -50% and +100% a year
+GROWTH_SCAN_STEP = 0.025
+
+
+def implied_growth(base: dict, a: dict) -> dict:
+    """Reverse DCF: the constant annual revenue growth that makes the DCF value equal today's price.
+
+    Every other assumption is held at the user's values; growth is set flat for all forecast years
+    (growth_start = growth_end). Value isn't always rising with growth (faster growth also needs more
+    capex and working capital), so the range is scanned first and the lowest crossing is then
+    narrowed down by bisection on the same run() used for the forward model.
+    """
+    price = base["priceTrading"]
+    if not price:
+        return {"growth": None, "reason": "No current share price is available."}
+
+    def gap(g):
+        v = run(base, {**a, "growth_start": g, "growth_end": g})["valuation"]
+        if v is None or v["perShareTrading"] is None:
+            return None
+        return v["perShareTrading"] - price
+
+    lo, hi = GROWTH_RANGE
+    steps = int(round((hi - lo) / GROWTH_SCAN_STEP))
+    grid = [lo + GROWTH_SCAN_STEP * i for i in range(steps + 1)]
+    gaps = [gap(g) for g in grid]
+    if any(x is None for x in gaps):
+        return {"growth": None, "reason": "WACC is at or below terminal growth, so the model has no value to solve for."}
+    if gaps[0] >= 0:
+        return {"growth": None, "reason": "Even with revenue shrinking 50% a year, the model values the shares above today's price."}
+    crossing = next((i for i in range(1, len(grid)) if gaps[i] >= 0), None)
+    if crossing is None:
+        best = max(range(len(grid)), key=lambda i: gaps[i])
+        best_value = gaps[best] + price
+        if best_value <= 0:
+            reason = ("No growth rate reaches today's price: with these margin and capex assumptions the forecast cash "
+                      "flow stays negative, so faster growth only adds losses. Set the final-year EBIT margin to "
+                      "where you expect it to settle.")
+        elif best < len(grid) - 1:
+            reason = (f"No growth rate reaches today's price. The model's value peaks at about {best_value:,.2f} "
+                      f"with {grid[best]:.0%} growth, because faster growth needs more capex and working capital than "
+                      "it earns. Change the margin or capex assumptions.")
+        else:
+            reason = f"Even 100% annual revenue growth only reaches about {best_value:,.2f} with these assumptions."
+        return {"growth": None, "reason": reason}
+    lo, hi, f_lo = grid[crossing - 1], grid[crossing], gaps[crossing - 1]
+    while hi - lo > 1e-6:
+        mid = (lo + hi) / 2
+        f_mid = gap(mid)
+        if (f_mid >= 0) == (f_lo >= 0):
+            lo, f_lo = mid, f_mid
+        else:
+            hi = mid
+    return {"growth": (lo + hi) / 2, "reason": None}
+
+
+def _revenue_cagrs(ticker: str) -> dict:
+    """Actual revenue CAGR over the last 3 and 5 fiscal years, for comparison with the implied growth."""
+    annual = statements.build(ticker, "annual")
+    row = next(r for r in annual["statements"]["income"] if r["key"] == "revenue")
+    labels = [c["label"] for c in annual["columns"]]
+    out = {}
+    for years in (3, 5):
+        if len(row["values"]) > years:
+            end, start = row["values"][-1], row["values"][-1 - years]
+            if end and start and end > 0 and start > 0:
+                out[f"y{years}"] = {"value": (end / start) ** (1 / years) - 1, "span": f"{labels[-1 - years]}–{labels[-1]}"}
+    return out
+
+
 def model(ticker: str, overrides: dict | None) -> dict:
     base = base_data(ticker)
     d = defaults(base)
@@ -349,5 +419,6 @@ def model(ticker: str, overrides: dict | None) -> dict:
         "assumptions": a,
         "defaults": {k: d[k] for k in ASSUMPTION_KEYS},
         "warnings": _warnings(base, a, result),
+        "reverse": {**implied_growth(base, a), "years": result["years"], "cagr": _revenue_cagrs(ticker)},
         **result,
     }
