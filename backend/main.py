@@ -9,6 +9,7 @@ Production (one server for everything): build the website once with `npm run bui
 frontend/, then this app also serves it, so the whole site lives at one address.
 """
 
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -17,14 +18,20 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from data import game, gemini, news, screener, yahoo
+from data import game, gemini, news, screener, warmup, yahoo
 from exports import dcf_excel, excel
 from finance import assistant, comps, dcf, ratios, statements, valuation_history
 from finance import health as health_scores
 
 load_dotenv()
 
-app = FastAPI(title="Value Finch API")
+@asynccontextmanager
+async def lifespan(_app):
+    warmup.start()  # on Render only: keep the free server awake and preload popular companies
+    yield
+
+
+app = FastAPI(title="Value Finch API", lifespan=lifespan)
 
 
 def fetch(fn, *args):
