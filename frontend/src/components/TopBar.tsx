@@ -18,6 +18,7 @@ const NAV: [string, string, string][] = [
   ["EVTS", "Earnings", "/earnings"],
   ["MON", "Monitor", "/monitor"],
   ["EQS", "Screener", "/screener"],
+  ["LEARN", "Learn", "/learn"],
   ["GAME", "Puzzle", "/game"],
   ["HELP", "Help", "/help"],
 ];

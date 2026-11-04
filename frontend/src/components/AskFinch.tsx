@@ -17,6 +17,7 @@ const STARTERS: Record<string, string[]> = {
   Chart: ["What does the chart say about the trend?", "Explain RSI and moving averages here.", "How has it done against the index?"],
   Analysts: ["What do analysts think of it?", "How has it done against earnings estimates?", "When is the next earnings report?"],
   Insiders: ["Are insiders buying or selling?", "Should insider selling worry me?"],
+  Pitch: ["What's the strongest bull case?", "What's the strongest bear case?", "What target price can the data support?"],
   Overview: ["Is it overvalued or undervalued?", "How is it valued against competitors?", "What are the main risks?"],
   Financials: ["How has revenue grown?", "Is free cash flow keeping up with net income?", "How much debt does it carry?"],
   Ratios: ["Which ratios stand out, and why?", "Are margins improving?", "How do its returns compare with peers?"],
@@ -221,7 +222,7 @@ export default function AskFinch({ symbol = "", name = "", tab }: { symbol?: str
 }
 
 /** Renders the assistant's plain-text answer: paragraphs, "- " bullets and **bold** labels. No HTML is ever injected. */
-function Answer({ text }: { text: string }) {
+export function Answer({ text }: { text: string }) {
   const blocks: ReactNode[] = [];
   let bullets: string[] = [];
   const flush = () => {
