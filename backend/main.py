@@ -18,7 +18,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from data import game, gemini, markets, news, screener, warmup, yahoo
+from data import game, gemini, markets, news, screener, usage, warmup, yahoo
 from exports import dcf_excel, excel
 from finance import assistant, comps, dcf, insights, ratios, statements, street, valuation_history
 from finance import health as health_scores
@@ -243,12 +243,26 @@ def _visitor(request: Request) -> str:
     return forwarded or (request.client.host if request.client else "unknown")
 
 
+def _counted(request: Request):
+    """The visitor's daily-rotating anonymous hash, or None if their browser asks not to be tracked."""
+    if request.headers.get("dnt") == "1" or request.headers.get("sec-gpc") == "1":
+        return None
+    return usage.visitor_hash(_visitor(request), request.headers.get("user-agent", ""))
+
+
+FINCH_EVENTS = {"answer": "finch_question", "draft": "pitch_draft", "critique": "pitch_critique"}
+
+
 def _finch(request: Request, fn, *args):
     """Runs an Ask Finch call with the size check and clean errors for limits, setup and bad input."""
     if int(request.headers.get("content-length") or 0) > MAX_ASK_BYTES:
         raise HTTPException(413, "That request is too large.")
     try:
-        return fn(_visitor(request), *args)
+        result = fn(_visitor(request), *args)
+        visitor = _counted(request)
+        if visitor:
+            usage.record(FINCH_EVENTS[fn.__name__], visitor, args[0].upper() or None)
+        return result
     except assistant.LimitReached as exc:
         raise HTTPException(429, str(exc))
     except gemini.GeminiUnavailable as exc:
@@ -283,6 +297,26 @@ def pitch_draft(body: PitchBody, request: Request):
 def pitch_critique(body: PitchBody, request: Request):
     """Finch reviews a whole pitch like an investment club judge."""
     return _finch(request, assistant.critique, body.symbol, body.pitch, body.assumptions, body.peers)
+
+
+class TrackBody(BaseModel):
+    event: str = Field(max_length=30)
+    ticker: str = Field(default="", max_length=15)
+
+
+@app.post("/api/track", status_code=204)
+def track(body: TrackBody, request: Request):
+    """Anonymous usage counting from the browser (page views and pitch actions). See data/usage.py."""
+    visitor = _counted(request)
+    if visitor and body.event in usage.BROWSER_EVENTS:
+        usage.record(body.event, visitor, body.ticker.upper() or None)
+    return Response(status_code=204)
+
+
+@app.get("/api/stats")
+def stats():
+    """Usage totals and the last 30 days, with no personal data."""
+    return fetch(usage.summary)
 
 
 # ---------- The website itself (production) ----------
