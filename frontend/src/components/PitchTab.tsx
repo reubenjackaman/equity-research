@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { DcfAssumptions, Overview, pitchApi } from "../api";
 import { EMPTY_PITCH, Pitch, PitchSection, Rating, SECTIONS, loadPitch, savePitch, shareLink } from "../pitch";
 import { keys, load } from "../storage";
+import { track } from "../usage";
 import { useValuationData } from "../valuation";
 import { Answer } from "./AskFinch";
 import { FinchLogo } from "./Finch";
@@ -30,6 +31,8 @@ export default function PitchTab({ data }: { data: Overview }) {
   }, [symbol]);
 
   function update(patch: Partial<Pitch>) {
+    // Counted once per company per pitch: the first edit of an empty pitch.
+    if (!pitch.updated) track("pitch_started", symbol);
     setPitch((p) => {
       const next = { ...p, ...patch, updated: new Date().toISOString() };
       savePitch(symbol, next);
@@ -72,6 +75,7 @@ export default function PitchTab({ data }: { data: Overview }) {
 
   async function share() {
     const link = await shareLink(symbol, pitch);
+    track("pitch_shared", symbol);
     try {
       await navigator.clipboard.writeText(link);
       setCopied(true);
