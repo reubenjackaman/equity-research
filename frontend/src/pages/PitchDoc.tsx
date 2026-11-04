@@ -7,6 +7,7 @@ import { keyNumbers } from "../components/KeyNumbers";
 import * as fmt from "../format";
 import { Pitch, SECTIONS, adoptShared, loadPitch, readShared, upside } from "../pitch";
 import { keys, load } from "../storage";
+import { track } from "../usage";
 import { buildValuationRows } from "../valuation";
 
 type Source = { pitch: Pitch; assumptions: Partial<DcfAssumptions>; peers: string[] | null; shared: Awaited<ReturnType<typeof readShared>> };
@@ -71,6 +72,7 @@ export default function PitchDoc() {
                 if (Object.values(loadPitch(ticker)).some((v) => typeof v === "string" && v.length > 20) &&
                     !window.confirm(`You already have a ${ticker} pitch. Replace it with this one?`)) return;
                 adoptShared(source.shared!);
+                track("pitch_copied", ticker);
                 navigate(`/company/${encodeURIComponent(ticker)}?tab=Pitch`);
               }}
               className="btn bg-surface"
@@ -79,7 +81,10 @@ export default function PitchDoc() {
             </button>
           )}
           <button
-            onClick={() => window.print()}
+            onClick={() => {
+              track("pitch_pdf", ticker);
+              window.print();
+            }}
             disabled={!ready}
             className="rounded-sm bg-accent px-4 py-2 text-sm font-semibold text-on-accent hover:bg-accent-hover disabled:opacity-50"
           >

@@ -267,6 +267,16 @@ export function Privacy() {
         The site doesn't save your questions.
       </p>
 
+      <H2>Usage counts</H2>
+      <p>
+        The site counts how it's used, anonymously: page views, which company pages are opened, and actions such as starting a pitch,
+        exporting a PDF or asking Finch. To estimate daily visitors, the server makes a one-way scrambled code from your IP address and
+        browser name using a secret that changes every day and is never saved, so you can't be recognized from one day to the next and
+        your IP address isn't stored. No cookies are used for this. If your browser sends "Do Not Track" or "Global Privacy Control",
+        you aren't counted at all. The totals are public on the <Link to="/stats" className="font-medium text-accent underline">STATS</Link> page
+        and are kept by Upstash, a database service.
+      </p>
+
       <H2>Stock pitches</H2>
       <p>
         Pitches you write on the PITCH tab are saved only in your browser. When you ask Finch to draft a section or challenge your pitch,
