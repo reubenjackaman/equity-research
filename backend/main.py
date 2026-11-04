@@ -20,7 +20,7 @@ from pydantic import BaseModel, Field
 
 from data import game, gemini, markets, news, screener, warmup, yahoo
 from exports import dcf_excel, excel
-from finance import assistant, comps, dcf, ratios, statements, street, valuation_history
+from finance import assistant, comps, dcf, insights, ratios, statements, street, valuation_history
 from finance import health as health_scores
 
 load_dotenv()
@@ -80,6 +80,12 @@ def insiders_route(ticker: str):
 def estimates_route(ticker: str):
     """Analyst ratings, earnings surprises, the next report date and price targets."""
     return fetch(street.estimates, yahoo.normalize(ticker))
+
+
+@app.get("/api/company/{ticker}/insights")
+def insights_route(ticker: str):
+    """Plain-English findings ("What the numbers say"), written by rules from the site's own figures."""
+    return fetch(insights.build, yahoo.normalize(ticker))
 
 
 @app.get("/api/company/{ticker}/statements")
@@ -231,16 +237,18 @@ class AskBody(BaseModel):
 MAX_ASK_BYTES = 40_000
 
 
-@app.post("/api/ask")
-def ask(body: AskBody, request: Request):
-    """Ask Finch: a question about the company page, answered from the site's own data."""
-    if int(request.headers.get("content-length") or 0) > MAX_ASK_BYTES:
-        raise HTTPException(413, "That request is too large.")
+def _visitor(request: Request) -> str:
     # Behind Render's proxy the visitor's address is the first entry of X-Forwarded-For.
     forwarded = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
-    visitor = forwarded or (request.client.host if request.client else "unknown")
+    return forwarded or (request.client.host if request.client else "unknown")
+
+
+def _finch(request: Request, fn, *args):
+    """Runs an Ask Finch call with the size check and clean errors for limits, setup and bad input."""
+    if int(request.headers.get("content-length") or 0) > MAX_ASK_BYTES:
+        raise HTTPException(413, "That request is too large.")
     try:
-        return assistant.answer(visitor, body.symbol, body.tab, body.question, body.history, body.assumptions, body.peers)
+        return fn(_visitor(request), *args)
     except assistant.LimitReached as exc:
         raise HTTPException(429, str(exc))
     except gemini.GeminiUnavailable as exc:
@@ -249,6 +257,32 @@ def ask(body: AskBody, request: Request):
         raise HTTPException(404, "No data found for that ticker.")
     except ValueError as exc:
         raise HTTPException(422, str(exc))
+
+
+@app.post("/api/ask")
+def ask(body: AskBody, request: Request):
+    """Ask Finch: a question about the company page or market screen, answered from the site's own data."""
+    return _finch(request, assistant.answer, body.symbol, body.tab, body.question, body.history, body.assumptions, body.peers)
+
+
+class PitchBody(BaseModel):
+    symbol: str = Field(max_length=15)
+    section: str = Field(default="", max_length=20)
+    pitch: dict = Field(default={})
+    assumptions: dict = Field(default={})
+    peers: list = Field(default=[], max_length=20)
+
+
+@app.post("/api/pitch/draft")
+def pitch_draft(body: PitchBody, request: Request):
+    """Finch drafts one section of a stock pitch (thesis, catalysts, valuation or risks)."""
+    return _finch(request, assistant.draft, body.symbol, body.section, body.pitch, body.assumptions, body.peers)
+
+
+@app.post("/api/pitch/critique")
+def pitch_critique(body: PitchBody, request: Request):
+    """Finch reviews a whole pitch like an investment club judge."""
+    return _finch(request, assistant.critique, body.symbol, body.pitch, body.assumptions, body.peers)
 
 
 # ---------- The website itself (production) ----------
