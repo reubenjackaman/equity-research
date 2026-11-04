@@ -13,6 +13,8 @@ import RatiosTab from "../components/RatiosTab";
 import SearchBar from "../components/SearchBar";
 import SummaryTab from "../components/SummaryTab";
 import ChartTab from "../components/ChartTab";
+import InsightsPanel from "../components/Insights";
+import PitchTab from "../components/PitchTab";
 import { AnalystsTab, InsidersTab } from "../components/StreetTabs";
 import { Change } from "../components/Terminal";
 import { StarIcon } from "../components/TopBar";
@@ -119,6 +121,7 @@ export default function Company({ theme }: { theme: Theme }) {
       </nav>
 
       {tab === "Overview" && <OverviewTab data={data} theme={theme} />}
+      {tab === "Pitch" && <PitchTab data={data} />}
       {tab === "Chart" && <ChartTab ticker={data.symbol} currency={data.currency} theme={theme} />}
       {tab === "Analysts" && <AnalystsTab ticker={data.symbol} price={data.price} currency={data.currency} />}
       {tab === "Insiders" && <InsidersTab ticker={data.symbol} currency={data.currency} />}
@@ -159,7 +162,11 @@ function OverviewTab({ data, theme }: { data: Overview; theme: Theme }) {
         </div>
       </div>
 
-      <div className="card lg:col-span-3">
+      <div className="lg:col-span-3">
+        <InsightsPanel ticker={data.symbol} />
+      </div>
+
+      <div className="card mt-0 lg:col-span-3">
         <div className="mb-3 flex flex-wrap items-center gap-2">
           <h2 className="mr-2 text-xs font-semibold tracking-wider text-accent uppercase">About</h2>
           {data.sector && <Tag>{data.sector}</Tag>}

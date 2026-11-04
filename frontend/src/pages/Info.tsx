@@ -139,6 +139,15 @@ export function HowItWorks() {
         advice. To keep the free service available, it answers up to 200 questions a day across the site and 20 per visitor.
       </p>
 
+      <H2>Pitch builder and "What the numbers say"</H2>
+      <p>
+        The PITCH tab helps you build a stock pitch: a recommendation, a target price, and a thesis, catalysts, valuation and risks. Finch
+        can draft any section from the site's data, and "Challenge my pitch" reviews it the way an investment club judge might, checking
+        your target against the DCF, peer multiples and analyst targets. The finished pitch prints as a PDF or can be shared as a link.
+        "What the numbers say" on the Overview tab is different: it's written by fixed rules, not AI, comparing each figure with peers,
+        the company's own history, a government bond yield or a published threshold.
+      </p>
+
       <H2>How the math is checked</H2>
       <p>Statements, ratios and the Excel model are tested against Apple's reported figures, and the reverse DCF, health scores and valuation history are each checked against a worked example calculated separately by hand. That catches formula mistakes, but it can't promise every number for every company is right.</p>
 
@@ -256,6 +265,14 @@ export function Privacy() {
         site's data on that company (including any DCF assumptions and peers you've chosen) to Google's Gemini service to write the
         answer. Google's free tier may use this content to improve its products, so please don't type personal information into it.
         The site doesn't save your questions.
+      </p>
+
+      <H2>Stock pitches</H2>
+      <p>
+        Pitches you write on the PITCH tab are saved only in your browser. When you ask Finch to draft a section or challenge your pitch,
+        the pitch text is sent to Google's Gemini service in the same way as an Ask Finch question. A share link carries the pitch inside
+        the link itself (after the "#"), which browsers don't send to our server, so anyone you give the link to can read the pitch and
+        your name if you added one.
       </p>
 
       <H2>Questions</H2>

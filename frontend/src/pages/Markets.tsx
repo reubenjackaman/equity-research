@@ -36,7 +36,7 @@ const STEPS: { n: string; title: string; text: string; links: [string, string][]
   {
     n: "1",
     title: "Research a company",
-    text: "Type any US or TSX ticker for its overview, price chart, financial statements, ratios and health scores.",
+    text: "Type any US or TSX ticker for its statements, ratios, health scores and a plain-English read of what the numbers say.",
     links: [["AAPL", companyPath("AAPL")], ["SHOP.TO", companyPath("SHOP.TO")], ["NVDA GP", companyPath("NVDA", "Chart")]],
   },
   {
@@ -47,15 +47,15 @@ const STEPS: { n: string; title: string; text: string; links: [string, string][]
   },
   {
     n: "3",
-    title: "Follow the markets",
-    text: "World indices, top movers, US and Canadian yield curves, the economy and the earnings calendar.",
-    links: [["WEI", "/wei"], ["MOST", "/most"], ["GC", "/rates"], ["EVTS", "/earnings"]],
+    title: "Build your pitch",
+    text: "Write a stock pitch for class, a competition or an interview. Finch drafts sections, challenges your thesis like a judge, and you export a PDF or share a link.",
+    links: [["AAPL PITCH", companyPath("AAPL", "Pitch")], ["LEARN", "/learn"]],
   },
   {
     n: "4",
-    title: "Find ideas",
-    text: "Screen about 2,750 companies by sector, size, P/E and dividend, and keep the ones you like on a watchlist.",
-    links: [["EQS", "/screener"], ["MON", "/monitor"]],
+    title: "Follow the markets",
+    text: "World indices, movers, US and Canadian yield curves, the economy, the earnings calendar and a screener for ideas.",
+    links: [["WEI", "/wei"], ["GC", "/rates"], ["EVTS", "/earnings"], ["EQS", "/screener"]],
   },
 ];
 
@@ -73,8 +73,8 @@ export function MarketsHome() {
             <p className="font-mono text-xs font-semibold tracking-wider text-accent">VALUE FINCH · FREE RESEARCH TERMINAL</p>
             <h1 className="mt-3 text-2xl sm:text-3xl">Equity research for US and Canadian markets.</h1>
             <p className="prose-width mt-3 text-muted">
-              Financial statements, valuation models, market data and an AI analyst for about 2,750 US and TSX companies. Free, with no account
-              needed. Every figure shows where it came from and how it was calculated.
+              Research about 2,750 US and TSX companies, value them, and turn your work into a stock pitch that an AI analyst challenges
+              before a judge does. Built for students preparing pitches. Free, no account, and every figure shows how it was calculated.
             </p>
           </div>
           <div>
