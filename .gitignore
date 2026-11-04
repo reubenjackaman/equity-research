@@ -12,3 +12,4 @@ node_modules/
 frontend/dist/
 
 .DS_Store
+backend/usage.sqlite

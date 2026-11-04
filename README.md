@@ -246,6 +246,17 @@ Value Finch is aimed at students preparing stock pitches (classes, investment cl
 
 Check with `python -m tests.check_pitch`.
 
+## Usage counts (STATS)
+
+`backend/data/usage.py` counts page views, company pages opened and pitch actions (started, PDF, shared, copied),
+plus Ask Finch questions, drafts and critiques. It's anonymous: daily visitors are a one-way hash of IP and browser
+with a secret that changes daily and is never stored; no cookies; Do Not Track and Global Privacy Control are
+respected. The browser sends events to `POST /api/track`; totals are at `/stats` (`GET /api/stats`).
+
+Render's free plan wipes the disk on every restart, so on the live site counts go to a free Upstash Redis database.
+Set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` in Render's environment settings (never in code). Without
+them, counts go to `backend/usage.sqlite`, which is fine locally but resets on Render.
+
 ## Analysis added in November 2026
 
 - **What's priced in (reverse DCF)** on the DCF tab: `finance/dcf.py` `implied_growth()` scans then bisects for the flat
