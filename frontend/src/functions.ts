@@ -5,7 +5,7 @@ export type MarketFunction = { code: string; aliases: string[]; name: string; pa
 export type CompanyFunction = { code: string; aliases: string[]; name: string; tab: CompanyTab };
 
 export const COMPANY_TABS = [
-  "Overview", "Chart", "Financials", "Ratios", "Health", "Analysts", "Insiders", "News", "DCF", "Comps", "Summary",
+  "Overview", "Chart", "Financials", "Ratios", "Health", "Analysts", "Insiders", "News", "DCF", "Comps", "Summary", "Pitch",
 ] as const;
 export type CompanyTab = (typeof COMPANY_TABS)[number];
 
@@ -18,6 +18,7 @@ export const MARKET_FUNCTIONS: MarketFunction[] = [
   { code: "EVTS", aliases: ["ERN", "EARNINGS", "CAL"], name: "Earnings calendar, next two weeks", path: "/earnings" },
   { code: "MON", aliases: ["W", "WATCH", "WATCHLIST"], name: "Monitor: your watchlist", path: "/monitor" },
   { code: "EQS", aliases: ["SCREEN", "SCREENER", "EXPLORE"], name: "Equity screener", path: "/screener" },
+  { code: "LEARN", aliases: ["GLOSSARY", "TERMS", "GUIDE"], name: "How to pitch a stock, and a glossary of every term", path: "/learn" },
   { code: "GAME", aliases: ["MYSTERY"], name: "Mystery Company daily puzzle", path: "/game" },
   { code: "HELP", aliases: ["?", "FUNCTIONS"], name: "List of functions and shortcuts", path: "/help" },
 ];
@@ -34,6 +35,7 @@ export const COMPANY_FUNCTIONS: CompanyFunction[] = [
   { code: "DCF", aliases: ["VALUE"], name: "Discounted cash flow and reverse DCF", tab: "DCF" },
   { code: "RV", aliases: ["COMPS", "PEERS"], name: "Relative value against peers", tab: "Comps" },
   { code: "SUM", aliases: ["SUMMARY"], name: "Valuation summary and tear sheet", tab: "Summary" },
+  { code: "PITCH", aliases: ["PITCHBOOK", "THESIS"], name: "Build a stock pitch, have Finch challenge it, export a PDF", tab: "Pitch" },
 ];
 
 const byCode = <T extends { code: string; aliases: string[] }>(list: T[], word: string) =>

@@ -8,6 +8,8 @@ import {
   EarningsScreen, EconomyScreen, HelpScreen, MarketsHome, MonitorScreen, MoversScreen, RatesScreen, ScreenerScreen, WorldScreen,
 } from "./pages/Markets";
 import { About, Contact, HowItWorks, NotFound, Privacy, Terms } from "./pages/Info";
+import Learn from "./pages/Learn";
+import PitchDoc from "./pages/PitchDoc";
 import TearSheet from "./pages/TearSheet";
 import { useTheme } from "./theme";
 
@@ -22,10 +24,12 @@ export default function App() {
   }, [path, hash]);
 
   // The tear sheet is a standalone printable page, without the site header and footer.
-  if (path.endsWith("/tearsheet")) {
+  // The tear sheet and the pitch document are standalone printable pages.
+  if (path.endsWith("/tearsheet") || /^\/company\/[^/]+\/pitch$/.test(path)) {
     return (
       <Routes>
         <Route path="/company/:ticker/tearsheet" element={<TearSheet />} />
+        <Route path="/company/:ticker/pitch" element={<PitchDoc />} />
       </Routes>
     );
   }
@@ -45,6 +49,7 @@ export default function App() {
           <Route path="/monitor" element={<MonitorScreen />} />
           <Route path="/screener" element={<ScreenerScreen />} />
           <Route path="/help" element={<HelpScreen />} />
+          <Route path="/learn" element={<Learn />} />
           <Route path="/company/:ticker" element={<Company theme={theme} />} />
           <Route path="/game" element={<Game />} />
           <Route path="/how-it-works" element={<HowItWorks />} />

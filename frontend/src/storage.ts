@@ -57,6 +57,7 @@ export function useStored<T>(key: string, fallback: T) {
 export const keys = {
   dcf: (ticker: string) => `dcf:${ticker}`,
   peers: (ticker: string) => `peers:${ticker}`,
+  pitch: (ticker: string) => `pitch:${ticker}`,
   saved: "saved-tickers",
   recent: "recent-tickers",
   game: (puzzle: number) => `game-v2:${puzzle}`, // v2: puzzle #1's answer changed, so old progress is ignored

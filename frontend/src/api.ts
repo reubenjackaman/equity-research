@@ -517,3 +517,18 @@ export const companyApi = {
   insiders: (ticker: string) => get<Insiders>(`/api/company/${encodeURIComponent(ticker)}/insiders`),
   estimates: (ticker: string) => get<Estimates>(`/api/company/${encodeURIComponent(ticker)}/estimates`),
 };
+
+// ---------- Plain-English insights and the pitch builder ----------
+
+export type Insight = { topic: string; tone: "good" | "bad" | "neutral"; text: string; learn: string };
+export type Insights = { symbol: string; insights: Insight[]; skipped: string[] };
+
+export const insightsApi = {
+  get: (ticker: string) => get<Insights>(`/api/company/${encodeURIComponent(ticker)}/insights`),
+};
+
+type PitchRequest = { symbol: string; pitch: object; assumptions: Partial<DcfAssumptions>; peers: string[] };
+export const pitchApi = {
+  draft: async (body: PitchRequest & { section: string }) => (await post("/api/pitch/draft", body)).json() as Promise<{ text: string }>,
+  critique: async (body: PitchRequest) => (await post("/api/pitch/critique", body)).json() as Promise<{ text: string }>,
+};
