@@ -273,8 +273,7 @@ export function Privacy() {
         exporting a PDF or asking Finch. To estimate daily visitors, the server makes a one-way scrambled code from your IP address and
         browser name using a secret that changes every day and is never saved, so you can't be recognized from one day to the next and
         your IP address isn't stored. No cookies are used for this. If your browser sends "Do Not Track" or "Global Privacy Control",
-        you aren't counted at all. The totals are public on the <Link to="/stats" className="font-medium text-accent underline">STATS</Link> page
-        and are kept by Upstash, a database service.
+        you aren't counted at all. Only totals are kept, and they contain no personal information.
       </p>
 
       <H2>Stock pitches</H2>
