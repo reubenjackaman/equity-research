@@ -20,7 +20,6 @@ export const MARKET_FUNCTIONS: MarketFunction[] = [
   { code: "EQS", aliases: ["SCREEN", "SCREENER", "EXPLORE"], name: "Equity screener", path: "/screener" },
   { code: "LEARN", aliases: ["GLOSSARY", "TERMS", "GUIDE"], name: "How to pitch a stock, and a glossary of every term", path: "/learn" },
   { code: "GAME", aliases: ["MYSTERY"], name: "Mystery Company daily puzzle", path: "/game" },
-  { code: "STATS", aliases: ["USAGE"], name: "Anonymous usage counts for the site", path: "/stats" },
   { code: "HELP", aliases: ["?", "FUNCTIONS"], name: "List of functions and shortcuts", path: "/help" },
 ];
 

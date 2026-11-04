@@ -10,7 +10,6 @@ import {
 import { About, Contact, HowItWorks, NotFound, Privacy, Terms } from "./pages/Info";
 import Learn from "./pages/Learn";
 import PitchDoc from "./pages/PitchDoc";
-import StatsPage from "./pages/Stats";
 import TearSheet from "./pages/TearSheet";
 import { useTheme } from "./theme";
 import { usePageViews } from "./usage";
@@ -53,7 +52,6 @@ export default function App() {
           <Route path="/screener" element={<ScreenerScreen />} />
           <Route path="/help" element={<HelpScreen />} />
           <Route path="/learn" element={<Learn />} />
-          <Route path="/stats" element={<StatsPage />} />
           <Route path="/company/:ticker" element={<Company theme={theme} />} />
           <Route path="/game" element={<Game />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
