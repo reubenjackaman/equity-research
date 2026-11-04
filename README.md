@@ -229,6 +229,23 @@ SEDI), CN news, DCF, RV comps, SUM summary. A ticker tape of world markets scrol
 Ask Finch works on the market screens too: with no company, it reads the board, movers, curves,
 economy and earnings calendar instead. Check everything with `python -m tests.check_terminal`.
 
+## Pitch builder and teaching (November 2026)
+
+Value Finch is aimed at students preparing stock pitches (classes, investment clubs, case competitions, interviews).
+
+- **PITCH tab** (`frontend/src/components/PitchTab.tsx`, `pitch.ts`): recommendation, target, horizon, and four sections
+  (thesis, catalysts, valuation, risks), saved in the browser. "Draft with Finch" writes a section from the site's data;
+  "Challenge my pitch" reviews it like a judge (`finance/assistant.py` `draft` / `critique`, routes `/api/pitch/draft`
+  and `/api/pitch/critique`, same limits as Ask Finch). Key numbers (DCF, comps, analyst target, priced-in growth) sit beside it.
+- **Printable pitch and share links** (`pages/PitchDoc.tsx`, at `/company/AAPL/pitch`): a letter-size document with a
+  football field including the pitch target. Share links carry the pitch, DCF assumptions and peers compressed after `#p=`,
+  so nothing is stored on the server; the reader can save a copy to edit.
+- **What the numbers say** (`finance/insights.py`, `/api/company/{t}/insights`): rule-based plain-English findings (no AI),
+  each comparing a figure with peers, history, past growth, the 10-year yield or a published threshold.
+- **LEARN** (`pages/Learn.tsx`): a six-step guide to pitching a stock and a glossary; findings link to their entry (`/learn#pe`).
+
+Check with `python -m tests.check_pitch`.
+
 ## Analysis added in November 2026
 
 - **What's priced in (reverse DCF)** on the DCF tab: `finance/dcf.py` `implied_growth()` scans then bisects for the flat
