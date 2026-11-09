@@ -95,7 +95,7 @@ npm run dev
 
 Then open **http://localhost:5173**. To stop either server, press `Ctrl+C`.
 
-Tip: http://localhost:8000/docs lists every backend route and lets you try them in the browser.
+Tip: with `SHOW_DOCS=1` in `backend/.env`, http://localhost:8000/docs lists every backend route and lets you try them in the browser.
 
 ## Running it as one server (production mode)
 
