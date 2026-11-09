@@ -114,7 +114,7 @@ export default function Company({ theme }: { theme: Theme }) {
               t === tab ? "border-accent bg-surface text-ink" : "border-transparent text-muted hover:bg-surface hover:text-ink"
             }`}
           >
-            <span className={`font-mono font-semibold ${t === tab ? "text-accent" : "text-accent/70"}`}>{tabCode(t)}</span>
+            <span className={`font-mono font-semibold ${t === tab ? "text-accent" : "text-accent dark:text-accent/70"}`}>{tabCode(t)}</span>
             {t}
           </button>
         ))}
@@ -171,9 +171,9 @@ function OverviewTab({ data, theme }: { data: Overview; theme: Theme }) {
           <h2 className="mr-2 text-xs font-semibold tracking-wider text-accent uppercase">About</h2>
           {data.sector && <Tag>{data.sector}</Tag>}
           {data.industry && <Tag>{data.industry}</Tag>}
-          {data.website && (
-            <a href={data.website} target="_blank" rel="noreferrer" className="tap ml-auto text-sm text-accent hover:underline">
-              {data.website.replace(/^https?:\/\/(www\.)?/, "")}
+          {fmt.safeUrl(data.website) && (
+            <a href={fmt.safeUrl(data.website)} target="_blank" rel="noreferrer" className="tap ml-auto text-sm text-accent hover:underline">
+              {data.website!.replace(/^https?:\/\/(www\.)?/, "")}
             </a>
           )}
         </div>

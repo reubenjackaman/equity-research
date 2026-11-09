@@ -89,7 +89,7 @@ export function MarketsHome() {
             </p>
             <p className="mt-1 text-xs text-muted">
               Add a function code for a specific screen, like <span className="font-mono text-ink">AAPL GP</span> for the chart.{" "}
-              <Link to="/help" className="text-accent hover:underline">See all codes</Link>
+              <Link to="/help" className="text-accent underline hover:text-accent-hover">See all codes</Link>
             </p>
           </div>
         </div>
@@ -131,8 +131,8 @@ export function MarketsHome() {
           </li>
         </ol>
         <p className="mt-3 text-sm text-muted">
-          New here? Read <Link to="/how-it-works" className="text-accent hover:underline">how it works</Link>, or try today's{" "}
-          <Link to="/game" className="text-accent hover:underline">Mystery Company puzzle</Link>: guess the company from its financials.
+          New here? Read <Link to="/how-it-works" className="text-accent underline hover:text-accent-hover">how it works</Link>, or try today's{" "}
+          <Link to="/game" className="text-accent underline hover:text-accent-hover">Mystery Company puzzle</Link>: guess the company from its financials.
         </p>
       </section>
 

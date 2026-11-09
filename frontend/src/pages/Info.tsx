@@ -2,7 +2,7 @@ import { ReactNode, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FinchLogo } from "../components/Finch";
 
-const UPDATED = "November 3, 2026";
+const UPDATED = "November 8, 2026";
 const GITHUB = "https://github.com/reubenjackaman";
 const REPO = `${GITHUB}/equity-research`;
 
@@ -56,7 +56,7 @@ export function HowItWorks() {
           <><b>Yahoo Finance:</b> share prices, price history, and statements for companies EDGAR doesn't cover, including most TSX listings.</>,
           <><b>Finnhub:</b> company news, peer lists, analyst ratings, earnings estimates and surprises, insider trades and the earnings calendar.</>,
           <><b>FRED (St. Louis Fed) and the Bank of Canada:</b> government bond yields, policy rates and economic indicators.</>,
-          <><b>Wikipedia:</b> a backup company description when no other is available.</>,
+          <><b>Wikipedia:</b> a backup company description when no other is available, used under the <A href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</A> licence.</>,
         ]}
       />
       <p>Prices and overviews are refreshed about every 15 minutes, so they can lag the market. Anything that can't be found shows as N/A rather than a guess.</p>
@@ -222,6 +222,12 @@ export function Terms() {
         Value Finch is for educational purposes only. Nothing on it is investment, financial, legal or tax advice, or a recommendation to buy or
         sell any security. Valuations are estimates based on assumptions and can be wrong. Any investment decision is yours, and you may
         want to speak with a licensed professional first.
+      </p>
+
+      <H2>Ask Finch</H2>
+      <p>
+        Ask Finch is an AI assistant powered by Google's Gemini service and is meant for users aged 18 or over. Its answers are
+        generated automatically, can be wrong, and aren't advice from a person.
       </p>
 
       <H2>Data accuracy</H2>
