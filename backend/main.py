@@ -3,18 +3,23 @@ The API server. The React frontend calls these routes; each route asks a
 data module for the numbers (which are cached) and returns JSON.
 
 Run with:  uvicorn main:app --reload
-Then visit http://localhost:8000/docs to try every route in the browser.
+Add SHOW_DOCS=1 (in .env or the command) to try every route at http://localhost:8000/docs.
 
 Production (one server for everything): build the website once with `npm run build` in
 frontend/, then this app also serves it, so the whole site lives at one address.
 """
 
+import os
+import re
+import threading
+import time
+from collections import defaultdict, deque
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import Body, FastAPI, HTTPException, Query, Request, Response
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -31,7 +36,65 @@ async def lifespan(_app):
     yield
 
 
-app = FastAPI(title="Value Finch API", lifespan=lifespan)
+# The interactive API docs (/docs) are left off on the public site; turn them on locally with SHOW_DOCS=1.
+_docs = os.getenv("SHOW_DOCS") == "1"
+app = FastAPI(title="Value Finch API", lifespan=lifespan, docs_url="/docs" if _docs else None,
+              redoc_url=None, openapi_url="/openapi.json" if _docs else None)
+
+# Tickers are letters, digits and . - ^ = (e.g. RY.TO, BRK-B, ^GSPC, CAD=X). Anything else is turned away
+# before it reaches a data provider or a download's file name.
+TICKER = re.compile(r"^[A-Za-z0-9.^=-]{1,15}$")
+
+# A generous per-visitor cap on API calls, so one scraper can't hog the server or get it throttled by Yahoo.
+# A company page makes about 20 calls, and a class on one school network shares an address.
+API_PER_MINUTE = 300
+UNLIMITED = {"/api/health", "/api/track"}
+
+SECURITY_HEADERS = {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "SAMEORIGIN",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    "Strict-Transport-Security": "max-age=31536000",
+}
+
+
+class _ApiLimiter:
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.recent = defaultdict(deque)
+
+    def allow(self, visitor: str) -> bool:
+        now = time.monotonic()
+        with self.lock:
+            calls = self.recent[visitor]
+            while calls and now - calls[0] > 60:
+                calls.popleft()
+            if len(calls) >= API_PER_MINUTE:
+                return False
+            calls.append(now)
+            if len(self.recent) > 10_000:  # forget idle visitors so memory stays small
+                for v in [v for v, q in self.recent.items() if not q or now - q[-1] > 60]:
+                    del self.recent[v]
+            return True
+
+
+api_limiter = _ApiLimiter()
+
+
+@app.middleware("http")
+async def guard(request: Request, call_next):
+    path = request.url.path
+    if path.startswith("/api/"):
+        parts = path.split("/")
+        if path.startswith("/api/company/") and (len(parts) < 4 or not TICKER.match(parts[3])):
+            return JSONResponse({"detail": "That isn't a valid ticker."}, status_code=404, headers=SECURITY_HEADERS)
+        if path not in UNLIMITED and not api_limiter.allow(_visitor(request)):
+            return JSONResponse({"detail": "Too many requests. Please wait a minute and try again."}, status_code=429,
+                                headers=SECURITY_HEADERS)
+    response = await call_next(request)
+    response.headers.update(SECURITY_HEADERS)
+    return response
 
 
 def fetch(fn, *args):
