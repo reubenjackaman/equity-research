@@ -56,3 +56,8 @@ export function ratio(v: number | null | undefined, format: "pct" | "x" | "days"
   if (format === "days") return v.toFixed(1);
   return v.toFixed(2) + "x";
 }
+
+/** A link from a data provider, only if it's a normal web address (never javascript: or data:). */
+export function safeUrl(url: string | null | undefined): string | undefined {
+  return url && /^https?:\/\//i.test(url) ? url : undefined;
+}
