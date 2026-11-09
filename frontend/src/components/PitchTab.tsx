@@ -107,7 +107,7 @@ export default function PitchTab({ data }: { data: Overview }) {
           <p className="mb-3 text-sm text-muted">
             Build the pitch you'd give in class, a stock pitch competition or an interview. Write it yourself or have Finch draft a section from
             the data, then press <span className="font-medium text-ink">Challenge my pitch</span> to hear what a judge would push back on.{" "}
-            <Link to="/learn#pitch" className="text-accent hover:underline">How to pitch a stock</Link>
+            <Link to="/learn#pitch" className="text-accent underline hover:text-accent-hover">How to pitch a stock</Link>
           </p>
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

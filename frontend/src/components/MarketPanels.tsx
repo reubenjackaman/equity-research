@@ -410,7 +410,7 @@ export function WatchPanel() {
     <Panel title="Your watchlist" code="MON" to="/monitor" bodyClass="">
       {saved.length === 0 ? (
         <p className="p-3 text-sm text-muted">
-          Star a company to watch it here, or open <Link to="/monitor" className="text-accent hover:underline">MON</Link> to add tickers.
+          Star a company to watch it here, or open <Link to="/monitor" className="text-accent underline hover:text-accent-hover">MON</Link> to add tickers.
         </p>
       ) : (
         <table className="w-full text-xs">

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { News, newsApi } from "../api";
+import { safeUrl } from "../format";
 
 function timeAgo(iso: string) {
   const minutes = (Date.now() - new Date(iso).getTime()) / 60000;
@@ -62,7 +63,7 @@ export default function NewsTab({ ticker }: { ticker: string }) {
         {articles.map((a) => (
           <li key={a.url}>
             <a
-              href={a.url}
+              href={safeUrl(a.url)}
               target="_blank"
               rel="noopener noreferrer"
               className="group block px-4 py-3 hover:bg-subtle sm:px-5"

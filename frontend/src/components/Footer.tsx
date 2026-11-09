@@ -33,8 +33,8 @@ export default function Footer() {
         ))}
       </div>
       <p className="mx-auto mt-8 max-w-screen-2xl border-t border-line pt-4 text-xs text-muted">
-        For educational purposes only. Not investment advice. Data from SEC EDGAR, Yahoo Finance, Finnhub, FRED and the Bank of
-        Canada may be delayed or incomplete. © 2026 Reuben Jackaman.
+        For educational purposes only. Not investment advice. Data from SEC EDGAR, Yahoo Finance, Finnhub, FRED, the Bank of
+        Canada and Wikipedia may be delayed or incomplete. © 2026 Reuben Jackaman.
       </p>
     </footer>
   );

@@ -72,7 +72,7 @@ export default function TopBar({ theme, onToggleTheme }: { theme: Theme; onToggl
                   active ? "bg-subtle text-ink" : "text-muted hover:bg-subtle hover:text-ink"
                 }`}
               >
-                <span className={`font-mono font-semibold ${active ? "text-accent" : "text-accent/80"}`}>{code}</span>
+                <span className={`font-mono font-semibold ${active ? "text-accent" : "text-accent dark:text-accent/80"}`}>{code}</span>
                 {label}
               </Link>
             );
