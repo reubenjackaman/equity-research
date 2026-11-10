@@ -10,10 +10,12 @@ from finance import dcf
 
 # 1. Independent worked example: a made-up company valued by hand, without dcf.run().
 #    Revenue 100, 20% EBIT margin, no tax, no capex/D&A/working capital, so FCF = 20% of revenue.
-#    3-year forecast, WACC 10%, terminal growth 2%, no debt or cash, 1 share.
+#    3-year forecast, WACC 10%, terminal growth 2%, no debt or cash, 1 share. Mid-year discounting;
+#    with no capex, D&A or working capital, the terminal-year FCF is simply final-year FCF × (1 + g).
 true_growth, wacc, g, years = 0.05, 0.10, 0.02, 3
 fcf = [100 * (1 + true_growth) ** t * 0.20 for t in range(1, years + 1)]
-by_hand = sum(f / (1 + wacc) ** t for t, f in enumerate(fcf, start=1)) + fcf[-1] * (1 + g) / (wacc - g) / (1 + wacc) ** years
+by_hand = (sum(f / (1 + wacc) ** (t - 0.5) for t, f in enumerate(fcf, start=1))
+           + fcf[-1] * (1 + g) / (wacc - g) / (1 + wacc) ** (years - 0.5))
 base = {
     "priceTrading": by_hand, "fx": 1.0, "marketCap": by_hand,
     "history": [{"revenue": 100.0, "ebit": 20.0, "nwc": 0.0}],
