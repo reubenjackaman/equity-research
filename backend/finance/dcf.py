@@ -5,14 +5,20 @@ Discounted cash flow (DCF) model: unlevered free cash flow to the firm, discount
     EBIT_t           = Revenue_t × EBIT margin_t
     NOPAT_t          = EBIT_t × (1 − tax rate)
     Unlevered FCF_t  = NOPAT_t + D&A_t − Capex_t − ΔNWC_t
-    PV_t             = FCF_t ÷ (1 + WACC)^t                    (end-of-year discounting)
-    Terminal value   = FCF_N × (1 + g) ÷ (WACC − g)            (Gordon growth)
-    Enterprise value = Σ PV_t + Terminal value ÷ (1 + WACC)^N
+    PV_t             = FCF_t ÷ (1 + WACC)^(t − 0.5)            (mid-year: cash arrives through the year)
+    Terminal FCF     = NOPAT_N × (1 + g) − ΔNWC at growth g    (steady state: capex = D&A)
+    Terminal value   = Terminal FCF ÷ (WACC − g)               (Gordon growth)
+    Enterprise value = Σ PV_t + Terminal value ÷ (1 + WACC)^(N − 0.5)
     Equity value     = Enterprise value − Total debt + Cash + Short-term investments
     Value per share  = Equity value ÷ Diluted shares
 
-Revenue growth fades in a straight line from the Year-1 rate to the final-year rate.
+Revenue growth fades in a straight line from the Year-1 rate to the final-year rate over a
+10-year forecast (the usual length, so a fast grower isn't cut back to slow growth too soon).
 EBIT margin moves in a straight line from the last actual margin to the target margin.
+
+In the terminal year, capex is set equal to D&A: a company growing ~2.5% forever doesn't keep
+spending far more than depreciation, as it may during a build-out (e.g. Microsoft's AI data
+centres). Holding today's capex in the perpetuity would assume that spending never pays off.
 
 WACC (CAPM):
     Cost of equity = Risk-free rate + Beta × Equity risk premium
@@ -36,6 +42,7 @@ HISTORY_YEARS = 3
 DEFAULT_ERP = 0.05            # equity risk premium; long-run US estimates are roughly 4-6%
 DEFAULT_TERMINAL_GROWTH = 0.025
 DEFAULT_RISK_FREE = 0.045     # used only if the 10-year Treasury yield can't be fetched
+DEFAULT_YEARS = 10
 
 ASSUMPTION_KEYS = [
     "years", "growth_start", "growth_end", "margin_target", "tax_rate", "da_pct", "capex_pct",
@@ -174,9 +181,11 @@ def defaults(base: dict) -> dict:
     kd = _clamp(kd, 0.02, 0.12) if kd else base["riskFree"] + 0.015
 
     return {
-        "years": 5,
+        "years": DEFAULT_YEARS,
         "growth_start": round(growth_start, 4),
-        "growth_end": round(min(growth_start, terminal + 0.01) if growth_start > terminal else growth_start, 4),
+        # Fast growers slow to terminal growth + 1%; shrinking companies recover to terminal growth
+        # rather than shrinking for the whole forecast (often a one-off, like a fall in oil prices).
+        "growth_end": round(terminal + 0.01 if growth_start > terminal + 0.01 else max(growth_start, terminal), 4),
         "margin_target": round(last["ebit"] / last["revenue"], 4),  # hold the latest margin; edit to model change
         "tax_rate": round(tax, 4),
         "da_pct": round(avg([x["da"] / x["revenue"] for x in h if x["da"] is not None]) or 0.0, 4),
@@ -231,7 +240,7 @@ def run(base: dict, a: dict) -> dict:
         nwc = revenue * a["nwc_pct"]
         d_nwc = nwc - prev_nwc
         fcf = nopat + da - capex - d_nwc
-        discount = 1 / (1 + wacc) ** t
+        discount = 1 / (1 + wacc) ** (t - 0.5)
         forecast.append({
             "label": f"Year {t}", "revenue": revenue, "growth": growth, "margin": margin, "ebit": ebit,
             "taxes": taxes, "nopat": nopat, "da": da, "capex": capex, "nwc": nwc, "dNwc": d_nwc,
@@ -239,8 +248,8 @@ def run(base: dict, a: dict) -> dict:
         })
         prev_rev, prev_nwc = revenue, nwc
 
-    valuation = _value(base, forecast, wacc, g)
-    sensitivity = _sensitivity(base, forecast, wacc, g)
+    valuation = _value(base, forecast, wacc, g, a)
+    sensitivity = _sensitivity(base, forecast, wacc, g, a)
 
     history = []
     for i, h in enumerate(base["history"][1:], start=1):
@@ -254,14 +263,23 @@ def run(base: dict, a: dict) -> dict:
     return {"years": years, "wacc": w, "history": history, "forecast": forecast, "valuation": valuation, "sensitivity": sensitivity}
 
 
-def _value(base: dict, forecast: list, wacc: float, g: float):
+def terminal_fcf(forecast: list, g: float, a: dict) -> float:
+    """Free cash flow in the first year after the forecast, in steady state: revenue grows at g,
+    the final-year margin holds, capex equals D&A (so they cancel), and working capital grows with revenue."""
+    last = forecast[-1]
+    revenue = last["revenue"] * (1 + g)
+    return revenue * last["margin"] * (1 - a["tax_rate"]) - (revenue * a["nwc_pct"] - last["nwc"])
+
+
+def _value(base: dict, forecast: list, wacc: float, g: float, a: dict):
     """Enterprise value -> equity value -> value per share. None if WACC <= terminal growth."""
     if wacc <= g:
         return None
     n = len(forecast)
-    pv_sum = sum(f["fcf"] / (1 + wacc) ** (t + 1) for t, f in enumerate(forecast))
-    tv = forecast[-1]["fcf"] * (1 + g) / (wacc - g)
-    pv_tv = tv / (1 + wacc) ** n
+    pv_sum = sum(f["fcf"] / (1 + wacc) ** (t + 0.5) for t, f in enumerate(forecast))
+    tv_fcf = terminal_fcf(forecast, g, a)
+    tv = tv_fcf / (wacc - g)
+    pv_tv = tv / (1 + wacc) ** (n - 0.5)
     ev = pv_sum + pv_tv
     b = base["balance"]
     equity = ev - b["debt"] + b["cash"]
@@ -269,7 +287,7 @@ def _value(base: dict, forecast: list, wacc: float, g: float):
     per_share_trading = per_share * base["fx"] if per_share is not None else None
     price = base["priceTrading"]
     return {
-        "pvFcf": pv_sum, "terminalValue": tv, "pvTerminal": pv_tv, "enterpriseValue": ev,
+        "pvFcf": pv_sum, "terminalFcf": tv_fcf, "terminalValue": tv, "pvTerminal": pv_tv, "enterpriseValue": ev,
         "debt": b["debt"], "cash": b["cash"], "equityValue": equity, "shares": b["shares"],
         "perShare": per_share, "perShareTrading": per_share_trading, "price": price,
         # Upside is meaningless when the model says the shares are worth less than nothing.
@@ -281,7 +299,7 @@ def _value(base: dict, forecast: list, wacc: float, g: float):
 STEP = 0.005
 
 
-def _sensitivity(base: dict, forecast: list, wacc: float, g: float) -> dict:
+def _sensitivity(base: dict, forecast: list, wacc: float, g: float, a: dict) -> dict:
     """Value per share (trading currency) for WACC ±1% and terminal growth ±1%, in 0.5% steps.
 
     Changing WACC only changes discounting, so the forecast FCFs are reused as-is.
@@ -292,7 +310,7 @@ def _sensitivity(base: dict, forecast: list, wacc: float, g: float) -> dict:
     for w in waccs:
         row = []
         for gg in growths:
-            v = _value(base, forecast, w, gg)
+            v = _value(base, forecast, w, gg, a)
             row.append(v["perShareTrading"] if v else None)
         grid.append(row)
     return {"waccs": waccs, "growths": growths, "values": grid}
