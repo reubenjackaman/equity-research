@@ -111,8 +111,9 @@ export default function DcfTab({ ticker }: { ticker: string }) {
       <ForecastTable data={data} />
 
       <p className="text-xs leading-relaxed text-muted">
-        Unlevered free cash flow = EBIT × (1 − tax) + D&A − Capex − Increase in working capital, discounted at WACC at the end of
-        each year. Terminal value uses the Gordon growth formula. Debt, cash and share count are as of {data.balanceAsOf}.{" "}
+        Unlevered free cash flow = EBIT × (1 − tax) + D&A − Capex − Increase in working capital, discounted at WACC from the middle
+        of each year, since cash comes in through the year. The terminal value assumes steady growth forever (Gordon growth), with
+        capex equal to D&A once growth has slowed. Debt, cash and share count are as of {data.balanceAsOf}.{" "}
         {data.currency !== data.tradingCurrency &&
           `Figures are in ${data.currency}; the value per share is converted to ${data.tradingCurrency} at ${data.fx.toFixed(4)} to compare with the share price. `}
         A DCF is only as good as its assumptions. The defaults simply extend recent history.
