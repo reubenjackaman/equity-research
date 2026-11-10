@@ -167,8 +167,9 @@ EPS from its pre-2020-split 10-K ($9.21) is shown as $2.30, so every year lines 
 
 ```
 Unlevered FCF   = EBIT × (1 − tax rate) + D&A − Capex − Increase in working capital
-Terminal value  = FCF in final year × (1 + g) ÷ (WACC − g)
-Enterprise value = PV of forecast FCFs + PV of terminal value   (end-of-year discounting)
+Terminal FCF    = NOPAT in final year × (1 + g) − Increase in working capital   (capex = D&A)
+Terminal value  = Terminal FCF ÷ (WACC − g)
+Enterprise value = PV of forecast FCFs + PV of terminal value   (mid-year discounting)
 Equity value    = Enterprise value − Total debt + Cash & short-term investments
 WACC            = E/V × (Rf + Beta × ERP) + D/V × Cost of debt × (1 − tax rate)
 ```
@@ -177,7 +178,8 @@ How the defaults are set (all editable in the app):
 
 | Assumption | Default |
 |---|---|
-| Revenue growth | Year 1 = 3-year revenue CAGR, fading to terminal growth + 1% |
+| Forecast length | 10 years |
+| Revenue growth | Year 1 = 3-year revenue CAGR (capped at −5% to 25%), fading to terminal growth + 1%; a shrinking company recovers to terminal growth |
 | EBIT margin | Latest year's margin, held flat |
 | Tax, D&A, capex | 3-year averages (as % of revenue or pre-tax income) |
 | Working capital | (Receivables + Inventory − Payables) ÷ Revenue, latest year |
@@ -197,8 +199,8 @@ cd backend
 .venv/bin/python -m tests.check_dcf_excel
 ```
 
-Simplifications to be aware of: end-of-year discounting (no mid-year convention), no stub
-period, book value of debt, operating leases not added to debt, and stock-based compensation
+Simplifications to be aware of: no stub period (Year 1 is the fiscal year after the last
+annual report), book value of debt, operating leases not added to debt, and stock-based compensation
 not deducted from FCF. That last one flatters companies that pay heavily in stock. Banks and
 insurers aren't supported, because "free cash flow to the firm" isn't meaningful for them.
 
