@@ -111,7 +111,7 @@ def workbook(result: dict) -> bytes:
         "ebit": "EBIT (operating income)", "taxes": "Taxes on EBIT", "nopat": "NOPAT = EBIT − taxes",
         "da": "+ Depreciation & amortization", "capex": "− Capital expenditures", "nwc": "Net working capital",
         "dnwc": "− Increase in net working capital", "fcf": "Unlevered free cash flow",
-        "df": "Discount factor = 1 ÷ (1 + WACC)^t", "pv": "Present value of FCF",
+        "df": "Discount factor = 1 ÷ (1 + WACC)^(t − 0.5), mid-year", "pv": "Present value of FCF",
     }
     for key, r in R.items():
         put(f"A{r}", labels[key], font=BOLD if key in ("fcf", "revenue") else None)
@@ -147,7 +147,7 @@ def workbook(result: dict) -> bytes:
         put(f"{c}{R['nwc']}", f"={c}{R['revenue']}*$B$12", MONEY)
         put(f"{c}{R['dnwc']}", f"={c}{R['nwc']}-{p}{R['nwc']}", MONEY)
         put(f"{c}{R['fcf']}", f"={c}{R['nopat']}+{c}{R['da']}-{c}{R['capex']}-{c}{R['dnwc']}", MONEY, BOLD)
-        put(f"{c}{R['df']}", f"=1/(1+$B$25)^{c}{R['year']}", "0.0000")
+        put(f"{c}{R['df']}", f"=1/(1+$B$25)^({c}{R['year']}-0.5)", "0.0000")
         put(f"{c}{R['pv']}", f"={c}{R['fcf']}*{c}{R['df']}", MONEY)
     for c in range(1, first_f + n):
         ws.cell(row=R["fcf"], column=c).border = TOP_BORDER
@@ -156,20 +156,27 @@ def workbook(result: dict) -> bytes:
     vt = R["pv"] + 2
     header(vt, "Valuation")
     fcf_range = f"{fcols[0]}{R['fcf']}:{last_f}{R['fcf']}"
+    rev_n, margin_n, nwc_n = (f"${last_f}${R[k]}" for k in ("revenue", "margin", "nwc"))
+
+    def terminal_fcf(g):
+        """Steady-state FCF in year N+1: capex = D&A, so FCF = NOPAT − increase in working capital."""
+        return f"({rev_n}*(1+{g})*{margin_n}*(1-$B$9)-({rev_n}*(1+{g})*$B$12-{nwc_n}))"
+
     val = [
         ("Sum of PV of free cash flows", f"=SUM({fcols[0]}{R['pv']}:{last_f}{R['pv']})", MONEY),
-        ("Terminal value = FCF_N × (1 + g) ÷ (WACC − g)",
-         f'=IF($B$25<=$B$13,"N/A",{last_f}{R["fcf"]}*(1+$B$13)/($B$25-$B$13))', MONEY),
-        ("PV of terminal value", f'=IFERROR(B{vt + 2}*{last_f}{R["df"]},"N/A")', MONEY),
-        ("Enterprise value", f'=IFERROR(B{vt + 1}+B{vt + 3},"N/A")', MONEY),
+        ("Terminal-year FCF = NOPAT × (1 + g) − ΔNWC (capex = D&A)", f"={terminal_fcf('$B$13')}", MONEY),
+        ("Terminal value = terminal-year FCF ÷ (WACC − g)",
+         f'=IF($B$25<=$B$13,"N/A",B{vt + 2}/($B$25-$B$13))', MONEY),
+        ("PV of terminal value = TV ÷ (1 + WACC)^(N − 0.5)", f'=IFERROR(B{vt + 3}/(1+$B$25)^($B$5-0.5),"N/A")', MONEY),
+        ("Enterprise value", f'=IFERROR(B{vt + 1}+B{vt + 4},"N/A")', MONEY),
         ("Less: total debt", "=-B23", MONEY),
         ("Plus: cash & short-term investments", "=B28", MONEY),
-        ("Equity value", f'=IFERROR(B{vt + 4}+B{vt + 5}+B{vt + 6},"N/A")', MONEY),
-        (f"Value per share ({ccy})", f'=IFERROR(B{vt + 7}/B29,"N/A")', PRICE),
-        (f"Value per share ({tccy})", f'=IFERROR(B{vt + 8}*B31,"N/A")', PRICE),
+        ("Equity value", f'=IFERROR(B{vt + 5}+B{vt + 6}+B{vt + 7},"N/A")', MONEY),
+        (f"Value per share ({ccy})", f'=IFERROR(B{vt + 8}/B29,"N/A")', PRICE),
+        (f"Value per share ({tccy})", f'=IFERROR(B{vt + 9}*B31,"N/A")', PRICE),
         (f"Current share price ({tccy})", "=B30", PRICE),
-        ("Upside / (downside)", f'=IFERROR(B{vt + 9}/B{vt + 10}-1,"N/A")', PCT),
-        ("Terminal value as % of enterprise value", f'=IFERROR(B{vt + 3}/B{vt + 4},"N/A")', PCT),
+        ("Upside / (downside)", f'=IFERROR(B{vt + 10}/B{vt + 11}-1,"N/A")', PCT),
+        ("Terminal value as % of enterprise value", f'=IFERROR(B{vt + 4}/B{vt + 5},"N/A")', PCT),
     ]
     for i, (label, formula, fmt) in enumerate(val, start=1):
         put(f"A{vt + i}", label, font=BOLD if "per share" in label or "Upside" in label else None)
@@ -189,7 +196,8 @@ def workbook(result: dict) -> bytes:
             gc = f"{col(2 + j)}${st + 1}"
             put(
                 f"{col(2 + j)}{r}",
-                f'=IF($A{r}<={gc},"N/A",(NPV($A{r},{fcf_range})+{last_f}{R["fcf"]}*(1+{gc})/($A{r}-{gc})/(1+$A{r})^$B$5'
+                f'=IF($A{r}<={gc},"N/A",(NPV($A{r},{fcf_range})*(1+$A{r})^0.5'
+                f"+{terminal_fcf(gc)}/($A{r}-{gc})/(1+$A{r})^($B$5-0.5)"
                 f"-$B$23+$B$28)/$B$29*$B$31)",
                 PRICE,
                 BOLD if k == 0 and steps[j] == 0 else None,
