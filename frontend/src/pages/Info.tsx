@@ -90,8 +90,8 @@ export function HowItWorks() {
       <H2>DCF valuation</H2>
       <p>
         The discounted cash flow model projects a company's free cash flow, discounts it to today at the WACC, and adds a terminal value. The
-        defaults are only a starting point: a 5% equity risk premium, 2.5% long-term growth, and the 10-year Treasury yield as the risk-free
-        rate. Change any assumption and the value updates. The Excel export uses live formulas, so you can check the model cell by cell.
+        defaults are only a starting point: a 10-year forecast, a 5% equity risk premium, 2.5% long-term growth, and the 10-year Treasury
+        yield as the risk-free rate. Change any assumption and the value updates. The Excel export uses live formulas, so you can check the model cell by cell.
       </p>
 
       <H2>Comparable companies</H2>
