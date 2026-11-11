@@ -13,3 +13,4 @@ frontend/dist/
 
 .DS_Store
 backend/usage.sqlite
+frontend/tsconfig.tsbuildinfo
