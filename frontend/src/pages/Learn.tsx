@@ -91,10 +91,10 @@ export default function Learn() {
   }, [hash]);
 
   return (
-    <div className="mx-auto max-w-screen-2xl px-3 pt-3 pb-24">
-      <div className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="fkey">LEARN</span>
-        <h1 className="text-lg">How to pitch a stock, and what every number means</h1>
+    <div className="mx-auto max-w-screen-2xl px-4 pt-6 pb-24">
+      <div className="mb-5">
+        <h1 className="deed-title text-3xl">Learn the basics</h1>
+        <p className="prose-width mt-1 text-muted">How to pitch a stock, and what every number on this site means.</p>
       </div>
 
       <div className="grid gap-3 lg:grid-cols-[22rem_1fr]">

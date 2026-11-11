@@ -1,15 +1,17 @@
 // The terminal's market screens: the dashboard (MKTS) and WEI, MOST, GC, ECO, EVTS, MON, EQS and HELP.
 import { FormEvent, ReactNode, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { marketsApi } from "../api";
+import { marketsApi, type BoardQuote, type Mover } from "../api";
 import AskFinch from "../components/AskFinch";
 import Explore from "../components/Explore";
 import CommandBar, { OPEN_ASK } from "../components/CommandBar";
 import { FinchLogo } from "../components/Finch";
+import DeedCard from "../components/DeedCard";
+import { ArrowRight, Trend } from "../components/Icons";
 import {
   BoardPanel, CurveChart, EarningsPanel, EconomyPanel, MoverTable, MoversPanel, RatesPanel, WatchPanel, useQuotes,
 } from "../components/MarketPanels";
-import { Change, Panel, PanelState } from "../components/Terminal";
+import { Change, Panel, PanelState, level } from "../components/Terminal";
 import * as fmt from "../format";
 import { COMPANY_FUNCTIONS, MARKET_FUNCTIONS, companyPath } from "../functions";
 import { useSaved, useStored, keys } from "../storage";
@@ -17,14 +19,13 @@ import { useApi } from "../useApi";
 
 function Screen({ title, code, intro, screen, children }: { title: string; code: string; intro?: ReactNode; screen: string; children: ReactNode }) {
   useEffect(() => {
-    document.title = `${code} · ${title} · Value Finch`;
+    document.title = `${title} · Value Finch`;
   }, [code, title]);
   return (
-    <div className="mx-auto max-w-screen-2xl px-3 pt-3 pb-24">
-      <div className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span className="fkey">{code}</span>
-        <h1 className="text-lg">{title}</h1>
-        {intro && <p className="text-sm text-muted">{intro}</p>}
+    <div className="mx-auto max-w-screen-2xl px-4 pt-6 pb-24">
+      <div className="mb-4">
+        <h1 className="deed-title text-3xl">{title}</h1>
+        {intro && <p className="prose-width mt-1 text-muted">{intro}</p>}
       </div>
       {children}
       <AskFinch tab={screen} />
@@ -32,136 +33,224 @@ function Screen({ title, code, intro, screen, children }: { title: string; code:
   );
 }
 
-const STEPS: { n: string; title: string; text: string; links: [string, string][] }[] = [
+const STEPS: { title: string; text: string; link: [string, string] }[] = [
   {
-    n: "1",
-    title: "Research a company",
-    text: "Type any US or TSX ticker for its statements, ratios, health scores and a plain-English read of what the numbers say.",
-    links: [["AAPL", companyPath("AAPL")], ["SHOP.TO", companyPath("SHOP.TO")], ["NVDA GP", companyPath("NVDA", "Chart")]],
+    title: "Look up a company",
+    text: "Its statements, ratios and health scores, each with a plain-English note on what the number says.",
+    link: ["Try Apple", companyPath("AAPL")],
   },
   {
-    n: "2",
-    title: "Value it",
-    text: "Build a DCF with your own assumptions, compare it with peers, and see what growth today's price implies.",
-    links: [["RY.TO DCF", companyPath("RY.TO", "DCF")], ["MSFT RV", companyPath("MSFT", "Comps")], ["AAPL SUM", companyPath("AAPL", "Summary")]],
+    title: "Work out what it's worth",
+    text: "Build a valuation with your own guesses, compare it with similar companies, and see what today's price expects.",
+    link: ["Value Royal Bank", companyPath("RY.TO", "DCF")],
   },
   {
-    n: "3",
-    title: "Build your pitch",
-    text: "Write a stock pitch for class, a competition or an interview. Finch drafts sections, challenges your thesis like a judge, and you export a PDF or share a link.",
-    links: [["AAPL PITCH", companyPath("AAPL", "Pitch")], ["LEARN", "/learn"]],
+    title: "Write a stock pitch",
+    text: "Finch, the AI analyst, drafts sections and questions your reasoning like a judge would. Export a PDF when you're done.",
+    link: ["Start a pitch", companyPath("AAPL", "Pitch")],
   },
   {
-    n: "4",
-    title: "Follow the markets",
-    text: "World indices, movers, US and Canadian yield curves, the economy, the earnings calendar and a screener for ideas.",
-    links: [["WEI", "/wei"], ["GC", "/rates"], ["EVTS", "/earnings"], ["EQS", "/screener"]],
+    title: "Learn the basics",
+    text: "Short lessons on what a share is, how to read a balance sheet, and how valuation works.",
+    link: ["Start learning", "/learn"],
   },
 ];
 
-/** MKTS: the home page. What the site is, where to start, then today's markets. */
+const EXAMPLES: [string, string][] = [
+  ["Apple", "AAPL"],
+  ["Shopify", "SHOP.TO"],
+  ["Royal Bank", "RY.TO"],
+  ["Tesla", "TSLA"],
+];
+
+/** Three well-known, heavily traded companies from today's movers, dealt as a fanned hand of deed cards. */
+function Hand() {
+  const { data } = useApi(marketsApi.movers, "movers", 10 * 60 * 1000);
+  // One card per sector, so the hand shows three different colour bands.
+  const cards: Mover[] = [];
+  for (const m of data?.us.active ?? []) {
+    if (m.marketCap && m.sector && !cards.some((c) => c.sector === m.sector)) cards.push(m);
+    if (cards.length === 3) break;
+  }
+  if (!cards.length) {
+    return <div className="mx-auto aspect-[5/7] w-56 animate-pulse rounded-lg border-[1.5px] border-line-strong/30 bg-surface/60" aria-label="Loading today's companies" />;
+  }
+  const fan = [
+    "xl:-rotate-[5deg] xl:translate-y-5",
+    "xl:z-10 xl:-translate-y-1",
+    "xl:rotate-[5deg] xl:translate-y-5",
+  ];
+  return (
+    <div>
+      <ul className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] md:justify-center xl:mx-0 xl:gap-0 xl:overflow-visible xl:px-0">
+        {cards.map((c, i) => (
+          <li key={c.symbol} className={`w-[68vw] max-w-60 shrink-0 snap-center xl:mx-1 xl:w-56 ${fan[i] ?? ""}`}>
+            <DeedCard c={c} className="shadow-sm" />
+          </li>
+        ))}
+      </ul>
+      <p className="mt-2 text-center text-xs font-semibold md:hidden">Swipe for more cards</p>
+      <p className="mt-2 text-center text-sm text-muted xl:mt-10">Today's most traded US companies (prices delayed a few minutes). Turn a card over to see what its numbers mean.</p>
+    </div>
+  );
+}
+
+const INDEXES: [string, string, string, string][] = [
+  ["S&P 500", "500", "United States", "The 500 biggest US companies, weighted by size. The usual meaning of \u201cthe market\u201d."],
+  ["Nasdaq", "3,000+", "United States", "Over 3,000 companies listed on the Nasdaq exchange, heavy in technology."],
+  ["Dow Jones", "30", "United States", "30 large, well-known US companies, weighted by share price. The oldest index."],
+  ["S&P/TSX", "About 220", "Canada", "About 220 of the biggest companies on the Toronto Stock Exchange, heavy in banks and energy."],
+];
+
+/** The headline indices as deed cards; the back says what each index is. */
+function IndexRow() {
+  const { data, error } = useApi(marketsApi.board, "board", 5 * 60 * 1000);
+  const quotes = data?.flatMap((g) => g.items) ?? [];
+  if (!data) return <PanelState error={error} rows={4} />;
+  return (
+    <ul className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      {INDEXES.map(([label, count, country, what]) => {
+        const q = quotes.find((x) => x.label === label);
+        return q ? (
+          <li key={label} className="min-w-0">
+            <IndexCard q={q} what={what} count={count} country={country} />
+          </li>
+        ) : null;
+      })}
+    </ul>
+  );
+}
+
+function IndexCard({ q, what, count, country }: { q: BoardQuote; what: string; count: string; country: string }) {
+  const [back, setBack] = useState(false);
+  const up = (q.changePercent ?? 0) >= 0;
+  return (
+    <div className={`deed-flip ${back ? "is-back" : ""}`}>
+      <div className="deed-flip-inner">
+        <button type="button" onClick={() => setBack(true)} aria-hidden={back} tabIndex={back ? -1 : 0} aria-label={`${q.label}: turn over for what this index is`} className="deed deed-face flex flex-col text-left">
+          <div className="deed-band justify-center text-center text-base">{q.label}</div>
+          <div className="mx-4 mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">{level(q)}</div>
+          <div className={`mx-4 text-sm font-bold ${up ? "text-gain" : "text-loss"}`}>
+            <Trend dir={up ? "up" : "down"} /> {fmt.signed(q.changePercent)}% today
+          </div>
+          <dl className="mx-4 mt-2 divide-y divide-line border-y border-line text-xs sm:text-sm">
+            {([["Companies", count], ["Country", country], ["Past month", q.monthChangePercent == null ? "N/A" : `${fmt.signed(q.monthChangePercent)}%`]] as [string, string][]).map(([k, v]) => (
+              <div key={k} className="flex justify-between gap-2 py-1">
+                <dt className="text-muted">{k}</dt>
+                <dd className="text-right font-semibold">{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <span className="mx-4 mt-auto mb-3 pt-2 text-xs text-muted">Tap to turn over</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setBack(false)}
+          tabIndex={back ? 0 : -1}
+          aria-hidden={!back}
+          aria-label={`${q.label}: turn the card back over`}
+          className="deed deed-face deed-back flex flex-col text-left"
+        >
+          <div className="deed-band w-[calc(100%-16px)] justify-center text-center text-base">What is the {q.label}?</div>
+          <p className="mx-4 mt-2 min-h-0 flex-1 overflow-auto text-sm">{what}</p>
+          <span className="mx-4 mb-3 text-xs text-muted">Tap to turn back</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** The home page: what the site is, a working search, a hand of live company cards, then today's markets. */
 export function MarketsHome() {
   useEffect(() => {
-    document.title = "Value Finch · Free equity research terminal";
+    document.title = "Value Finch · Company research for beginners";
   }, []);
 
   return (
     <div className="pb-24">
-      <section className="border-b border-line bg-surface">
-        <div className="mx-auto grid max-w-screen-2xl gap-6 px-3 py-8 sm:py-10 lg:grid-cols-[1fr_minmax(0,34rem)] lg:items-center lg:gap-12">
-          <div>
-            <p className="font-mono text-xs font-semibold tracking-wider text-accent">VALUE FINCH · FREE RESEARCH TERMINAL</p>
-            <h1 className="mt-3 text-2xl sm:text-3xl">Equity research for US and Canadian markets.</h1>
-            <p className="prose-width mt-3 text-muted">
-              Research about 2,750 US and TSX companies, value them, and turn your work into a stock pitch that an AI analyst challenges
-              before a judge does. Built for students preparing pitches. Free, no account, and every figure shows how it was calculated.
-            </p>
-          </div>
-          <div>
+      <section className="mx-auto grid max-w-screen-2xl gap-10 px-4 [&>*]:min-w-0 pt-10 pb-12 xl:grid-cols-[minmax(0,1fr)_minmax(0,46rem)] xl:items-center xl:gap-8 xl:pt-16 xl:pb-20">
+        <div>
+          <FinchLogo className="h-14 w-14 text-ink" />
+          <h1 className="mt-4 max-w-[17ch] text-4xl font-extrabold sm:text-[4.25rem] sm:leading-[0.95]" style={{ fontStretch: "80%" }}>
+            Understand a company before you buy its shares.
+          </h1>
+          <p className="prose-width mt-5 text-lg">
+            Look up any of about 2,750 US and Canadian companies. Every number comes with a plain-English note on what it means, so you can
+            understand a business before you put money near it. Free, and no account needed.
+          </p>
+          <div className="mt-7 max-w-xl">
             <CommandBar large />
-            <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
-              <span>Try</span>
-              {[["AAPL", companyPath("AAPL")], ["SHOP.TO", companyPath("SHOP.TO")], ["RY.TO", companyPath("RY.TO")], ["TSLA", companyPath("TSLA")]].map(([t, to]) => (
-                <Link key={t} to={to} className="tap font-mono text-ink underline decoration-line-strong hover:text-accent">
-                  {t}
+            <p className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+              <span className="text-muted">Or try</span>
+              {EXAMPLES.map(([label, t]) => (
+                <Link key={t} to={companyPath(t)} className="tap rounded-md border-[1.5px] border-line-strong bg-surface px-3 py-1 font-semibold hover:bg-ink hover:text-surface">
+                  {label}
                 </Link>
               ))}
             </p>
-            <p className="mt-1 text-xs text-muted">
-              Add a function code for a specific screen, like <span className="font-mono text-ink">AAPL GP</span> for the chart.{" "}
-              <Link to="/help" className="text-accent underline hover:text-accent-hover">See all codes</Link>
+            <p className="mt-5 text-sm text-muted">
+              Then you can{" "}
+              {STEPS.slice(1).map((st, i, all) => (
+                <span key={st.title}>
+                  <Link to={st.link[1]} className="font-bold text-ink underline">{st.title.toLowerCase()}</Link>
+                  {i < all.length - 2 ? ", " : i === all.length - 2 ? " or " : "."}
+                </span>
+              ))}
             </p>
           </div>
         </div>
+        <Hand />
       </section>
 
-      <section aria-labelledby="start" className="mx-auto max-w-screen-2xl px-3 pt-6">
-        <h2 id="start" className="text-xs font-semibold tracking-wider text-muted uppercase">Where to start</h2>
-        <ol className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          {STEPS.map((s) => (
-            <li key={s.n} className="flex flex-col border border-line bg-surface p-4">
-              <div className="flex items-baseline gap-2">
-                <span className="font-mono text-sm font-semibold text-accent">{s.n}</span>
-                <h3 className="text-base">{s.title}</h3>
-              </div>
-              <p className="mt-1.5 flex-1 text-sm text-muted">{s.text}</p>
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {s.links.map(([label, to]) => (
-                  <Link key={label} to={to} className="tap rounded-sm border border-line px-2 py-0.5 font-mono text-xs text-accent transition-colors hover:border-accent">
-                    {label}
-                  </Link>
-                ))}
-              </div>
-            </li>
-          ))}
-          <li className="flex flex-col border border-accent/60 bg-accent-soft p-4">
-            <div className="flex items-center gap-2">
-              <FinchLogo className="h-5 w-5 text-accent" />
-              <h3 className="text-base">Ask Finch, the AI analyst</h3>
-            </div>
-            <p className="mt-1.5 flex-1 text-sm text-muted">
-              Ask anything, like "is Royal Bank overvalued?" or "what is the yield curve saying?". It reads the data on your screen.
+      <section aria-labelledby="today" className="mx-auto max-w-screen-2xl px-4 pt-6">
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+          <div>
+            <h2 id="today" className="deed-title text-3xl">How the markets did today</h2>
+            <p className="prose-width mt-1 text-muted">
+              An index tracks a basket of big companies, so it shows how the market did as a whole. Turn a card over to see what's inside it.
             </p>
-            <button
-              onClick={() => window.dispatchEvent(new Event(OPEN_ASK))}
-              className="mt-3 self-start rounded-sm bg-accent px-3 py-1 font-mono text-xs font-semibold text-on-accent hover:bg-accent-hover"
-            >
-              ASK FINCH
-            </button>
-          </li>
-        </ol>
-        <p className="mt-3 text-sm text-muted">
-          New here? Read <Link to="/how-it-works" className="text-accent underline hover:text-accent-hover">how it works</Link>, or try today's{" "}
-          <Link to="/game" className="text-accent underline hover:text-accent-hover">Mystery Company puzzle</Link>: guess the company from its financials.
+          </div>
+          <Link to="/markets" className="btn">
+            See the full markets board <ArrowRight />
+          </Link>
+        </div>
+        <IndexRow />
+        <p className="mt-6 text-sm text-muted">
+          Stuck on a word or a number?{" "}
+          <button onClick={() => window.dispatchEvent(new Event(OPEN_ASK))} className="font-bold text-accent underline hover:text-accent-hover">
+            Ask Finch
+          </button>
+          , or play today's{" "}
+          <Link to="/game" className="font-bold text-accent underline hover:text-accent-hover">Mystery Company puzzle</Link> and guess a company from its numbers.
         </p>
-      </section>
-
-      <section aria-labelledby="today" className="mx-auto max-w-screen-2xl px-3 pt-8">
-        <div className="mb-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <span className="fkey">MKTS</span>
-          <h2 id="today" className="text-lg">Today's markets</h2>
-          <p className="text-sm text-muted">Delayed and end-of-day data, refreshed every few minutes. Click any panel title for its full screen.</p>
-        </div>
-        <div className="grid gap-3 lg:grid-cols-12">
-          <div className="space-y-3 lg:col-span-4">
-            <BoardPanel title="Equity indices" groups={["Americas", "Europe", "Asia-Pacific"]} />
-          </div>
-          <div className="space-y-3 lg:col-span-4">
-            <MoversPanel rows={8} />
-            <BoardPanel title="Currencies, commodities, crypto" code="WEI" groups={["Currencies", "Commodities", "Crypto"]} />
-          </div>
-          <div className="space-y-3 lg:col-span-4">
-            <RatesPanel />
-            <EarningsPanel limit={10} />
-            <WatchPanel />
-          </div>
-          <div className="lg:col-span-12">
-            <EconomyPanel wide />
-          </div>
-        </div>
       </section>
       <AskFinch tab="Markets" />
     </div>
+  );
+}
+
+/** The full markets board: indices, movers, currencies, rates, earnings and the economy, for people who want the detail. */
+export function MarketsBoardScreen() {
+  return (
+    <Screen title="Markets board" code="MKTS" screen="Markets" intro="Every market we follow on one page. Prices are delayed a few minutes; click a card's title for its full page.">
+        <div className="grid gap-4 lg:grid-cols-12">
+        <div className="min-w-0 space-y-4 lg:col-span-4">
+          <BoardPanel title="Equity indices" groups={["Americas", "Europe", "Asia-Pacific"]} />
+        </div>
+        <div className="min-w-0 space-y-4 lg:col-span-4">
+          <MoversPanel rows={8} />
+          <BoardPanel title="Currencies, commodities, crypto" code="WEI" groups={["Currencies", "Commodities", "Crypto"]} />
+        </div>
+        <div className="min-w-0 space-y-4 lg:col-span-4">
+          <RatesPanel />
+          <EarningsPanel limit={10} />
+          <WatchPanel />
+        </div>
+        <div className="min-w-0 lg:col-span-12">
+          <EconomyPanel wide />
+        </div>
+      </div>
+    </Screen>
   );
 }
 

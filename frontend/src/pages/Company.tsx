@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { api, ApiError, Overview } from "../api";
 import * as fmt from "../format";
+import { bandStyle } from "../sectors";
 import AskFinch from "../components/AskFinch";
 import CompsTab from "../components/CompsTab";
 import DcfTab from "../components/DcfTab";
@@ -16,9 +17,9 @@ import ChartTab from "../components/ChartTab";
 import InsightsPanel from "../components/Insights";
 import PitchTab from "../components/PitchTab";
 import { AnalystsTab, InsidersTab } from "../components/StreetTabs";
-import { Change } from "../components/Terminal";
+import { Change, Panel } from "../components/Terminal";
 import { StarIcon } from "../components/TopBar";
-import { COMPANY_TABS, CompanyTab, tabCode } from "../functions";
+import { COMPANY_TABS, CompanyTab } from "../functions";
 import { addRecent, useSaved } from "../storage";
 import type { Theme } from "../theme";
 
@@ -59,65 +60,72 @@ export default function Company({ theme }: { theme: Theme }) {
   const range = data.fiftyTwoWeekLow !== null && data.fiftyTwoWeekHigh !== null ? `${fmt.num(data.fiftyTwoWeekLow)} – ${fmt.num(data.fiftyTwoWeekHigh)}` : "N/A";
 
   return (
-    <div className="mx-auto max-w-screen-2xl px-3 pt-3 pb-24">
-      {/* Header: the security line, price and a strip of key figures. Bottom padding keeps the Ask Finch button off the last line. */}
-      <div className="border border-line bg-surface">
-        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 px-3 py-2">
+    <div className="mx-auto max-w-screen-2xl px-4 pt-6 pb-24" style={bandStyle(data.sector)}>
+      {/* Header: the company as a deed card in its sector's colour. Bottom padding keeps the Ask Finch button off the last line. */}
+      <div className="deed pb-2">
+        <div className="deed-band flex-wrap py-1.5 text-xs">
+          <span>{data.sector ?? "Company"}{data.industry ? ` · ${data.industry}` : ""}</span>
+          <span className="font-semibold normal-case tracking-normal">{data.exchange ?? "N/A"} · {data.currency ?? "N/A"}</span>
+        </div>
+        <div className="mx-2 flex flex-wrap items-end justify-between gap-x-8 gap-y-3 px-3 pt-4 pb-3">
           <div className="min-w-0">
-            <div className="flex items-center gap-2 font-mono text-xs">
-              <span className="font-semibold text-accent">{data.symbol} {country} EQUITY</span>
-              <span className="text-muted">{data.exchange ?? "N/A"} · {data.currency ?? "N/A"}</span>
-            </div>
-            <div className="mt-0.5 flex items-center gap-1.5">
-              <h1 className="truncate text-xl">{data.name}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="deed-title text-3xl leading-none sm:text-4xl">{data.name}</h1>
               <button
                 onClick={() => toggle(data.symbol)}
                 aria-pressed={isSaved(data.symbol)}
                 aria-label={isSaved(data.symbol) ? `Remove ${data.symbol} from watchlist`: `Add ${data.symbol} to watchlist`}
-                title={isSaved(data.symbol) ? "On your watchlist (MON): click to remove" : "Add to your watchlist (MON)"}
-                className={`shrink-0 rounded-sm p-1 transition-colors hover:bg-subtle ${isSaved(data.symbol) ? "text-warn" : "text-muted hover:text-warn"}`}
+                title={isSaved(data.symbol) ? "On your watchlist: click to remove" : "Add to your watchlist"}
+                className={`shrink-0 rounded-md p-1.5 hover:bg-subtle ${isSaved(data.symbol) ? "text-warn" : "text-muted hover:text-ink"}`}
               >
-                <StarIcon filled={isSaved(data.symbol)} className="h-5 w-5" />
+                <StarIcon filled={isSaved(data.symbol)} className="h-6 w-6" />
               </button>
             </div>
+            <div className="mt-1 text-sm text-muted">
+              Ticker <span className="font-bold text-ink">{data.symbol}</span>
+              {country === "CN" ? " · Canada" : " · United States"}
+            </div>
           </div>
-          <div className="flex items-baseline gap-3 font-mono">
-            <span className="text-2xl font-semibold">{fmt.price(data.price, data.currency)}</span>
-            <span className={`text-sm ${(data.change ?? 0) >= 0 ? "text-gain" : "text-loss"}`}>{fmt.signed(data.change)}</span>
-            <Change value={data.changePercent} className="text-sm" />
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className="text-4xl font-extrabold tracking-tight">{fmt.price(data.price, data.currency)}</span>
+            <span className={`text-base font-bold ${(data.change ?? 0) >= 0 ? "text-gain" : "text-loss"}`}>
+              {fmt.signed(data.change)} ({fmt.signed(data.changePercent)}%) today
+            </span>
           </div>
         </div>
-        <dl className="grid grid-cols-2 border-t border-line font-mono text-xs sm:grid-cols-3 lg:grid-cols-6">
+        <dl className="mx-2 grid grid-cols-2 border-t border-line text-sm sm:grid-cols-3 lg:grid-cols-6">
           {[
-            ["Mkt cap", fmt.big(data.marketCap)],
-            ["52-wk range", range],
-            ["Volume", fmt.big(data.volume)],
-            ["Avg vol (3M)", fmt.big(data.averageVolume)],
-            ["Beta", fmt.num(data.beta)],
-            ["Div. yield", fmt.pct(data.dividendYield)],
+            ["Company value", fmt.big(data.marketCap)],
+            ["Year low – high", range],
+            ["Shares traded", fmt.big(data.volume)],
+            ["Usually traded", fmt.big(data.averageVolume)],
+            ["Beta (swing)", fmt.num(data.beta)],
+            ["Dividend yield", fmt.pct(data.dividendYield)],
           ].map(([label, value]) => (
-            <div key={label} className="flex justify-between gap-2 border-line px-3 py-1.5 lg:border-l lg:first:border-l-0">
-              <dt className="font-sans text-muted">{label}</dt>
-              <dd>{value}</dd>
+            <div key={label} className="border-line px-3 py-2 lg:border-l lg:first:border-l-0">
+              <dt className="text-xs text-muted">{label}</dt>
+              <dd className="font-bold">{value}</dd>
             </div>
           ))}
         </dl>
       </div>
 
-      <nav aria-label="Company functions" className="mt-3 flex gap-px overflow-x-auto border-b border-line [scrollbar-width:none]">
-        {TABS.map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            aria-current={t === tab ? "page" : undefined}
-            className={`-mb-px flex items-center gap-1.5 border-b-2 px-2.5 py-1.5 text-xs whitespace-nowrap transition-colors ${
-              t === tab ? "border-accent bg-surface text-ink" : "border-transparent text-muted hover:bg-surface hover:text-ink"
-            }`}
-          >
-            <span className={`font-mono font-semibold ${t === tab ? "text-accent" : "text-accent dark:text-accent/70"}`}>{tabCode(t)}</span>
-            {t}
-          </button>
-        ))}
+      <nav aria-label="Company sections" className="mt-5 -mx-4 overflow-x-auto px-4 [scrollbar-width:none]">
+        <ul className="flex gap-1.5">
+          {TABS.map((t) => (
+            <li key={t}>
+              <button
+                onClick={() => setTab(t)}
+                aria-current={t === tab ? "page" : undefined}
+                className={`rounded-md border-[1.5px] px-3.5 py-1.5 text-sm font-semibold whitespace-nowrap ${
+                  t === tab ? "border-line-strong bg-ink text-surface" : "border-transparent text-ink hover:border-line-strong hover:bg-surface"
+                }`}
+              >
+                {t}
+              </button>
+            </li>
+          ))}
+        </ul>
       </nav>
 
       {tab === "Overview" && <OverviewTab data={data} theme={theme} />}
@@ -141,13 +149,12 @@ function OverviewTab({ data, theme }: { data: Overview; theme: Theme }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="mt-3 grid gap-3 lg:grid-cols-3">
+    <div className="mt-4 grid gap-4 lg:grid-cols-3">
       <div className="lg:col-span-2">
         <PriceChart ticker={data.symbol} theme={theme} />
       </div>
 
-      <div className="card">
-        <h2 className="mb-3 text-xs font-semibold tracking-wider text-accent uppercase">Key statistics</h2>
+      <Panel title="Key numbers" bodyClass="px-3 pt-1 pb-2">
         <dl className="divide-y divide-line text-sm">
           <Stat label="Market cap" value={fmt.big(data.marketCap)} />
           <Stat label="Shares outstanding" value={fmt.big(data.sharesOutstanding)} />
@@ -160,15 +167,14 @@ function OverviewTab({ data, theme }: { data: Overview; theme: Theme }) {
           <div className="mb-1.5 text-xs text-muted">52-week range</div>
           <RangeBar low={data.fiftyTwoWeekLow} high={data.fiftyTwoWeekHigh} current={data.price} currency={data.currency} />
         </div>
-      </div>
+      </Panel>
 
       <div className="lg:col-span-3">
         <InsightsPanel ticker={data.symbol} />
       </div>
 
-      <div className="card mt-0 lg:col-span-3">
+      <Panel title="About the company" className="lg:col-span-3" bodyClass="px-3 pt-3 pb-2">
         <div className="mb-3 flex flex-wrap items-center gap-2">
-          <h2 className="mr-2 text-xs font-semibold tracking-wider text-accent uppercase">About</h2>
           {data.sector && <Tag>{data.sector}</Tag>}
           {data.industry && <Tag>{data.industry}</Tag>}
           {fmt.safeUrl(data.website) && (
@@ -190,7 +196,7 @@ function OverviewTab({ data, theme }: { data: Overview; theme: Theme }) {
             {expanded ? "Show less" : "Show more"}
           </button>
         )}
-      </div>
+      </Panel>
     </div>
   );
 }
