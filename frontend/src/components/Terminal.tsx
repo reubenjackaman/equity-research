@@ -3,16 +3,17 @@ import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import type { BoardQuote } from "../api";
 import * as fmt from "../format";
+import { bandStyle } from "../sectors";
 
-/** A terminal panel: an amber title strip (with its function code) over a bordered box. */
+/** A deed card: a coloured title band over card stock. `code` is accepted for older callers but no longer shown. */
 export function Panel({
   title,
-  code,
   to,
   actions,
   children,
   className = "",
   bodyClass = "p-3",
+  sector,
 }: {
   title: string;
   code?: string;
@@ -21,28 +22,23 @@ export function Panel({
   children: ReactNode;
   className?: string;
   bodyClass?: string;
+  sector?: string | null; // colours the band by sector
 }) {
-  const heading = (
-    <span className="flex min-w-0 items-center gap-2">
-      {code && <span className="fkey">{code}</span>}
-      <span className="truncate">{title}</span>
-    </span>
-  );
   return (
-    <section className={`min-w-0 border border-line bg-surface ${className}`}>
-      <header className="panel-head">
-        <h2 className="min-w-0 text-xs">
+    <section className={`deed min-w-0 pb-2 ${className}`} style={sector ? bandStyle(sector) : undefined}>
+      <header className="deed-band">
+        <h2 className="min-w-0 truncate text-sm">
           {to ? (
-            <Link to={to} className="hover:text-accent-hover hover:underline">
-              {heading}
+            <Link to={to} className="underline-offset-4 hover:underline">
+              {title}
             </Link>
           ) : (
-            heading
+            title
           )}
         </h2>
-        {actions && <div className="flex shrink-0 items-center gap-1 normal-case tracking-normal">{actions}</div>}
+        {actions && <div className="flex shrink-0 items-center gap-1 font-normal normal-case tracking-normal">{actions}</div>}
       </header>
-      <div className={`overflow-x-auto ${bodyClass}`}>{children}</div>
+      <div className={`mx-2 overflow-x-auto ${bodyClass}`}>{children}</div>
     </section>
   );
 }
@@ -110,14 +106,14 @@ export function Segmented<T extends string>({
 }) {
   const items = (options as (T | { value: T; label: string })[]).map((o) => (typeof o === "string" ? { value: o, label: o } : o));
   return (
-    <div role="group" aria-label={label} className="flex flex-wrap rounded-sm border border-line">
+    <div role="group" aria-label={label} className="flex flex-wrap overflow-hidden rounded-md border-[1.5px] border-line-strong bg-surface">
       {items.map((o) => (
         <button
           key={o.value}
           onClick={() => onChange(o.value)}
           aria-pressed={o.value === value}
-          className={`px-2 py-0.5 font-mono text-xs font-medium transition-colors ${
-            o.value === value ? "bg-accent text-on-accent" : "text-muted hover:text-ink"
+          className={`px-2.5 py-0.5 text-xs font-semibold ${
+            o.value === value ? "bg-ink text-surface" : "text-ink hover:bg-subtle"
           }`}
         >
           {o.label}

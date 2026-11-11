@@ -65,10 +65,12 @@ export default function PriceChart({ ticker, theme }: { ticker: string; theme: T
   }, [data, theme, up]);
 
   return (
-    <div className="card">
+    <div className="deed pb-2">
+      <h2 className="deed-band text-sm">Share price</h2>
+      <div className="mx-2 px-3 pt-3 pb-1">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div className="text-sm">
-          <span className="font-semibold">Price</span>
+          <span className="font-semibold">Change</span>
           {rangeReturn !== null && (
             <span className={`ml-2 ${up ? "text-gain" : "text-loss"}`}>
               {up ? "+" : ""}
@@ -76,16 +78,13 @@ export default function PriceChart({ ticker, theme }: { ticker: string; theme: T
             </span>
           )}
         </div>
-        <div className="flex rounded bg-subtle p-0.5">
+        <div className="flex overflow-hidden rounded-md border-[1.5px] border-line-strong">
           {RANGES.map((r) => (
             <button
               key={r}
               onClick={() => setRange(r)}
-              className={`rounded px-3 py-1 text-xs font-medium transition-colors ${
-                r === range
-                  ? "bg-surface"
-                  : "text-muted hover:text-ink"
-              }`}
+              aria-pressed={r === range}
+              className={`px-3 py-1 text-xs font-semibold ${r === range ? "bg-ink text-surface" : "text-ink hover:bg-subtle"}`}
             >
               {r}
             </button>
@@ -96,6 +95,7 @@ export default function PriceChart({ ticker, theme }: { ticker: string; theme: T
         {error && <p className="p-4 text-sm text-muted">Price history unavailable: {error}</p>}
         {!error && !data && <div className="h-full animate-pulse rounded bg-subtle" />}
         <div ref={containerRef} className="absolute inset-0" />
+      </div>
       </div>
     </div>
   );

@@ -114,7 +114,7 @@ export function MoverTable({ set, view, rows = 10 }: { set: MoversSet; view: Mov
         <thead>
           <tr className="text-muted">
             <th className="px-3 py-1 text-left font-medium">Ticker</th>
-            <th className="hidden px-2 py-1 text-left font-medium sm:table-cell">Name</th>
+            <th className="hidden px-2 py-1 text-left font-medium sm:table-cell lg:hidden 2xl:table-cell">Name</th>
             <th className="px-2 py-1 text-right font-medium">Last</th>
             <th className="px-2 py-1 text-right font-medium">Day</th>
             <th className="py-1 pr-3 pl-2 text-right font-medium">{view === "active" ? "Traded" : "Mkt cap"}</th>
@@ -123,13 +123,13 @@ export function MoverTable({ set, view, rows = 10 }: { set: MoversSet; view: Mov
         <tbody>
           {set[view].slice(0, rows).map((m: Mover) => (
             <tr key={m.symbol} className="border-t border-line/60 hover:bg-subtle">
-              <td className="px-3 py-1 font-semibold">
+              <td className="px-3 py-1 font-semibold whitespace-nowrap">
                 <Link to={companyPath(m.symbol)} className="text-accent hover:underline">
                   {m.symbol}
                 </Link>
               </td>
-              <td className="hidden max-w-48 truncate px-2 py-1 font-sans text-muted sm:table-cell">{m.name}</td>
-              <td className="px-2 py-1 text-right">{m.price.toFixed(2)}</td>
+              <td className="hidden max-w-48 truncate px-2 py-1 font-sans text-muted sm:table-cell lg:hidden 2xl:table-cell">{m.name}</td>
+              <td className="px-2 py-1 text-right">{m.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
               <td className="px-2 py-1 text-right">
                 <Change value={m.changePercent} />
               </td>
@@ -410,7 +410,7 @@ export function WatchPanel() {
     <Panel title="Your watchlist" code="MON" to="/monitor" bodyClass="">
       {saved.length === 0 ? (
         <p className="p-3 text-sm text-muted">
-          Star a company to watch it here, or open <Link to="/monitor" className="text-accent underline hover:text-accent-hover">MON</Link> to add tickers.
+          Tap the star next to any company's name to follow it here, or <Link to="/monitor" className="text-accent underline hover:text-accent-hover">add companies to your watchlist</Link>.
         </p>
       ) : (
         <table className="w-full text-xs">

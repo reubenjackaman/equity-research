@@ -10,7 +10,7 @@ export const COMPANY_TABS = [
 export type CompanyTab = (typeof COMPANY_TABS)[number];
 
 export const MARKET_FUNCTIONS: MarketFunction[] = [
-  { code: "MKTS", aliases: ["HOME", "MAIN"], name: "Markets dashboard", path: "/" },
+  { code: "MKTS", aliases: ["HOME", "MAIN"], name: "Markets board", path: "/markets" },
   { code: "WEI", aliases: ["WORLD", "INDICES"], name: "World markets: indices, currencies, commodities, crypto", path: "/wei" },
   { code: "MOST", aliases: ["MOVERS", "MOV"], name: "Top movers and most traded, US and TSX", path: "/most" },
   { code: "GC", aliases: ["RATES", "CURVE", "YCRV"], name: "Yield curves and policy rates, US and Canada", path: "/rates" },

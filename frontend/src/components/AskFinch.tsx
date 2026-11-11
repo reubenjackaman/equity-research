@@ -121,11 +121,11 @@ export default function AskFinch({ symbol = "", name = "", tab }: { symbol?: str
     return (
       <button
         onClick={() => setOpen(true)}
-        className="fixed right-4 bottom-4 z-30 flex items-center gap-2 rounded-sm border border-accent bg-surface py-1.5 pr-3 pl-2 text-sm font-medium text-ink shadow-sm transition-colors hover:bg-accent hover:text-on-accent"
+        className="fixed right-4 bottom-4 z-30 flex items-center gap-2 rounded-full border-[1.5px] border-line-strong bg-ink py-2 pr-4 pl-2.5 text-sm font-bold text-surface shadow-sm hover:bg-accent hover:text-on-accent"
       >
-        <FinchLogo className="h-5 w-5 text-accent" />
-        <span className="font-mono text-xs font-semibold tracking-wider">ASK FINCH</span>
-        <span className="hidden text-xs text-muted sm:inline">AI</span>
+        <FinchLogo className="h-6 w-6" />
+        Ask Finch
+        <span className="hidden font-normal opacity-75 sm:inline">· AI help</span>
       </button>
     );
   }
@@ -133,17 +133,17 @@ export default function AskFinch({ symbol = "", name = "", tab }: { symbol?: str
   return (
     <aside
       aria-label="Ask Finch"
-      className="fixed inset-x-0 bottom-0 z-40 flex h-[55vh] flex-col border-t border-line-strong bg-surface shadow-sm lg:inset-y-0 lg:right-0 lg:left-auto lg:h-auto lg:top-0 lg:w-[26rem] lg:border-t-0 lg:border-l lg:shadow-none"
+      className="fixed inset-x-0 bottom-0 z-40 flex h-[55vh] flex-col border-t-[1.5px] border-line-strong bg-surface shadow-sm lg:inset-y-0 lg:right-0 lg:left-auto lg:h-auto lg:top-0 lg:w-[26rem] lg:border-t-0 lg:border-l-[1.5px] lg:shadow-none"
     >
-      <header className="flex items-center justify-between gap-2 border-b border-line bg-subtle px-3 py-1.5">
+      <header className="flex items-center justify-between gap-2 border-b-[1.5px] border-line-strong bg-ink px-3 py-2 text-surface">
         <div className="flex items-center gap-2">
-          <FinchLogo className="h-5 w-5 text-accent" />
+          <FinchLogo className="h-7 w-7" />
           <div>
-            <h2 className="font-mono text-xs font-semibold tracking-wider text-accent">ASK FINCH · AI</h2>
-            <p className="text-xs text-muted">{symbol ? `About ${name}, using the ${tab} tab` : `Markets, using the ${tab} screen`}</p>
+            <h2 className="deed-title text-base leading-tight">Ask Finch, your AI analyst</h2>
+            <p className="text-xs opacity-80">{symbol ? `About ${name}, using the ${tab} tab` : `About the markets, using this page`}</p>
           </div>
         </div>
-        <button onClick={() => setOpen(false)} aria-label="Minimize Ask Finch" title="Minimize (your chat is kept)" className="min-w-11 rounded p-2 text-muted hover:bg-subtle hover:text-ink">
+        <button onClick={() => setOpen(false)} aria-label="Minimize Ask Finch" title="Minimize (your chat is kept)" className="min-w-11 rounded p-2 hover:bg-surface hover:text-ink">
           <svg className="mx-auto h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <path d="M5 5l10 10M15 5L5 15" />
           </svg>

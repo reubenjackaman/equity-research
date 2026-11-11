@@ -1,85 +1,72 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { api, marketsApi, Overview } from "../api";
+import { api, Overview } from "../api";
 import * as fmt from "../format";
 import { keys, useSaved, useStored } from "../storage";
 import type { Theme } from "../theme";
-import { useApi } from "../useApi";
 import CommandBar from "./CommandBar";
 import { Birdhouse } from "./Finch";
-import { Change, level } from "./Terminal";
 
-const NAV: [string, string, string][] = [
-  ["MKTS", "Markets", "/"],
-  ["WEI", "World", "/wei"],
-  ["MOST", "Movers", "/most"],
-  ["GC", "Rates", "/rates"],
-  ["ECO", "Economy", "/eco"],
-  ["EVTS", "Earnings", "/earnings"],
-  ["MON", "Monitor", "/monitor"],
-  ["EQS", "Screener", "/screener"],
-  ["LEARN", "Learn", "/learn"],
-  ["GAME", "Puzzle", "/game"],
-  ["HELP", "Help", "/help"],
+const NAV: [string, string][] = [
+  ["Markets", "/markets"],
+  ["Movers", "/most"],
+  ["Screener", "/screener"],
+  ["Learn", "/learn"],
+  ["Puzzle", "/game"],
+  ["Help", "/help"],
 ];
 
-/** The bar at the top of every page: logo, command line, market clock, saved companies, theme,
- *  then a row of function keys and the scrolling ticker tape. */
+/** The bar at the top of every page: the Value Finch mark, plain-word navigation, company search,
+ *  market hours, saved companies and the light/dark switch. */
 export default function TopBar({ theme, onToggleTheme }: { theme: Theme; onToggleTheme: () => void }) {
   const { pathname } = useLocation();
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-bg">
-      <div className="mx-auto flex max-w-screen-2xl flex-wrap items-center gap-2 px-3 py-1.5 sm:flex-nowrap sm:gap-3">
-        <Link
-          to="/"
-          aria-label="Value Finch home"
-          className="tap flex shrink-0 items-center gap-1.5 rounded-sm px-1 py-1 transition-colors hover:text-accent"
-        >
-          <Birdhouse className="h-6 w-6 text-accent" />
-          <span className="hidden font-mono text-sm font-semibold tracking-wider whitespace-nowrap md:inline">VALUE FINCH</span>
+    <header className="sticky top-0 z-30 border-b-[1.5px] border-line-strong bg-surface">
+      <div className="mx-auto flex max-w-screen-2xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5 xl:flex-nowrap">
+        <Link to="/" aria-label="Value Finch home" className="tap flex shrink-0 items-center gap-2 rounded-md py-1 pr-1">
+          <Birdhouse className="h-8 w-8 text-ink" />
+          <span className="deed-title text-xl leading-none whitespace-nowrap">Value Finch</span>
         </Link>
-        {/* On phones the command line gets its own full-width row. */}
-        <div className="order-last w-full sm:order-none sm:max-w-2xl sm:flex-1">
+        <nav aria-label="Main" className="order-last -mx-4 w-[calc(100%+2rem)] overflow-x-auto px-4 [scrollbar-width:none] xl:order-none xl:mx-0 xl:w-auto">
+          <ul className="flex gap-1">
+            {NAV.map(([label, to]) => {
+              const active = to === "/" ? pathname === "/" : pathname.startsWith(to);
+              return (
+                <li key={to}>
+                  <Link
+                    to={to}
+                    aria-current={active ? "page" : undefined}
+                    className={`tap block rounded-md px-3 py-1.5 text-sm font-semibold whitespace-nowrap ${
+                      active ? "bg-ink text-surface" : "text-ink hover:bg-subtle"
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+        <div className="order-last w-full xl:order-none xl:ml-auto xl:max-w-md xl:flex-1">
           <CommandBar />
         </div>
-        <span className="ml-auto flex items-center gap-1 sm:gap-2">
+        <span className="ml-auto flex items-center gap-1 xl:ml-0">
           <MarketClock />
           <SavedMenu />
           <button
             onClick={onToggleTheme}
             aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-            className="min-w-11 shrink-0 rounded-sm p-2 text-muted sm:min-w-0 hover:bg-subtle"
+            className="min-w-11 shrink-0 rounded-md p-2 text-ink hover:bg-subtle"
           >
             {theme === "dark" ? (
-              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 2Zm0 13a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 15Zm0-9a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm7.25 3.25a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1 0-1.5h1.5ZM4.25 10a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h1.5a.75.75 0 0 1 .75.75Zm11.06-5.31a.75.75 0 0 1 0 1.06l-1.06 1.06a.75.75 0 1 1-1.06-1.06l1.06-1.06a.75.75 0 0 1 1.06 0ZM6.81 13.19a.75.75 0 0 1 0 1.06l-1.06 1.06a.75.75 0 0 1-1.06-1.06l1.06-1.06a.75.75 0 0 1 1.06 0Zm8.5 2.12a.75.75 0 0 1-1.06 0l-1.06-1.06a.75.75 0 1 1 1.06-1.06l1.06 1.06a.75.75 0 0 1 0 1.06ZM6.81 6.81a.75.75 0 0 1-1.06 0L4.69 5.75a.75.75 0 0 1 1.06-1.06l1.06 1.06a.75.75 0 0 1 0 1.06Z" /></svg>
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 2Zm0 13a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 15Zm0-9a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm7.25 3.25a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1 0-1.5h1.5ZM4.25 10a.75.75 0 0 1-.75.75H2a.75.75 0 0 1 0-1.5h1.5a.75.75 0 0 1 .75.75Zm11.06-5.31a.75.75 0 0 1 0 1.06l-1.06 1.06a.75.75 0 1 1-1.06-1.06l1.06-1.06a.75.75 0 0 1 1.06 0ZM6.81 13.19a.75.75 0 0 1 0 1.06l-1.06 1.06a.75.75 0 0 1-1.06-1.06l1.06-1.06a.75.75 0 0 1 1.06 0Zm8.5 2.12a.75.75 0 0 1-1.06 0l-1.06-1.06a.75.75 0 1 1 1.06-1.06l1.06 1.06a.75.75 0 0 1 0 1.06ZM6.81 6.81a.75.75 0 0 1-1.06 0L4.69 5.75a.75.75 0 0 1 1.06-1.06l1.06 1.06a.75.75 0 0 1 0 1.06Z" /></svg>
             ) : (
-              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M7.455 2.004a.75.75 0 0 1 .26.77 7 7 0 0 0 9.958 7.967.75.75 0 0 1 1.067.853A8.5 8.5 0 1 1 6.647 1.921a.75.75 0 0 1 .808.083Z" clipRule="evenodd" /></svg>
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M7.455 2.004a.75.75 0 0 1 .26.77 7 7 0 0 0 9.958 7.967.75.75 0 0 1 1.067.853A8.5 8.5 0 1 1 6.647 1.921a.75.75 0 0 1 .808.083Z" clipRule="evenodd" /></svg>
             )}
           </button>
         </span>
       </div>
-      <nav aria-label="Functions" className="border-t border-line">
-        <div className="mx-auto flex max-w-screen-2xl gap-1 overflow-x-auto px-3 py-1 [scrollbar-width:none]">
-          {NAV.map(([code, label, to]) => {
-            const active = to === "/" ? pathname === "/" : pathname.startsWith(to);
-            return (
-              <Link
-                key={code}
-                to={to}
-                aria-current={active ? "page" : undefined}
-                className={`tap flex shrink-0 items-center gap-1.5 rounded-sm px-1.5 py-0.5 text-xs whitespace-nowrap transition-colors ${
-                  active ? "bg-subtle text-ink" : "text-muted hover:bg-subtle hover:text-ink"
-                }`}
-              >
-                <span className={`font-mono font-semibold ${active ? "text-accent" : "text-accent dark:text-accent/80"}`}>{code}</span>
-                {label}
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
-      <TickerTape />
     </header>
   );
 }
@@ -101,12 +88,9 @@ function MarketClock() {
   const status = !weekday ? "Closed" : minutes >= 570 && minutes < 960 ? "Open" : minutes >= 240 && minutes < 570 ? "Pre-market" : minutes >= 960 && minutes < 1200 ? "After hours" : "Closed";
   const time = `${parts.hour.padStart(2, "0")}:${parts.minute.padStart(2, "0")}`;
   return (
-    <span className="hidden items-center gap-2 font-mono text-xs whitespace-nowrap lg:flex" title="US and TSX regular trading hours: 9:30 to 4:00 New York time, weekdays (holidays not shown)">
-      <span className="text-muted">NY {time}</span>
-      <span className={`flex items-center gap-1 ${status === "Open" ? "text-gain" : "text-muted"}`}>
-        <span className={`h-1.5 w-1.5 rounded-full ${status === "Open" ? "bg-gain" : "bg-line-strong"}`} />
-        {status.toUpperCase()}
-      </span>
+    <span className="hidden items-center gap-1.5 text-xs whitespace-nowrap xl:flex" title={`New York time ${time}. US and TSX regular trading hours: 9:30 to 4:00 New York time, weekdays (holidays not shown)`}>
+      <span className={`h-2 w-2 rounded-full ${status === "Open" ? "bg-gain" : "bg-muted"}`} />
+      <span className={status === "Open" ? "font-semibold text-gain" : "text-muted"}>Markets {status === "Open" ? "open" : status.toLowerCase()}</span>
     </span>
   );
 }
@@ -228,35 +212,6 @@ function QuoteRow({ symbol, quote, onRemove }: { symbol: string; quote: Overview
           ×
         </button>
       )}
-    </div>
-  );
-}
-
-/** The scrolling ticker tape of world markets, refreshed every 5 minutes. Hover to pause; each item opens World markets. */
-function TickerTape() {
-  const { data } = useApi(marketsApi.board, "board", 5 * 60 * 1000);
-  if (!data) return <div className="h-7 border-t border-line" />;
-  const items = data.flatMap((g) => g.items).filter((q) => q.value !== null);
-  const strip = (copy: number) =>
-    items.map((q) => (
-      <Link
-        key={`${copy}-${q.symbol}`}
-        to="/wei"
-        tabIndex={copy ? -1 : undefined}
-        aria-hidden={copy ? true : undefined}
-        className="flex shrink-0 items-center gap-1.5 px-3 font-mono text-xs whitespace-nowrap hover:bg-subtle"
-      >
-        <span className="text-accent">{q.label.toUpperCase()}</span>
-        <span>{level(q)}</span>
-        <Change value={q.changePercent} bp={q.changeBp} />
-      </Link>
-    ));
-  return (
-    <div className="tape overflow-hidden border-t border-line py-1" style={{ ["--tape-duration" as string]: `${items.length * 4}s` }}>
-      <div className="tape-track flex w-max">
-        {strip(0)}
-        {strip(1)}
-      </div>
     </div>
   );
 }

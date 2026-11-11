@@ -1,0 +1,725 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-11T04:42:54+00:00",
+  "title": "Design System: Value Finch",
+  "extensions": {
+    "colorMeta": {
+      "board": {
+        "role": "neutral",
+        "displayName": "The Board",
+        "canonical": "#d6e7da",
+        "cssVar": "--bg",
+        "darkValue": "#0e1c15",
+        "oklch": "oklch(91.2% 0.025 152.9)",
+        "tonalRamp": [
+          "#080d09",
+          "#1f2621",
+          "#38433b",
+          "#546258",
+          "#76857a",
+          "#9ca89f",
+          "#c4cec6",
+          "#e9f1eb"
+        ]
+      },
+      "card-stock": {
+        "role": "neutral",
+        "displayName": "Card Stock",
+        "canonical": "#fdfdf9",
+        "cssVar": "--surface",
+        "darkValue": "#17221c",
+        "oklch": "oklch(99.3% 0.005 106.5)",
+        "tonalRamp": [
+          "#0b0b0a",
+          "#242422",
+          "#40403d",
+          "#5e5e5b",
+          "#80807d",
+          "#a5a5a2",
+          "#cbcbc8",
+          "#eeeeed"
+        ]
+      },
+      "board-tint": {
+        "role": "neutral",
+        "displayName": "Board Tint",
+        "canonical": "#eef4ef",
+        "cssVar": "--subtle",
+        "darkValue": "#1e2c24",
+        "oklch": "oklch(96.1% 0.009 150.7)",
+        "tonalRamp": [
+          "#0a0c0a",
+          "#222523",
+          "#3d413e",
+          "#5a5f5b",
+          "#7d827e",
+          "#a2a6a2",
+          "#c8cbc9",
+          "#ecefed"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Rule",
+        "canonical": "#cfd9d1",
+        "cssVar": "--line",
+        "darkValue": "#2b3b31",
+        "oklch": "oklch(87.5% 0.015 151.7)",
+        "tonalRamp": [
+          "#090c0a",
+          "#212522",
+          "#3b423d",
+          "#58605a",
+          "#7a837c",
+          "#9fa7a1",
+          "#c6ccc7",
+          "#ebf0ec"
+        ]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Deed Ink",
+        "canonical": "#16181d",
+        "cssVar": "--ink / --line-strong / --accent / --band",
+        "darkValue": "#eef3ef",
+        "oklch": "oklch(20.9% 0.010 268.2)",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#232427",
+          "#3e4044",
+          "#5b5d63",
+          "#7e8086",
+          "#a2a4aa",
+          "#c9cacf",
+          "#edeef2"
+        ]
+      },
+      "ink-soft": {
+        "role": "primary",
+        "displayName": "Soft Ink",
+        "canonical": "#3f4650",
+        "cssVar": "--accent-hover",
+        "darkValue": "#c9d6cc",
+        "oklch": "oklch(39.2% 0.019 257.3)",
+        "tonalRamp": [
+          "#090b0f",
+          "#20242a",
+          "#3b4048",
+          "#575e68",
+          "#7a818b",
+          "#9fa5ae",
+          "#c6cbd2",
+          "#ebeff4"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "#475158",
+        "cssVar": "--muted",
+        "darkValue": "#a6b5ab",
+        "oklch": "oklch(42.9% 0.017 238.4)",
+        "tonalRamp": [
+          "#080c0e",
+          "#1f2529",
+          "#3a4146",
+          "#565f66",
+          "#788289",
+          "#9da6ac",
+          "#c5ccd1",
+          "#eaeff3"
+        ]
+      },
+      "ink-wash": {
+        "role": "neutral",
+        "displayName": "Ink Wash",
+        "canonical": "#e6ece7",
+        "cssVar": "--accent-soft",
+        "darkValue": "#24332a",
+        "oklch": "oklch(93.7% 0.009 150.7)",
+        "tonalRamp": [
+          "#0a0c0a",
+          "#222523",
+          "#3d413e",
+          "#5a5f5b",
+          "#7d827e",
+          "#a2a6a2",
+          "#c8cbc9",
+          "#ecefed"
+        ]
+      },
+      "paper-white": {
+        "role": "neutral",
+        "displayName": "Paper White",
+        "canonical": "#ffffff",
+        "cssVar": "--on-accent / --on-band",
+        "darkValue": "#0e1c15",
+        "oklch": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242424",
+          "#404040",
+          "#5d5d5d",
+          "#808080",
+          "#a4a4a4",
+          "#cacaca",
+          "#eeeeee"
+        ]
+      },
+      "gain": {
+        "role": "tertiary",
+        "displayName": "Gain Green",
+        "canonical": "#137a3f",
+        "cssVar": "--gain",
+        "darkValue": "#5bd394",
+        "oklch": "oklch(51.0% 0.128 151.9)",
+        "tonalRamp": [
+          "#001101",
+          "#002e0f",
+          "#024d24",
+          "#186f3b",
+          "#40945c",
+          "#74b686",
+          "#a5dab2",
+          "#d3fadc"
+        ]
+      },
+      "gain-soft": {
+        "role": "tertiary",
+        "displayName": "Gain Wash",
+        "canonical": "#e0f1e6",
+        "cssVar": "--gain-soft",
+        "darkValue": "#12301f",
+        "oklch": "oklch(94.2% 0.023 157.6)",
+        "tonalRamp": [
+          "#080d09",
+          "#1f2621",
+          "#38433c",
+          "#546159",
+          "#76847b",
+          "#9ca8a0",
+          "#c3cdc7",
+          "#e9f1ec"
+        ]
+      },
+      "loss": {
+        "role": "tertiary",
+        "displayName": "Loss Red",
+        "canonical": "#b8322a",
+        "cssVar": "--loss",
+        "darkValue": "#ff8478",
+        "oklch": "oklch(52.2% 0.172 28.1)",
+        "tonalRamp": [
+          "#230000",
+          "#4b0102",
+          "#751712",
+          "#a32d26",
+          "#ce5246",
+          "#ec8275",
+          "#ffb1a5",
+          "#ffdbd1"
+        ]
+      },
+      "loss-soft": {
+        "role": "tertiary",
+        "displayName": "Loss Wash",
+        "canonical": "#f8e3e1",
+        "cssVar": "--loss-soft",
+        "darkValue": "#3a1b18",
+        "oklch": "oklch(93.2% 0.023 24.1)",
+        "tonalRamp": [
+          "#0f0909",
+          "#2b2121",
+          "#493c3b",
+          "#695958",
+          "#8d7b7a",
+          "#b0a19f",
+          "#d4c7c6",
+          "#f6eceb"
+        ]
+      },
+      "warn": {
+        "role": "tertiary",
+        "displayName": "Caution Ochre",
+        "canonical": "#7f5a00",
+        "cssVar": "--warn",
+        "darkValue": "#f3c84b",
+        "oklch": "oklch(49.4% 0.102 80.7)",
+        "tonalRamp": [
+          "#150800",
+          "#332000",
+          "#543a00",
+          "#785711",
+          "#9d7a37",
+          "#bea06b",
+          "#e0c79d",
+          "#ffeccc"
+        ]
+      },
+      "warn-soft": {
+        "role": "tertiary",
+        "displayName": "Caution Wash",
+        "canonical": "#f8eed2",
+        "cssVar": "--warn-soft",
+        "darkValue": "#2e2711",
+        "oklch": "oklch(95.0% 0.038 90.7)",
+        "tonalRamp": [
+          "#0e0b04",
+          "#282417",
+          "#453f2e",
+          "#655d47",
+          "#888068",
+          "#aba490",
+          "#d0caba",
+          "#f3eee2"
+        ]
+      },
+      "chart-blue": {
+        "role": "tertiary",
+        "displayName": "Chart Blue",
+        "canonical": "#1f55b3",
+        "cssVar": "--info",
+        "darkValue": "#8db2ff",
+        "oklch": "oklch(47.1% 0.160 260.7)",
+        "tonalRamp": [
+          "#000729",
+          "#042052",
+          "#163c7e",
+          "#2959ae",
+          "#4a7ed8",
+          "#78a5f1",
+          "#a7ccff",
+          "#d3f0ff"
+        ]
+      },
+      "band-technology": {
+        "role": "secondary",
+        "displayName": "Technology Band",
+        "canonical": "#1f55b3",
+        "cssVar": "--band (via bandStyle)",
+        "onBand": "#ffffff",
+        "darkValue": "#1f55b3",
+        "oklch": "oklch(47.1% 0.160 260.7)",
+        "tonalRamp": [
+          "#000729",
+          "#042052",
+          "#163c7e",
+          "#2959ae",
+          "#4a7ed8",
+          "#78a5f1",
+          "#a7ccff",
+          "#d3f0ff"
+        ]
+      },
+      "band-financial-services": {
+        "role": "secondary",
+        "displayName": "Financial Services Band",
+        "canonical": "#1d7a46",
+        "cssVar": "--band (via bandStyle)",
+        "onBand": "#ffffff",
+        "darkValue": "#1d7a46",
+        "oklch": "oklch(51.3% 0.118 153.7)",
+        "tonalRamp": [
+          "#001102",
+          "#002d13",
+          "#084d29",
+          "#1e6f40",
+          "#449361",
+          "#77b58a",
+          "#a7d9b5",
+          "#d4fade"
+        ]
+      },
+      "band-healthcare": {
+        "role": "secondary",
+        "displayName": "Healthcare Band",
+        "canonical": "#c9352a",
+        "cssVar": "--band (via bandStyle)",
+        "onBand": "#ffffff",
+        "darkValue": "#c9352a",
+        "oklch": "oklch(55.5% 0.187 28.9)",
+        "tonalRamp": [
+          "#250000",
+          "#4d0000",
+          "#790e09",
+          "#a8251c",
+          "#d44c3e",
+          "#f17e6f",
+          "#ffaea0",
+          "#ffdace"
+        ]
+      },
+      "band-consumer-cyclical": {
+        "role": "secondary",
+        "displayName": "Consumer Cyclical Band",
+        "canonical": "#e8732a",
+        "cssVar": "--band (via bandStyle)",
+        "onBand": "#16181d",
+        "darkValue": "#e8732a",
+        "oklch": "oklch(68.2% 0.166 48.1)",
+        "tonalRamp": [
+          "#210000",
+          "#470b00",
+          "#712200",
+          "#9d3a00",
+          "#c75d15",
+          "#e58a5a",
+          "#ffb791",
+          "#ffe0c3"
+        ]
+      },
+      "band-consumer-defensive": {
+        "role": "secondary",
+        "displayName": "Consumer Defensive Band",
+        "canonical": "#f2b705",
+        "cssVar": "--band (via bandStyle)",
+        "onBand": "#16181d",
+        "darkValue": "#f2b705",
+        "oklch": "oklch(81.1% 0.166 85.0)",
+        "tonalRamp": [
+          "#190600",
+          "#391d00",
+          "#5d3700",
+          "#835300",
+          "#aa7600",
+          "#c99e37",
+          "#e9c67d",
+          "#ffebb5"
+        ]
+      },
+      "band-energy": {
+        "role": "secondary",
+        "displayName": "Energy Band",
+        "canonical": "#7a4424",
+        "cssVar": "--band (via bandStyle)",
+        "onBand": "#ffffff",
+        "darkValue": "#7a4424",
+        "oklch": "oklch(44.6% 0.087 49.7)",
+        "tonalRamp": [
+          "#180600",
+          "#381b0a",
+          "#5b351e",
+          "#815033",
+          "#a87254",
+          "#c8997f",
+          "#e8c1ad",
+          "#ffe7d7"
+        ]
+      },
+      "band-industrials": {
+        "role": "secondary",
+        "displayName": "Industrials Band",
+        "canonical": "#6c3d9a",
+        "cssVar": "--band (via bandStyle)",
+        "onBand": "#ffffff",
+        "darkValue": "#6c3d9a",
+        "oklch": "oklch(46.3% 0.148 304.5)",
+        "tonalRamp": [
+          "#120221",
+          "#2e1546",
+          "#4d2d6e",
+          "#6f469a",
+          "#9368c2",
+          "#b592de",
+          "#d7bcfa",
+          "#f8e4ff"
+        ]
+      },
+      "band-utilities": {
+        "role": "secondary",
+        "displayName": "Utilities Band",
+        "canonical": "#5fb3e6",
+        "cssVar": "--band (via bandStyle)",
+        "onBand": "#16181d",
+        "darkValue": "#5fb3e6",
+        "oklch": "oklch(73.4% 0.110 237.5)",
+        "tonalRamp": [
+          "#000d1d",
+          "#002840",
+          "#004566",
+          "#10658f",
+          "#3a89b6",
+          "#70add3",
+          "#a2d2f1",
+          "#d0f4ff"
+        ]
+      },
+      "band-real-estate": {
+        "role": "secondary",
+        "displayName": "Real Estate Band",
+        "canonical": "#d64a86",
+        "cssVar": "--band (via bandStyle)",
+        "onBand": "#ffffff",
+        "darkValue": "#d64a86",
+        "oklch": "oklch(61.8% 0.183 357.5)",
+        "tonalRamp": [
+          "#22000b",
+          "#490024",
+          "#730f40",
+          "#a0255e",
+          "#cb4b81",
+          "#e97ca5",
+          "#ffaccb",
+          "#ffd8ef"
+        ]
+      },
+      "band-communication-services": {
+        "role": "secondary",
+        "displayName": "Communication Services Band",
+        "canonical": "#13857f",
+        "cssVar": "--band (via bandStyle)",
+        "onBand": "#ffffff",
+        "darkValue": "#13857f",
+        "oklch": "oklch(55.8% 0.093 189.1)",
+        "tonalRamp": [
+          "#00100f",
+          "#002c2a",
+          "#004b47",
+          "#006c67",
+          "#34918b",
+          "#6db3ae",
+          "#a1d7d2",
+          "#d0f8f4"
+        ]
+      },
+      "band-basic-materials": {
+        "role": "secondary",
+        "displayName": "Basic Materials Band",
+        "canonical": "#8a9a1e",
+        "cssVar": "--band (via bandStyle)",
+        "onBand": "#16181d",
+        "darkValue": "#8a9a1e",
+        "oklch": "oklch(65.2% 0.141 117.2)",
+        "tonalRamp": [
+          "#0a0d00",
+          "#222800",
+          "#3c4600",
+          "#596600",
+          "#7b8a17",
+          "#a0ae5b",
+          "#c6d292",
+          "#ebf5c4"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Home hero headline only; 3.5rem below 640px."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Condensed caps section, page and company titles."
+      },
+      "title": {
+        "displayName": "Band Lettering",
+        "purpose": "Lettering inside every deed-card band."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "The big price or index level on a card face; 3.5rem in the company header."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "One-sentence introductions, the hero sentence."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Reading text, held to 65ch."
+      },
+      "table": {
+        "displayName": "Table",
+        "purpose": "Ruled value tables: muted labels, semibold values."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Captions, hints, column heads, footnotes."
+      }
+    },
+    "shadows": [
+      {
+        "name": "lift",
+        "value": "0 2px 6px rgb(22 24 29 / 0.12)",
+        "purpose": "Only for things off the board: the fanned hero hand, dropdown menus, the floating Ask Finch button."
+      },
+      {
+        "name": "frame",
+        "value": "inset 0 0 0 5px var(--surface), inset 0 0 0 6px var(--line-strong)",
+        "purpose": "The inset frame line on every deed card and panel; structural, not elevation."
+      }
+    ],
+    "motion": [
+      {
+        "name": "card-flip",
+        "value": "transform 480ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Deed card turn-over around the vertical axis; none under prefers-reduced-motion."
+      },
+      {
+        "name": "default-transition",
+        "value": "120ms",
+        "purpose": "Tailwind default transition duration; state changes are hard reversals, not fades."
+      },
+      {
+        "name": "ticker-tape",
+        "value": "translateX(-50%) 120s linear infinite",
+        "purpose": "Scrolling ticker tape; pauses on hover, becomes a still scrollable strip under reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone-max",
+        "value": "639px",
+        "note": "44px minimum control height"
+      },
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px",
+        "note": "hero splits into two columns, hand fans"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      },
+      {
+        "name": "container",
+        "value": "1536px"
+      }
+    ],
+    "themes": {
+      "default": "light",
+      "storageKey": "vf-theme",
+      "darkClass": ".dark on <html>",
+      "forceLight": ".force-light (printable tear sheet)",
+      "darkPlainBand": {
+        "band": "#dfe9e2",
+        "onBand": "#0e1c15"
+      }
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one solid action in a context (Research on a card back, search submit); hover is a hard reversal to card stock.",
+      "html": "<button class=\"ds-btn-primary\">Research AAPL</button>",
+      "css": ":host{--bg:#d6e7da;--surface:#fdfdf9;--subtle:#eef4ef;--line:#cfd9d1;--line-strong:#16181d;--ink:#16181d;--muted:#475158;--accent:#16181d;--accent-hover:#3f4650;--on-accent:#fff;--gain:#137a3f;--loss:#b8322a;--band:var(--ink);--on-band:#fff;font-family:Archivo,ui-sans-serif,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink);} .ds-btn-primary{display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--line-strong);border-radius:6px;background:var(--ink);color:var(--surface);padding:8px 16px;font:700 .875rem/1.5 inherit;font-family:inherit;cursor:pointer;} .ds-btn-primary:hover{background:var(--surface);color:var(--ink);} .ds-btn-primary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;} .ds-btn-primary:disabled{opacity:.5;}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Outlined card-stock button for secondary actions (Download CSV, See all markets); hover reverses to ink.",
+      "html": "<button class=\"ds-btn\">See the full markets board</button>",
+      "css": ":host{--bg:#d6e7da;--surface:#fdfdf9;--subtle:#eef4ef;--line:#cfd9d1;--line-strong:#16181d;--ink:#16181d;--muted:#475158;--accent:#16181d;--accent-hover:#3f4650;--on-accent:#fff;--gain:#137a3f;--loss:#b8322a;--band:var(--ink);--on-band:#fff;font-family:Archivo,ui-sans-serif,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink);} .ds-btn{display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--line-strong);border-radius:6px;background:var(--surface);color:var(--ink);padding:6px 14px;font-family:inherit;font-size:.875rem;font-weight:600;cursor:pointer;} .ds-btn:hover{background:var(--ink);color:var(--surface);} .ds-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}"
+    },
+    {
+      "name": "Company Search",
+      "kind": "input",
+      "refersTo": "search-field",
+      "description": "The hero search: card stock, ink border, drawn magnifier, solid ink submit inside the field.",
+      "html": "<form class=\"ds-search\"><svg viewBox=\"0 0 20 20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><circle cx=\"8.5\" cy=\"8.5\" r=\"5.5\"/><path d=\"m13 13 4.5 4.5\"/></svg><input placeholder=\"Search a company, like Apple or Shopify\" aria-label=\"Search a company\"><button type=\"button\">Search</button></form>",
+      "css": ":host{--bg:#d6e7da;--surface:#fdfdf9;--subtle:#eef4ef;--line:#cfd9d1;--line-strong:#16181d;--ink:#16181d;--muted:#475158;--accent:#16181d;--accent-hover:#3f4650;--on-accent:#fff;--gain:#137a3f;--loss:#b8322a;--band:var(--ink);--on-band:#fff;font-family:Archivo,ui-sans-serif,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink);} .ds-search{display:flex;align-items:center;max-width:36rem;border:1.5px solid var(--line-strong);border-radius:8px;background:var(--surface);} .ds-search:focus-within{outline:2px solid var(--accent);outline-offset:2px;} .ds-search svg{width:24px;height:24px;margin-left:16px;color:var(--muted);flex-shrink:0;} .ds-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;padding:16px 10px;font-family:inherit;font-size:1.125rem;color:var(--ink);} .ds-search input::placeholder{color:var(--muted);} .ds-search button{margin:6px;border:0;border-radius:6px;background:var(--ink);color:var(--surface);padding:12px 24px;font-family:inherit;font-weight:700;font-size:1rem;cursor:pointer;}"
+    },
+    {
+      "name": "Top Navigation",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Plain-word links in the card-stock top bar; the current page is a solid ink block.",
+      "html": "<nav class=\"ds-nav\"><span class=\"ds-mark\">Value Finch</span><a href=\"#\" aria-current=\"page\">Markets</a><a href=\"#\">Movers</a><a href=\"#\">Screener</a><a href=\"#\">Learn</a><a href=\"#\">Puzzle</a></nav>",
+      "css": ":host{--bg:#d6e7da;--surface:#fdfdf9;--subtle:#eef4ef;--line:#cfd9d1;--line-strong:#16181d;--ink:#16181d;--muted:#475158;--accent:#16181d;--accent-hover:#3f4650;--on-accent:#fff;--gain:#137a3f;--loss:#b8322a;--band:var(--ink);--on-band:#fff;font-family:Archivo,ui-sans-serif,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink);} .ds-nav{display:flex;align-items:center;gap:4px;padding:10px 16px;background:var(--surface);border-bottom:1.5px solid var(--line-strong);} .ds-mark{font-stretch:75%;font-weight:800;text-transform:uppercase;letter-spacing:.02em;font-size:1.4375rem;margin-right:16px;} .ds-nav a{padding:6px 12px;border-radius:6px;font-size:.875rem;font-weight:600;color:var(--ink);text-decoration:none;} .ds-nav a:hover{background:var(--subtle);} .ds-nav a[aria-current=page]{background:var(--ink);color:var(--surface);} .ds-nav a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}"
+    },
+    {
+      "name": "Segmented Control",
+      "kind": "chip",
+      "refersTo": "segmented-option",
+      "description": "Range and region switches; the selected option is a solid ink block.",
+      "html": "<div class=\"ds-seg\" role=\"group\" aria-label=\"Range\"><button>1M</button><button>6M</button><button aria-pressed=\"true\">1Y</button><button>5Y</button></div>",
+      "css": ":host{--bg:#d6e7da;--surface:#fdfdf9;--subtle:#eef4ef;--line:#cfd9d1;--line-strong:#16181d;--ink:#16181d;--muted:#475158;--accent:#16181d;--accent-hover:#3f4650;--on-accent:#fff;--gain:#137a3f;--loss:#b8322a;--band:var(--ink);--on-band:#fff;font-family:Archivo,ui-sans-serif,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink);} .ds-seg{display:inline-flex;overflow:hidden;border:1.5px solid var(--line-strong);border-radius:6px;background:var(--surface);} .ds-seg button{border:0;background:transparent;color:var(--ink);padding:2px 10px;font-family:inherit;font-size:.8125rem;font-weight:600;cursor:pointer;} .ds-seg button:hover{background:var(--subtle);} .ds-seg button[aria-pressed=true]{background:var(--ink);color:var(--surface);} .ds-seg button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;}"
+    },
+    {
+      "name": "Ticker Chip",
+      "kind": "chip",
+      "refersTo": "ticker-chip",
+      "description": "Example companies under the hero search; hover reverses to ink.",
+      "html": "<span class=\"ds-chips\">Or try <a href=\"#\">Apple</a><a href=\"#\">Shopify</a><a href=\"#\">Royal Bank</a></span>",
+      "css": ":host{--bg:#d6e7da;--surface:#fdfdf9;--subtle:#eef4ef;--line:#cfd9d1;--line-strong:#16181d;--ink:#16181d;--muted:#475158;--accent:#16181d;--accent-hover:#3f4650;--on-accent:#fff;--gain:#137a3f;--loss:#b8322a;--band:var(--ink);--on-band:#fff;font-family:Archivo,ui-sans-serif,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink);} .ds-chips{display:flex;align-items:center;gap:8px;font-size:.875rem;color:var(--muted);} .ds-chips a{border:1.5px solid var(--line-strong);border-radius:6px;background:var(--surface);color:var(--ink);padding:4px 12px;font-weight:600;text-decoration:none;} .ds-chips a:hover{background:var(--ink);color:var(--surface);} .ds-chips a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}"
+    },
+    {
+      "name": "Deed Card",
+      "kind": "card",
+      "refersTo": "deed-card",
+      "description": "The signature card: sector band, ticker and signed change, big price, ruled value table, tap hint. Taps turn it over to plain-English explanations.",
+      "html": "<button class=\"ds-deed ds-card\" style=\"--band:#1f55b3;--on-band:#fff\"><div class=\"ds-band\">Nvidia Corporation</div><div class=\"ds-row1\"><b>NVDA</b><span class=\"ds-up\">+1.48% today</span></div><div class=\"ds-fig\">$168.89</div><dl><div><dt>Sector</dt><dd>Technology</dd></div><div><dt>Company value</dt><dd>5.16T</dd></div><div><dt>Traded today</dt><dd>72.05B</dd></div></dl><span class=\"ds-hint\">Tap to turn over</span></button>",
+      "css": ":host{--bg:#d6e7da;--surface:#fdfdf9;--subtle:#eef4ef;--line:#cfd9d1;--line-strong:#16181d;--ink:#16181d;--muted:#475158;--accent:#16181d;--accent-hover:#3f4650;--on-accent:#fff;--gain:#137a3f;--loss:#b8322a;--band:var(--ink);--on-band:#fff;font-family:Archivo,ui-sans-serif,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink);} .ds-deed{background:var(--surface);border:1.5px solid var(--line-strong);border-radius:8px;box-shadow:inset 0 0 0 5px var(--surface),inset 0 0 0 6px var(--line-strong);color:var(--ink);} .ds-band{display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 8px 0;padding:8px 12px;border-radius:3px;background:var(--band);color:var(--on-band);font-stretch:75%;font-weight:800;letter-spacing:.04em;text-transform:uppercase;} .ds-card{display:flex;flex-direction:column;width:14rem;aspect-ratio:5/7;padding:0;text-align:left;font-family:inherit;cursor:pointer;box-shadow:inset 0 0 0 5px var(--surface),inset 0 0 0 6px var(--line-strong),0 2px 6px rgb(22 24 29/.12);} .ds-card .ds-band{min-height:4.25rem;font-size:1.1875rem;line-height:1.2;text-align:center;} .ds-row1{display:flex;justify-content:space-between;align-items:baseline;margin:12px 16px 0;font-size:.875rem;} .ds-row1 b{font-stretch:75%;font-weight:800;text-transform:uppercase;letter-spacing:.02em;} .ds-up{color:var(--gain);font-weight:700;} .ds-fig{margin:4px 16px 0;font-size:2.5rem;line-height:1.05;font-weight:800;letter-spacing:-.025em;} .ds-card dl{margin:12px 16px 0;border-top:1px solid var(--line);font-size:.875rem;} .ds-card dl div{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);} .ds-card dt{color:var(--muted);} .ds-card dd{margin:0;font-weight:600;} .ds-hint{margin:auto 16px 12px;padding-top:12px;text-align:center;font-size:.8125rem;color:var(--muted);} .ds-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}"
+    },
+    {
+      "name": "Panel",
+      "kind": "card",
+      "refersTo": "deed-band",
+      "description": "A content panel: the same card with an ink (or sector) band carrying its title in condensed caps.",
+      "html": "<section class=\"ds-deed ds-panel\"><header class=\"ds-band\" style=\"justify-content:space-between\">Key numbers</header><dl><div><dt>Market cap</dt><dd>5.06T</dd></div><div><dt>Dividend yield</dt><dd>0.31%</dd></div><div><dt>Beta (5Y monthly)</dt><dd>1.09</dd></div></dl></section>",
+      "css": ":host{--bg:#d6e7da;--surface:#fdfdf9;--subtle:#eef4ef;--line:#cfd9d1;--line-strong:#16181d;--ink:#16181d;--muted:#475158;--accent:#16181d;--accent-hover:#3f4650;--on-accent:#fff;--gain:#137a3f;--loss:#b8322a;--band:var(--ink);--on-band:#fff;font-family:Archivo,ui-sans-serif,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink);} .ds-deed{background:var(--surface);border:1.5px solid var(--line-strong);border-radius:8px;box-shadow:inset 0 0 0 5px var(--surface),inset 0 0 0 6px var(--line-strong);color:var(--ink);} .ds-band{display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 8px 0;padding:8px 12px;border-radius:3px;background:var(--band);color:var(--on-band);font-stretch:75%;font-weight:800;letter-spacing:.04em;text-transform:uppercase;} .ds-panel{max-width:24rem;padding-bottom:8px;} .ds-panel .ds-band{font-size:.875rem;} .ds-panel dl{margin:0 8px;padding:12px;font-size:.875rem;} .ds-panel dl div{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);} .ds-panel dl div:last-child{border-bottom:0;} .ds-panel dt{color:var(--muted);} .ds-panel dd{margin:0;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Deed Card Board",
+    "overview": "Every company is a property deed card a beginner already knows how to read: a coloured band carrying the name, a big price, and a short ruled table of what it is worth. The page is the board those cards sit on, a pale green field; the cards are off-white stock with a dark edge and a thin frame line drawn just inside it. The site refuses both the dark trading-terminal dashboard and the generic white fintech card grid: there is one card anatomy, used for hero movers, index cards, company headers and every content panel alike, so rows compare at a glance.\n\nThe system is flat and printed. Colour lives only in the bands; everything a visitor reads is black ink on card stock, set in one family (Archivo) at two widths, condensed heavy caps for card lettering and normal width for reading, with tabular figures everywhere so columns of numbers line up. Interaction is a hard two-state reversal, ink to card and card to ink, never a fade or tint. The signature move is the turn-over: a deed card flips on tap to a back that explains its numbers in plain English, and flips back on a second tap.\n\nDark mode is the same board at night: deep felt green, dark card stock, light ink, and plain bands that go light with dark lettering. Light is the default; the visitor's choice is remembered under the `vf-theme` key and applied before paint. The printable tear sheet is forced light.",
+    "keyCharacteristics": [
+      "Pale green board ground, off-white card stock, black ink.",
+      "One card anatomy everywhere: dark edge, inset frame line, band, ruled value table.",
+      "Colour only in card bands; sector colour on company pages, plain ink bands elsewhere.",
+      "Archivo only, at 75 to 80% width for lettering and 100% for reading; tabular figures throughout.",
+      "Hard ink/card reversals for hover and active states.",
+      "Cards turn over on tap to explain their numbers."
+    ],
+    "rules": [
+      {
+        "name": "The Band-Only Colour Rule",
+        "body": "Colour lives in card bands. Everything a visitor reads stays ink on card stock; the only other hues allowed are the gain/loss/caution signals and chart series.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ink Link Rule",
+        "body": "Links are ink with a 3px-offset underline, never a brand colour. Inline links in running text are bold and underlined; the hover darkens to soft ink.",
+        "section": "colors"
+      },
+      {
+        "name": "The Signed Number Rule",
+        "body": "A gain or loss is never carried by colour alone: every change shows a sign (+/-) or a drawn triangle beside the green or red.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Widths Rule",
+        "body": "One family, two widths: condensed heavy caps for anything that is a card's lettering (bands, card titles, section headlines, the wordmark), normal width for everything read as sentences or numbers.",
+        "section": "typography"
+      },
+      {
+        "name": "The Lying Flat Rule",
+        "body": "Cards on the board cast no shadow; only a dealt hand, a menu or a floating control lifts, and only with the soft Lift shadow.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do put colour in the band and nowhere else on a card; set it with `bandStyle(sector)`, on the page wrapper for a company page.",
+      "Do use the same card anatomy (edge, inset frame, band, figure, ruled table) for every new company, index or data panel.",
+      "Do make hover and active states a hard reversal between ink and card stock.",
+      "Do sign every change (+/-) or pair it with a drawn triangle, alongside the gain/loss colour.",
+      "Do draw icons as inline SVG in one stroke weight that inherit the text colour, as in `Icons.tsx`.",
+      "Do keep 44px minimum touch targets at phone width and respect reduced motion on the flip and ticker tape."
+    ],
+    "donts": [
+      "Don't colour links, headings or body text; links are ink and underlined.",
+      "Don't add a turn-back button to a card; the second tap on the back turns it over.",
+      "Don't use typographic glyphs (arrows, triangles, stars typed as characters) as icons.",
+      "Don't put small uppercase eyebrow labels above headings; the band is the only label a card carries.",
+      "Don't cast shadows from cards lying on the board, and don't use hard offset shadows anywhere.",
+      "Don't introduce a second typeface or a monospace; figures use Archivo's tabular numerals.",
+      "Don't fade or tint on hover; reverse."
+    ]
+  }
+}

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { HintFinch } from "../components/Finch";
 import { Clue, GameCompany, GameGuess, GameHint, GameHintKind, GameToday, gameApi } from "../api";
 import * as fmt from "../format";
+import { ArrowRight, Trend } from "../components/Icons";
 import { keys, load, save, useStored } from "../storage";
 
 type Stats = { played: number; won: number; streak: number; best: number };
@@ -164,7 +165,7 @@ function Board({ today }: { today: GameToday }) {
       </div>
 
       <p className="text-xs leading-relaxed text-muted">
-        ▲ means the mystery company's number is higher than your guess, ▼ lower. Green means a match: same sector or listing,
+        <Trend dir="up" /> means the mystery company's number is higher than your guess, <Trend dir="down" /> lower. Green means a match: same sector or listing,
         market cap or P/E within 10%, dividend yield within 0.25 points, 1-year return within 5 points. Market caps are in US
         dollars. Figures are from a market snapshot dated {today.snapshotDate}. A new puzzle starts at midnight Toronto time.
       </p>
@@ -228,7 +229,7 @@ function GuessRow({ g }: { g: GameGuess }) {
       <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-6">
         {TILES.map((t) => {
           const clue = g.clues[t.key];
-          const arrow = clue === "higher" ? "▲" : clue === "lower" ? "▼" : "";
+          const arrow = clue === "higher" ? <Trend dir="up" /> : clue === "lower" ? <Trend dir="down" /> : null;
           return (
             <div
               key={t.key}
@@ -300,7 +301,7 @@ function Result({ today, guesses, hints, won, answer }: { today: GameToday; gues
               to={`/company/${encodeURIComponent(answer.symbol)}`}
               className="tap mt-1 text-sm font-medium text-accent underline"
             >
-              Research {answer.symbol} →
+              Research {answer.symbol} <ArrowRight />
             </Link>
           </div>
         )}

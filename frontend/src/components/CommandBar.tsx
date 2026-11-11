@@ -102,8 +102,9 @@ export default function CommandBar({ large = false }: { large?: boolean }) {
           out.push({ kind: "fn", code: f.code, label: `${ticker} ${f.code}`, detail: f.name, path: companyPath(ticker, f.tab) });
       }
     }
-    const fns = words.length ? out.slice(0, 6) : out;
-    return [...fns, ...results.slice(0, 8).map((r): Suggestion => ({ kind: "ticker", ...r }))];
+    // Companies first, then a few matching screens; an empty box shows only the hint.
+    const fns = words.length ? out.slice(0, 4) : [];
+    return [...results.slice(0, 8).map((r): Suggestion => ({ kind: "ticker", ...r })), ...fns];
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, results, symbol]);
 
@@ -162,10 +163,11 @@ export default function CommandBar({ large = false }: { large?: boolean }) {
 
   return (
     <div ref={boxRef} className="relative w-full">
-      <div className="flex items-center rounded-sm border border-line-strong bg-bg focus-within:border-accent">
-        <span className={`pl-2.5 font-mono font-semibold text-accent ${large ? "pl-4 text-lg" : "text-sm"}`} aria-hidden>
-          &gt;
-        </span>
+      <div className={`flex items-center border-[1.5px] border-line-strong bg-surface focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent ${large ? "rounded-lg" : "rounded-md"}`}>
+        <svg className={`shrink-0 text-muted ${large ? "ml-4 h-6 w-6" : "ml-2.5 h-4 w-4"}`} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+          <circle cx="8.5" cy="8.5" r="5.5" />
+          <path d="m13 13 4.5 4.5" />
+        </svg>
         <input
           ref={inputRef}
           value={query}
@@ -175,24 +177,24 @@ export default function CommandBar({ large = false }: { large?: boolean }) {
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={onKeyDown}
-          placeholder={large ? "Company or ticker, e.g. Apple" : symbol ? `${symbol} GP, WEI, a ticker or a company` : "Ticker, company or function: AAPL GP, RY.TO, WEI"}
-          aria-label="Command: a ticker, company name or function code"
+          placeholder={large ? "Search a company, like Apple or Shopify" : "Search a company or ticker"}
+          aria-label="Search a company by name or ticker"
           autoComplete="off"
           spellCheck={false}
-          className={`min-w-0 flex-1 bg-transparent px-2 font-mono text-ink uppercase outline-none placeholder:normal-case placeholder:text-muted ${large ? "py-3 text-base" : "py-1.5 text-sm"}`}
+          className={`min-w-0 flex-1 bg-transparent px-2.5 text-ink outline-none placeholder:text-muted ${large ? "py-4 text-lg" : "py-1.5 text-sm"}`}
         />
-        {!large && <kbd className="mr-1.5 hidden rounded-sm border border-line px-1.5 font-mono text-xs text-muted sm:inline">/</kbd>}
+        {!large && <kbd className="mr-2 hidden rounded border border-line px-1.5 text-xs text-muted sm:inline">/</kbd>}
         <button
           onMouseDown={(e) => e.preventDefault()}
           onClick={run}
-          className={`tap-exempt rounded-r-sm bg-accent font-mono font-semibold text-on-accent ${large ? "px-5 py-3 text-sm" : "hidden px-2.5 py-1.5 text-xs sm:block"}`}
+          className={`tap-exempt bg-ink font-bold text-surface hover:bg-subtle hover:text-ink ${large ? "m-1.5 rounded-md px-6 py-3 text-base" : "hidden rounded-r-[5px] px-3 py-1.5 text-xs sm:block"}`}
         >
-          GO
+          Search
         </button>
       </div>
 
       {open && (
-        <ul className="absolute z-40 mt-1 max-h-[70vh] w-full min-w-80 overflow-auto rounded-sm border border-line-strong bg-surface py-1 shadow-sm">
+        <ul className="absolute z-40 mt-1 max-h-[70vh] w-full min-w-80 overflow-auto rounded-md border-[1.5px] border-line-strong bg-surface py-1 shadow-sm">
           {suggestions.map((s, i) => (
             <li key={s.kind === "fn" ? `fn-${s.label}` : `t-${s.symbol}`}>
               <button
@@ -203,12 +205,12 @@ export default function CommandBar({ large = false }: { large?: boolean }) {
               >
                 {s.kind === "fn" ? (
                   <>
-                    <span className="w-28 shrink-0 font-mono font-semibold text-accent">{s.label}</span>
-                    <span className="min-w-0 flex-1 truncate text-muted">{s.detail}</span>
+                    <span className="min-w-0 flex-1 truncate font-semibold">{s.detail}</span>
+                    <span className="shrink-0 text-xs text-muted">{s.label}</span>
                   </>
                 ) : (
                   <>
-                    <span className="w-28 shrink-0 font-mono font-semibold">{s.symbol}</span>
+                    <span className="w-24 shrink-0 font-bold">{s.symbol}</span>
                     <span className="min-w-0 flex-1 truncate text-muted">{s.name}</span>
                     <span className="shrink-0 text-xs text-muted">{s.exchange}</span>
                   </>
@@ -219,8 +221,8 @@ export default function CommandBar({ large = false }: { large?: boolean }) {
           {loading && !results.length && <li className="px-3 py-1.5 text-sm text-muted">Searching companies…</li>}
           {!query && (
             <li className="border-t border-line px-3 pt-2 pb-1 text-xs text-muted">
-              Type a ticker then a function, like <span className="font-mono text-ink">AAPL GP</span>, and press Enter. Type{" "}
-              <span className="font-mono text-ink">ASK</span> for the AI assistant.
+              Type a company name or ticker, like <span className="font-semibold text-ink">Apple</span> or{" "}
+              <span className="font-semibold text-ink">RY.TO</span> for Royal Bank, then press Enter.
             </li>
           )}
         </ul>

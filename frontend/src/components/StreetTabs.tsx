@@ -3,6 +3,7 @@ import { useState } from "react";
 import { RatingMonth, companyApi } from "../api";
 import * as fmt from "../format";
 import { useApi } from "../useApi";
+import { Trend } from "./Icons";
 import { Panel, PanelState } from "./Terminal";
 
 // Diverging scale: greens for buy, neutral grey for hold, reds for sell. Each segment is also labelled.
@@ -113,7 +114,7 @@ export function AnalystsTab({ ticker, price, currency }: { ticker: string; price
                       <td className={`px-2 py-1.5 text-right ${beat ? "text-gain" : miss ? "text-loss" : "text-muted"}`}>
                         {s.surprisePercent === null ? "N/A" : `${fmt.signed(s.surprisePercent, 1)}%`}
                       </td>
-                      <td className="py-1.5 pr-3 pl-2 font-sans">{beat ? "▲ Beat" : miss ? "▼ Missed" : "In line"}</td>
+                      <td className="py-1.5 pr-3 pl-2 font-sans">{beat ? <><Trend dir="up" /> Beat</> : miss ? <><Trend dir="down" /> Missed</> : "In line"}</td>
                     </tr>
                   );
                 })}
