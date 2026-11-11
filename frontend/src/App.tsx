@@ -5,7 +5,7 @@ import TopBar from "./components/TopBar";
 import Company from "./pages/Company";
 import Game from "./pages/Game";
 import {
-  EarningsScreen, EconomyScreen, HelpScreen, MarketsHome, MonitorScreen, MoversScreen, RatesScreen, ScreenerScreen, WorldScreen,
+  EarningsScreen, EconomyScreen, HelpScreen, MarketsBoardScreen, MarketsHome, MonitorScreen, MoversScreen, RatesScreen, ScreenerScreen, WorldScreen,
 } from "./pages/Markets";
 import { About, Contact, HowItWorks, NotFound, Privacy, Terms } from "./pages/Info";
 import Learn from "./pages/Learn";
@@ -43,6 +43,7 @@ export default function App() {
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<MarketsHome />} />
+          <Route path="/markets" element={<MarketsBoardScreen />} />
           <Route path="/wei" element={<WorldScreen />} />
           <Route path="/most" element={<MoversScreen />} />
           <Route path="/rates" element={<RatesScreen />} />

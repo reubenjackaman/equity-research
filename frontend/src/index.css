@@ -4,49 +4,56 @@
    Anything inside a "force-light" element (the printable tear sheet) always stays light. */
 @custom-variant dark (&:where(.dark, .dark *):not(:where(.force-light, .force-light *)));
 
-/* The one source of truth for colour. Components use these names (bg-surface, text-muted...),
-   and dark mode swaps the values here. */
+/* Value Finch's look: deed cards on a board. The page ground is the board's pale green field,
+   panels are white card stock with an inset frame line, and colour lives only in each card's
+   sector band. Components use these names (bg-surface, text-muted...); dark mode swaps the values. */
 :root,
 .force-light {
-  --bg: #eef0f3;
-  --surface: #ffffff;
-  --subtle: #e5e8ec;
-  --line: #d3d8de;
-  --line-strong: #a3acb7;
-  --ink: #0e1116;
-  --muted: #4f5a66;
-  --accent: #9a5000;
-  --accent-hover: #7a3f00;
-  --accent-soft: #fbefdf;
+  --bg: #d6e7da; /* the board */
+  --surface: #fdfdf9; /* card stock */
+  --subtle: #eef4ef;
+  --line: #cfd9d1; /* rules inside a card */
+  --line-strong: #16181d; /* a card's edge and frame */
+  --ink: #16181d;
+  --muted: #475158;
+  --accent: #16181d; /* links are ink with an underline: colour lives only in the bands */
+  --accent-hover: #3f4650;
+  --accent-soft: #e6ece7;
   --on-accent: #ffffff;
-  --gain: #0f7a43;
-  --gain-soft: #e2f3e9;
-  --loss: #c22d24;
-  --loss-soft: #fbe6e4;
-  --warn: #7f5c00;
-  --warn-soft: #f8efd5;
-  --info: #0b63bd;
+  --gain: #137a3f;
+  --gain-soft: #e0f1e6;
+  --loss: #b8322a;
+  --loss-soft: #f8e3e1;
+  --warn: #7f5a00;
+  --warn-soft: #f8eed2;
+  --info: #1f55b3;
+  --band: var(--ink);
+  --on-band: #ffffff;
+  color-scheme: light;
 }
-/* The terminal look: near-black panels, amber for function keys and headings, green/red for moves. */
+/* The board at night: deep felt green, dark card stock, light ink. */
 .dark:not(.force-light) {
-  --bg: #07090c;
-  --surface: #0f1318;
-  --subtle: #171c23;
-  --line: #232b35;
-  --line-strong: #3b4654;
-  --ink: #e7eaee;
-  --muted: #95a1af;
-  --accent: #ffa31a;
-  --accent-hover: #ffbb52;
-  --accent-soft: #2a1e0c;
-  --on-accent: #07090c;
-  --gain: #35d07f;
-  --gain-soft: #0f2419;
-  --loss: #ff6159;
-  --loss-soft: #2c1413;
+  --bg: #0e1c15;
+  --surface: #17221c;
+  --subtle: #1e2c24;
+  --line: #2b3b31;
+  --line-strong: #a9bdb0;
+  --ink: #eef3ef;
+  --muted: #a6b5ab;
+  --accent: #eef3ef;
+  --accent-hover: #c9d6cc;
+  --accent-soft: #24332a;
+  --on-accent: #0e1c15;
+  --gain: #5bd394;
+  --gain-soft: #12301f;
+  --loss: #ff8478;
+  --loss-soft: #3a1b18;
   --warn: #f3c84b;
-  --warn-soft: #2a2310;
-  --info: #5cb8ff;
+  --warn-soft: #2e2711;
+  --info: #8db2ff;
+  --band: #dfe9e2; /* plain bands go light at night, with dark lettering */
+  --on-band: #0e1c15;
+  color-scheme: dark;
 }
 .dark .force-light {
   color: var(--ink);
@@ -74,36 +81,37 @@
 }
 
 @theme {
-  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  /* The terminal design has one text face; headings that used the old serif now use Plex Sans too. */
-  --font-serif: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* One family, Archivo, at two widths: condensed heavy caps for card titles, normal width for reading.
+     Figures are always tabular so columns of numbers line up. */
+  --font-sans: "Archivo", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "Archivo", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Numbers used to be set in a monospace; they now use Archivo's tabular figures. */
+  --font-mono: "Archivo", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  /* Dense type scale for a data screen: 14px base. */
-  --text-xs: 0.75rem;
+  --text-xs: 0.8125rem;
   --text-xs--line-height: 1.4;
-  --text-sm: 0.8125rem;
-  --text-sm--line-height: 1.45;
-  --text-base: 0.875rem;
-  --text-base--line-height: 1.55;
-  --text-lg: 1.0625rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1rem;
+  --text-base--line-height: 1.6;
+  --text-lg: 1.1875rem;
   --text-lg--line-height: 1.35;
-  --text-xl: 1.3125rem;
+  --text-xl: 1.4375rem;
   --text-xl--line-height: 1.25;
-  --text-2xl: 1.625rem;
-  --text-2xl--line-height: 1.2;
-  --text-3xl: 2rem;
-  --text-3xl--line-height: 1.15;
-  --text-4xl: 2.5rem;
-  --text-4xl--line-height: 1.1;
+  --text-2xl: 1.875rem;
+  --text-2xl--line-height: 1.15;
+  --text-3xl: 2.5rem;
+  --text-3xl--line-height: 1.05;
+  --text-4xl: 3.5rem;
+  --text-4xl--line-height: 1;
 
-  --shadow-sm: 0 1px 2px rgb(31 27 26 / 0.08);
-  --default-transition-duration: 150ms;
+  --shadow-sm: 0 2px 6px rgb(22 24 29 / 0.12);
+  --default-transition-duration: 120ms;
 }
 
 @layer base {
   html {
-    scroll-padding-top: 7rem;
+    scroll-padding-top: 6rem;
   }
   body {
     @apply bg-bg font-sans text-base text-ink antialiased;
@@ -113,45 +121,114 @@
   h2,
   h3 {
     font-family: var(--font-sans);
-    font-weight: 600;
-    letter-spacing: -0.005em;
+    font-weight: 750;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
   }
-  /* Figures line up in columns, like a terminal. */
   table,
   .mono {
-    font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
-  }
-  table th {
-    font-family: var(--font-sans);
   }
   a {
     text-underline-offset: 3px;
+  }
+  ::selection {
+    background: var(--accent);
+    color: var(--on-accent);
   }
   :focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
+  input {
+    caret-color: var(--accent);
+  }
 }
 
 @layer components {
-  /* A panel on the terminal screen: a bordered box on the surface colour. */
+  /* A deed card: card stock with a dark edge and a thin frame line drawn just inside it. */
+  .deed,
   .card {
-    @apply mt-3 border border-line bg-surface p-4;
+    background: var(--surface);
+    border: 1.5px solid var(--line-strong);
+    border-radius: 8px;
+    box-shadow:
+      inset 0 0 0 5px var(--surface),
+      inset 0 0 0 6px var(--line-strong);
   }
-  /* A panel's title strip: amber, upper case, with an optional function code. */
+  .card {
+    @apply mt-3 p-5;
+  }
+  /* The coloured band at the top of a deed card. Its colour comes from --band (see sectors.ts). */
+  .deed-band,
   .panel-head {
-    @apply flex items-center justify-between gap-2 border-b border-line bg-subtle px-3 py-1.5 text-xs font-semibold tracking-wider text-accent uppercase;
+    @apply flex items-center justify-between gap-2 px-3 py-2;
+    margin: 8px 8px 0;
+    border-radius: 3px;
+    background: var(--band);
+    color: var(--on-band);
+    font-stretch: 75%;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
-  /* A function key: the short code (GP, DES, WEI...) that opens a screen. */
+  /* Card titles and big labels: condensed heavy caps, the lettering of a deed card. */
+  .deed-title {
+    font-stretch: 75%;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+  /* Old function codes (DES, GP, WEI). Kept as a quiet label where they still appear. */
   .fkey {
-    @apply inline-flex items-center rounded-sm bg-accent px-1.5 font-mono text-xs leading-5 font-semibold text-on-accent;
+    @apply inline-flex items-center rounded-sm border border-line-strong px-1.5 text-xs leading-5 font-bold;
+    font-stretch: 75%;
   }
   .btn {
-    @apply inline-flex items-center justify-center rounded-sm border border-line-strong bg-transparent px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-subtle disabled:opacity-50;
+    @apply inline-flex items-center justify-center rounded-md border-[1.5px] border-line-strong bg-surface px-3.5 py-1.5 text-sm font-semibold text-ink hover:bg-ink hover:text-surface disabled:opacity-50;
+  }
+  /* The one solid button: ink that reverses to the board colour's opposite on hover. */
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-md border-[1.5px] border-line-strong bg-ink px-4 py-2 text-sm font-bold text-surface hover:bg-surface hover:text-ink disabled:opacity-50;
   }
   .prose-width {
     max-width: 65ch;
+  }
+}
+
+/* The deed card's turn-over: a quick, eased flip around the vertical axis. People who prefer
+   reduced motion get an instant swap. The front sits in normal flow, so the card is always as tall
+   as its content (nothing can run into the frame line); the back is laid over it and scrolls if it
+   has more to say. Cards in the same row stretch to the tallest. */
+.deed-flip,
+.deed-flip-inner {
+  height: 100%;
+}
+.deed-flip {
+  perspective: 1400px;
+}
+.deed-flip-inner {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 480ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.deed-flip.is-back .deed-flip-inner {
+  transform: rotateY(180deg);
+}
+.deed-face {
+  width: 100%;
+  min-height: 100%;
+  backface-visibility: hidden;
+}
+.deed-back {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  transform: rotateY(180deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .deed-flip-inner {
+    transition: none;
   }
 }
 
