@@ -20,7 +20,7 @@ const FIELDS: { key: Key; label: string; kind: "pct" | "num"; help: string }[] =
 
 const WACC_FIELDS: { key: Key; label: string; kind: "pct" | "num"; help: string }[] = [
   { key: "risk_free", label: "Risk-free rate", kind: "pct", help: "Default: today's 10-year US Treasury yield." },
-  { key: "beta", label: "Beta", kind: "num", help: "Default: Blume-adjusted beta = 0.67 × raw beta + 0.33. Raw betas tend to drift toward 1." },
+  { key: "beta", label: "Beta", kind: "num", help: "Default: Blume-adjusted beta = 0.67 × raw beta + 0.33, with raw beta capped at 2.0. Raw betas tend to drift toward 1, and ones above 2 usually reflect a single boom or crash." },
   { key: "erp", label: "Equity risk premium", kind: "pct", help: "Extra return investors demand for owning stocks over Treasuries. 5% is a common assumption." },
   { key: "cost_of_debt", label: "Pre-tax cost of debt", kind: "pct", help: "Default: interest expense ÷ average debt, or risk-free + 1.5% if interest isn't reported." },
 ];
@@ -152,6 +152,13 @@ function Summary({ data, onExport }: { data: Dcf; onExport: () => void }) {
                 : `${up ? "+" : ""}${(v.upside * 100).toFixed(1)}% ${up ? "upside" : "downside"}`}
             </span>
           </div>
+          {data.reverse.growth !== null && (
+            <p className="mt-2 text-xs text-muted">
+              Today's price implies about{" "}
+              <strong className="font-semibold text-ink">{fmt.signed(data.reverse.growth * 100, 1)}%</strong> revenue growth a year
+              for {data.reverse.years} years (see What's priced in).
+            </p>
+          )}
           <dl className="mt-4 divide-y divide-line text-sm">
             <Row label="PV of forecast cash flows" value={fmt.big(v.pvFcf)} />
             <Row label="PV of terminal value" value={fmt.big(v.pvTerminal)} />
