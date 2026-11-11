@@ -22,7 +22,10 @@ centres). Holding today's capex in the perpetuity would assume that spending nev
 
 WACC (CAPM):
     Cost of equity = Risk-free rate + Beta × Equity risk premium
-    Beta default   = 0.67 × raw beta + 0.33 × 1.0   (Blume adjustment: betas drift toward 1 over time)
+    Beta default   = 0.67 × min(raw beta, 2.0) + 0.33 × 1.0
+                     (Blume adjustment: betas drift toward 1 over time. Raw beta is capped at 2.0 because a
+                     5-year beta above that usually reflects one crash or bubble rather than lasting risk:
+                     Shopify's 2.66 comes mostly from its 2021-22 boom and bust.)
     WACC           = E/(D+E) × Cost of equity + D/(D+E) × Cost of debt × (1 − tax rate)
     E = market cap, D = total debt (book value)
 
@@ -43,6 +46,7 @@ DEFAULT_ERP = 0.05            # equity risk premium; long-run US estimates are r
 DEFAULT_TERMINAL_GROWTH = 0.025
 DEFAULT_RISK_FREE = 0.045     # used only if the 10-year Treasury yield can't be fetched
 DEFAULT_YEARS = 10
+BETA_CAP = 2.0                # raw beta above this is capped before the Blume adjustment (see docstring)
 
 ASSUMPTION_KEYS = [
     "years", "growth_start", "growth_end", "margin_target", "tax_rate", "da_pct", "capex_pct",
@@ -193,7 +197,7 @@ def defaults(base: dict) -> dict:
         "nwc_pct": round(last["nwc"] / last["revenue"], 4) if last["nwc"] is not None else 0.0,
         "terminal_growth": terminal,
         "risk_free": round(base["riskFree"], 4),
-        "beta": round(0.67 * base["beta"] + 0.33, 2) if base.get("beta") else 1.0,  # Blume-adjusted
+        "beta": round(0.67 * min(base["beta"], BETA_CAP) + 0.33, 2) if base.get("beta") else 1.0,  # capped, Blume-adjusted
         "erp": DEFAULT_ERP,
         "cost_of_debt": round(kd, 4),
         "wacc_override": None,
@@ -339,7 +343,17 @@ def _warnings(base: dict, a: dict, result: dict) -> list:
         out.append(f"The DCF value is under a quarter of today's price. With these assumptions (capex "
                    f"{a['capex_pct']:.0%} of revenue, growth fading to {a['growth_end']:.1%}) the business keeps little "
                    "free cash flow; the market is pricing in faster growth, higher margins or a lower discount rate.")
-    if not base.get("beta"):
+    raw_beta = base.get("beta")
+    if raw_beta and raw_beta > BETA_CAP:
+        out.append(f"Yahoo's 5-year beta for this stock is {raw_beta:.2f}, which would make the discount rate very high. "
+                   f"Betas that high usually come from one boom or crash, so the default caps raw beta at {BETA_CAP:.1f} "
+                   f"(adjusted beta {0.67 * BETA_CAP + 0.33:.2f}). Edit the beta to use your own.")
+    margins = [x["ebit"] / x["revenue"] for x in base["history"][-3:]]
+    if len(margins) == 3 and margins[-1] > 0 and margins[0] < margins[1] < margins[2] and margins[-1] - margins[0] >= 0.03:
+        out.append(f"Operating margin has risen every year, from {margins[0]:.0%} to {margins[-1]:.0%}. The default holds "
+                   f"{margins[-1]:.0%} for the whole forecast, which is cautious. If you expect margins to keep improving, "
+                   "raise the final-year EBIT margin.")
+    if not raw_beta:
         out.append("Yahoo has no beta for this stock (usually too little trading history), so a beta of 1.0 is used.")
     if base.get("shareNote"):
         out.append(base["shareNote"])
