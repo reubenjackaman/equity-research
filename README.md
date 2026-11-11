@@ -184,7 +184,7 @@ How the defaults are set (all editable in the app):
 | Tax, D&A, capex | 3-year averages (as % of revenue or pre-tax income) |
 | Working capital | (Receivables + Inventory − Payables) ÷ Revenue, latest year |
 | Risk-free rate | Today's 10-year US Treasury yield |
-| Beta | Blume-adjusted: 0.67 × Yahoo beta + 0.33 |
+| Beta | Blume-adjusted: 0.67 × min(Yahoo beta, 2.0) + 0.33. Raw betas above 2 usually reflect one boom or crash (Shopify's 2.66), so they're capped |
 | Equity risk premium | 5% |
 | Cost of debt | Interest expense ÷ average debt; risk-free + 1.5% if not reported |
 | Terminal growth | 2.5% |
